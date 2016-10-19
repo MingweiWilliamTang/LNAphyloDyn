@@ -39,9 +39,9 @@ arma::mat chols(arma::mat S){
 }
 
 //[[Rcpp::export()]]
-mat mvrnormArma(int n, mat sigma) {
+arma::mat mvrnormArma(int n, arma::mat sigma) {
   int ncols = sigma.n_cols;
-  mat Y = randn(ncols,1);
+  arma::mat Y = randn(ncols,1);
   return chols(sigma) * Y;
 }
 
@@ -54,25 +54,25 @@ double log_like_traj(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
                      int gridsize,double t_correct = 90){
   arma::cube Acube = as<arma::cube>(Filter[0]);
   arma::cube Scube = as<arma::cube>(Filter[1]);
-  
+
   int k = SdeTraj.n_rows-1;
   double loglik = 0;
 //  int id1,id0;
-  
+
   arma:vec Xd1, Xd0;
-  
+
    Xd0 = Xd1 = (SdeTraj.submat(0,1,0,2)-OdeTraj.submat(0,1,0,2)).t();
 // Xd0 = Xd1 = (SdeTraj.submat(0,1,0,3) - OdeTraj.submat(0,1,0,3)).t();
   for(int i = 0; i < k; i++){
     Xd0 = Xd1;
   //  id0 = i * gridsize;
   //  id1 = (i+1) * gridsize - 1;
-   
+
     arma::mat SigInv = inv2(Scube.slice(i) );
     arma::mat A = Acube.slice(i);
-    
+
     Xd1 = (SdeTraj.submat((i+1),1,(i+1),2)-OdeTraj.submat(i+1,1,i+1,2)).t();
-    
+
     if(SdeTraj(i+1,0) <= t_correct){
     arma::mat INexp = ((Xd1 - A * Xd0).t() * SigInv * (Xd1 - A * Xd0));
     loglik += log(arma::det(SigInv)) - 0.5 * INexp(0,0);
@@ -84,8 +84,8 @@ double log_like_traj(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
   loglik += log(arma::det(SigInv)) * 1.5 - 0.5 * INexp(0,0);
  */
   }
- 
-  return loglik;  
+
+  return loglik;
 }
 
 /*
@@ -119,7 +119,7 @@ List IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2){
     invec(1) = exp(-Traj_par(i,2));
     invec(2) = exp(-Traj_par(i,3));
     Xinv = diagmat(invec);
-    F0 = F0 + F*dt; 
+    F0 = F0 + F*dt;
     Sigma = Sigma + (Sigma * F.t() + F * Sigma + Xinv * A.t() * H * A * Xinv) * dt;
   }
   List Res;
@@ -147,7 +147,7 @@ List IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2){
     invec(0) = exp(-Traj_par(i,1));
     invec(1) = exp(-Traj_par(i,2));
     Xinv = diagmat(invec);
-    F0 = F0 + F*dt; 
+    F0 = F0 + F*dt;
     Sigma = Sigma + (Sigma * F.t() + F * Sigma + Xinv * A.t() * H * A * Xinv) * dt;
   }
   List Res;
@@ -218,9 +218,9 @@ List Traj_sim(arma::vec initial, arma::mat OdeTraj, List Filter,double t_correct
   arma::cube Acube = as<arma::cube>(Filter[0]);
   arma::cube Scube = as<arma::cube>(Filter[1]);
   int k = OdeTraj.n_rows-1;
-  
+
   arma::vec X0,X1 = initial,eta0(2),eta1 = initial;
-  
+
   double loglike = 0;
   arma::mat LNA_traj(k+1,3);
   LNA_traj(0,0) = 0;
@@ -228,19 +228,19 @@ List Traj_sim(arma::vec initial, arma::mat OdeTraj, List Filter,double t_correct
   LNA_traj.submat(0,1,0,2) = initial.t();
 //  Rcout<<"test1"<<endl;
   for(int i = 0; i< k; i++){
-  
+
     arma::mat Sig = Scube.slice((i));
  //   arma::mat SigInv = inv2(Scube.slice(i).submat(0,0,1,1));
     arma::mat A = Acube.slice(i);
-     
+
     X0 = X1;
-    
+
     eta0 = eta1;
     eta1 = OdeTraj.submat(i+1, 1, i+1, 2).t();
 //    Rcout<<"test2"<<endl;
     arma::mat noise = mvrnormArma(2,Sig);
-    
-    X1 = A * (X0 - eta0) + eta1 + noise; 
+
+    X1 = A * (X0 - eta0) + eta1 + noise;
     //Rcout<<noise.submat(0,0,1,0)<<endl;
    if(OdeTraj(i+1,0) <= t_correct){
     arma::mat l1 = (-0.5) * noise.t() * inv2(Sig) * noise;
@@ -252,14 +252,14 @@ List Traj_sim(arma::vec initial, arma::mat OdeTraj, List Filter,double t_correct
     LNA_traj(i+1,0) = OdeTraj((i+1), 0);
     LNA_traj.submat(i+1,1,i+1,2) = X1.t();
   }
-  
+
   List Res;
   Res["SimuTraj"] = LNA_traj;
   Res["loglike"] = loglike;
   return Res;
 }
 
-// Simulate a LNA trajectory and give the corresponding loglikelihood at the same time 
+// Simulate a LNA trajectory and give the corresponding loglikelihood at the same time
 //[[Rcpp::export()]]
 List Traj_sim_ez(arma::vec initial, arma::vec times,double theta1, double theta2,
         int gridsize,double t_correct = 90){
@@ -273,33 +273,33 @@ List Traj_sim_ez(arma::vec initial, arma::vec times,double theta1, double theta2
     OdeTraj.submat(i,0,i,2) = OdeTraj_thin.submat(i*gridsize,0,i*gridsize,2);
   }
   List Filter = SIR_log_KOM_Filter2(OdeTraj_thin,theta1,theta2,gridsize);
-  
+
   arma::cube Acube = as<arma::cube>(Filter[0]);
   arma::cube Scube = as<arma::cube>(Filter[1]);
    k = OdeTraj.n_rows-1;
-  
+
   arma::vec X0,X1 = initial,eta0(2),eta1 = initial;
-  
+
   double loglike = 0;
   arma::mat LNA_traj(k+1,3);
   LNA_traj(0,0) = 0;
-  
+
   LNA_traj.submat(0,1,0,2) = initial.t();
   //  Rcout<<"test1"<<endl;
   for(int i = 0; i< k; i++){
-    
+
     arma::mat Sig = Scube.slice((i));
     //   arma::mat SigInv = inv2(Scube.slice(i).submat(0,0,1,1));
     arma::mat A = Acube.slice(i);
-    
+
     X0 = X1;
-    
+
     eta0 = eta1;
     eta1 = OdeTraj.submat(i+1, 1, i+1, 2).t();
     //    Rcout<<"test2"<<endl;
     arma::mat noise = mvrnormArma(2,Sig);
-    
-    X1 = A * (X0 - eta0) + eta1 + noise; 
+
+    X1 = A * (X0 - eta0) + eta1 + noise;
     //Rcout<<noise.submat(0,0,1,0)<<endl;
    if(OdeTraj((i+1), 0) <= t_correct){
     arma::mat l1 = (-0.5) * noise.t() * inv2(Sig) * noise;
@@ -311,21 +311,21 @@ List Traj_sim_ez(arma::vec initial, arma::vec times,double theta1, double theta2
     LNA_traj(i+1,0) = OdeTraj((i+1), 0);
     LNA_traj.submat(i+1,1,i+1,2) = X1.t();
   }
-  
+
   List Res;
   Res["SimuTraj"] = LNA_traj;
   Res["loglike"] = loglike;
   return Res;
 }
 
-/* 
+/*
  * In put a SDE path trajectory of log-transformed SIR and the parameter value,
  return the loglikelihood
  */
 //[[Rcpp::export()]]
 double log_like_traj2(arma::mat SdeTraj,arma::vec times,arma::vec state,
                       double theta1,double theta2,int gridsize,double t_correct = 90){
-  
+
 // generate the ODE path, calculate mean and covariance in the transition probability
   int k = SdeTraj.n_rows-1;
   arma::vec param(2);
@@ -338,13 +338,13 @@ double log_like_traj2(arma::mat SdeTraj,arma::vec times,arma::vec state,
     OdeTraj.submat(i,0,i,2) = OdeTraj_thin.submat(i*gridsize,0,i*gridsize,2);
   }
   List Filter = SIR_log_KOM_Filter2(OdeTraj_thin,theta1,theta2,gridsize);
-  arma::cube Acube = as<arma::cube>(Filter[0]); 
+  arma::cube Acube = as<arma::cube>(Filter[0]);
   arma::cube Scube = as<arma::cube>(Filter[1]);
 
-  
+
   double loglik = 0;
   //  int id1,id0;
-  
+
   arma:vec Xd1, Xd0;
   Xd0 = Xd1 = (SdeTraj.submat(0,1,0,2)-OdeTraj.submat(0,1,0,2)).t();
   // Xd0 = Xd1 = (SdeTraj.submat(0,1,0,3) - OdeTraj.submat(0,1,0,3)).t();
@@ -353,10 +353,10 @@ double log_like_traj2(arma::mat SdeTraj,arma::vec times,arma::vec state,
     Xd0 = Xd1;
     //  id0 = i * gridsize;
     //  id1 = (i+1) * gridsize - 1;
-    
+
     arma::mat SigInv = inv2(Scube.slice(i) );
     arma::mat A = Acube.slice(i);
-    
+
     Xd1 = (SdeTraj.submat((i+1),1,(i+1),2)-OdeTraj.submat(i+1,1,i+1,2)).t();
     if(OdeTraj(i+1,0) <= t_correct){
     arma::mat INexp = ((Xd1 - A * Xd0).t() * SigInv * (Xd1 - A * Xd0));
@@ -369,13 +369,13 @@ double log_like_traj2(arma::mat SdeTraj,arma::vec times,arma::vec state,
      loglik += log(arma::det(SigInv)) * 1.5 - 0.5 * INexp(0,0);
      */
   }
-  
-  return loglik;  
+
+  return loglik;
 }
 
 /*
  * Input the initial list, return the log coalescent likelihood
- * 
+ *
  */
 //[[Rcpp::export()]]
 double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int gridsize = 1){
@@ -404,13 +404,13 @@ double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int
   if(as<int>(init[9]) != f2.n_rows){
     Rcout<<"Incorrect length for f"<<endl;
   }
-  
+
   arma::vec gridrep;
   gridrep = as<vec>(init[6]);
   int k = sum(as<arma::vec>(init[6]));
-  
+
   arma::vec f(k);
-  
+
   int start = 0;
   for(int i = 0; i< f2.n_rows; i++){
     for(int j = 0; j<gridrep(i);j++){
@@ -438,13 +438,13 @@ double coal_loglik_step(List init, arma::mat f1, double t_correct, double lambda
   if(as<int>(init[9]) != f2.n_rows){
     Rcout<<"Incorrect length for f"<<endl;
   }
-  
+
   arma::vec gridrep;
   gridrep = as<vec>(init[6]);
   int k = sum(as<arma::vec>(init[6]));
-  
+
   arma::vec f(k);
-  
+
   int start = 0;
   for(int i = 0; i< f2.n_rows; i++){
     for(int j = 0; j<gridrep(i);j++){
@@ -460,35 +460,35 @@ double coal_loglik_step(List init, arma::mat f1, double t_correct, double lambda
 
 
 /*
- * Input the current trajectory and the ODE trajectory as well as the 
- * 
+ * Input the current trajectory and the ODE trajectory as well as the
+ *
  */
 //[[Rcpp::export()]]
 arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
                     List init, double t_correct, double lambda=10, int reps=1, int gridsize = 100){
-  // OdeTraj is the one with low resolution 
+  // OdeTraj is the one with low resolution
   arma::mat newTraj(f_cur.n_rows, f_cur.n_cols);
   for(int count = 0; count < reps; count ++){
     // centered the old trajectory without time grid
     arma::mat f_cur_centered = f_cur.cols(1,2) - OdeTraj.cols(1,2);
-    
+
     //simulate a new trajectory
     List v = Traj_sim(state,OdeTraj,FTs);
     arma::mat v_traj = as<mat>(v[0]).cols(1,2) -  OdeTraj.cols(1,2);
-    
+
     double u = R::runif(0,1);
     double logy = coal_loglik(init,f_cur,t_correct,lambda,gridsize) + log(u);
-    
+
     double theta = R::runif(0,2 * pi);
     double theta_min = theta - 2*pi;
     double theta_max = theta;
-      
+
     arma::mat f_prime = f_cur_centered * cos(theta) + v_traj * sin(theta);
     newTraj.col(0) = f_cur.col(0);
     newTraj.cols(1,2) = f_prime + OdeTraj.cols(1,2);
     while(coal_loglik(init,newTraj,t_correct,lambda,gridsize) <= logy){
     // shrink the bracket
-    
+
     if(theta < 0){
       theta_min = theta;
     }else{
@@ -507,21 +507,21 @@ arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
 /*
 List SampleS1(double s1,double s2,double state,double theta1,double theta2,
               double lambda,bool init = true){
- 
+
   double s1_new;
   if(init == true){
-    s1_new = s1 * exp(R::runif(-1,1)); 
+    s1_new = s1 * exp(R::runif(-1,1));
   }else{
     s1_new = s1 + R::runif(-0.5,0.5) * 0.000002;
   }
   arma::vec param_new(2);
   param_new(0) = s1_new;
   param_new(1) = s1_new * s2;
-  arma::mat Ode_Traj_thin_new = ODE(log(state),times, 
+  arma::mat Ode_Traj_thin_new = ODE(log(state),times,
                            param_new);
 }
-  
+
  */
-  
-  
-  
+
+
+
