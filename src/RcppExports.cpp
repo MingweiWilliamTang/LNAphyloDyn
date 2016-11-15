@@ -214,8 +214,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // ESlice
-arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, double t_correct, double lambda, int reps, int gridsize);
-RcppExport SEXP LNAPhyloDyn_ESlice(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP) {
+arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, double t_correct, double lambda, int reps, int gridsize, std::string funname);
+RcppExport SEXP LNAPhyloDyn_ESlice(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP funnameSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -228,26 +228,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< int >::type reps(repsSEXP);
     Rcpp::traits::input_parameter< int >::type gridsize(gridsizeSEXP);
-    rcpp_result_gen = Rcpp::wrap(ESlice(f_cur, OdeTraj, FTs, state, init, t_correct, lambda, reps, gridsize));
-    return rcpp_result_gen;
-END_RCPP
-}
-// ESlice2
-arma::mat ESlice2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, double t_correct, double lambda, int reps, int gridsize);
-RcppExport SEXP LNAPhyloDyn_ESlice2(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type f_cur(f_curSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type OdeTraj(OdeTrajSEXP);
-    Rcpp::traits::input_parameter< List >::type FTs(FTsSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type state(stateSEXP);
-    Rcpp::traits::input_parameter< List >::type init(initSEXP);
-    Rcpp::traits::input_parameter< double >::type t_correct(t_correctSEXP);
-    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< int >::type reps(repsSEXP);
-    Rcpp::traits::input_parameter< int >::type gridsize(gridsizeSEXP);
-    rcpp_result_gen = Rcpp::wrap(ESlice2(f_cur, OdeTraj, FTs, state, init, t_correct, lambda, reps, gridsize));
+    Rcpp::traits::input_parameter< std::string >::type funname(funnameSEXP);
+    rcpp_result_gen = Rcpp::wrap(ESlice(f_cur, OdeTraj, FTs, state, init, t_correct, lambda, reps, gridsize, funname));
     return rcpp_result_gen;
 END_RCPP
 }

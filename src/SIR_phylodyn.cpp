@@ -216,6 +216,7 @@ List Traj_sim(arma::vec initial, arma::mat OdeTraj, List Filter,double t_correct
 }
 
 // Simulate a LNA trajectory and give the corresponding loglikelihood at the same time
+
 //[[Rcpp::export()]]
 List Traj_sim_ez(arma::vec initial, arma::vec times,double theta1, double theta2,
         int gridsize,double t_correct = 90,std::string funname = "standard"){
@@ -228,7 +229,7 @@ List Traj_sim_ez(arma::vec initial, arma::vec times,double theta1, double theta2
   for(int i = 0; i< k + 1; i++){
     OdeTraj.submat(i,0,i,2) = OdeTraj_thin.submat(i*gridsize,0,i*gridsize,2);
   }
-  List Filter = SIR_log_KOM_Filter2(OdeTraj_thin,theta1,theta2,gridsize);
+  List Filter = SIR_log_KOM_Filter2(OdeTraj_thin,theta1,theta2,gridsize,funname);
 
   arma::cube Acube = as<arma::cube>(Filter[0]);
   arma::cube Scube = as<arma::cube>(Filter[1]);
@@ -293,7 +294,7 @@ double log_like_traj2(arma::mat SdeTraj,arma::vec times,arma::vec state,
   for(int i = 0; i< SdeTraj.n_rows; i++){
     OdeTraj.submat(i,0,i,2) = OdeTraj_thin.submat(i*gridsize,0,i*gridsize,2);
   }
-  List Filter = SIR_log_KOM_Filter2(OdeTraj_thin,theta1,theta2,gridsize);
+  List Filter = SIR_log_KOM_Filter2(OdeTraj_thin,theta1,theta2,gridsize,funname);
   arma::cube Acube = as<arma::cube>(Filter[0]);
   arma::cube Scube = as<arma::cube>(Filter[1]);
 
@@ -419,7 +420,7 @@ double coal_loglik_step(List init, arma::mat f1, double t_correct, double lambda
  * Input the current trajectory and the ODE trajectory as well as the
  *
  */
-//[[Rcpp::export()]]
+/*
 arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
                  List init, double t_correct, double lambda=10, int reps=1, int gridsize = 100){
   // OdeTraj is the one with low resolution
@@ -467,10 +468,12 @@ arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
   return newTraj;
 }
 
+*/
+
 
 //[[Rcpp::export()]]
-arma::mat ESlice2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
-                  List init, double t_correct, double lambda=10, int reps=1, int gridsize = 100){
+arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
+                  List init, double t_correct, double lambda=10, int reps=1, int gridsize = 100,std::string funname = "standard"){
   // OdeTraj is the one with low resolution
   arma::mat newTraj(f_cur.n_rows, f_cur.n_cols);
   double logy;
@@ -487,8 +490,11 @@ arma::mat ESlice2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
       Rcout<<OdeTraj<<endl;
     }
     double u = R::runif(0,1);
-    logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
-
+    if(funname == "standard"){
+      logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
+    }else{
+      logy = coal_loglik(init,f_cur,t_correct,lambda,gridsize) + log(u);
+    }
     double theta = R::runif(0,2 * pi);
     double theta_min = theta - 2*pi;
     double theta_max = theta;

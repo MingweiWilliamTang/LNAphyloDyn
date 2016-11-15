@@ -61,11 +61,7 @@ coal_loglik_step <- function(init, f1, t_correct, lambda, gridsize = 1L) {
     .Call('LNAPhyloDyn_coal_loglik_step', PACKAGE = 'LNAPhyloDyn', init, f1, t_correct, lambda, gridsize)
 }
 
-ESlice <- function(f_cur, OdeTraj, FTs, state, init, t_correct, lambda = 10, reps = 1L, gridsize = 100L) {
-    .Call('LNAPhyloDyn_ESlice', PACKAGE = 'LNAPhyloDyn', f_cur, OdeTraj, FTs, state, init, t_correct, lambda, reps, gridsize)
-}
-
-ESlice2 <- function(f_cur, OdeTraj, FTs, state, init, t_correct, lambda = 10, reps = 1L, gridsize = 100L) {
-    .Call('LNAPhyloDyn_ESlice2', PACKAGE = 'LNAPhyloDyn', f_cur, OdeTraj, FTs, state, init, t_correct, lambda, reps, gridsize)
+ESlice <- function(f_cur, OdeTraj, FTs, state, init, t_correct, lambda = 10, reps = 1L, gridsize = 100L, funname = "standard") {
+    .Call('LNAPhyloDyn_ESlice', PACKAGE = 'LNAPhyloDyn', f_cur, OdeTraj, FTs, state, init, t_correct, lambda, reps, gridsize, funname)
 }
 
