@@ -40,6 +40,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// expM
+arma::mat expM(arma::mat A);
+RcppExport SEXP LNAPhyloDyn_expM(SEXP ASEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
+    rcpp_result_gen = Rcpp::wrap(expM(A));
+    return rcpp_result_gen;
+END_RCPP
+}
 // log_like_traj
 double log_like_traj(arma::mat SdeTraj, arma::mat OdeTraj, List Filter, int gridsize, double t_correct);
 RcppExport SEXP LNAPhyloDyn_log_like_traj(SEXP SdeTrajSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP) {

@@ -13,6 +13,10 @@ mvrnormArma <- function(n, sigma) {
     .Call('LNAPhyloDyn_mvrnormArma', PACKAGE = 'LNAPhyloDyn', n, sigma)
 }
 
+expM <- function(A) {
+    .Call('LNAPhyloDyn_expM', PACKAGE = 'LNAPhyloDyn', A)
+}
+
 log_like_traj <- function(SdeTraj, OdeTraj, Filter, gridsize, t_correct = 90) {
     .Call('LNAPhyloDyn_log_like_traj', PACKAGE = 'LNAPhyloDyn', SdeTraj, OdeTraj, Filter, gridsize, t_correct)
 }

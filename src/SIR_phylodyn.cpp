@@ -1,6 +1,7 @@
 //@copyright Mingwei
 //#include<RcppArmadilloExtensions/sample.h>
 #include<RcppArmadillo.h>
+#include "basic_util.h"
 //[[Rcpp::depends(RcppArmadillo)]]
 #include<Rcpp.h>
 #include<R.h>
@@ -15,34 +16,6 @@ arma::mat Fm_log_LNA(double X,double Y,double theta1,double theta2){
   M << theta1 * exp(Y-X)/2 << -theta1*exp(Y)-theta1/2*exp(Y-X) <<arma::endr
     <<theta1*exp(X)-theta1*exp(X-Y)/2 << theta1*exp(X-Y)/2+theta2/2*exp(-Y)<<arma::endr;
   return M;
-}
-
-
-//[[Rcpp::export()]]
-arma::mat inv2(arma::mat a){
-  arma::mat res(2,2);
-  res(0,0) = a(1,1);
-  res(1,1) = a(0,0);
-  res(1,0) = -a(1,0);
-  res(0,1) = -a(0,1);
-  double D = res(0,0) * res(1,1) - res(1,0) * res(0,1);
-  return res * (1/D);
-}
-
-//[[Rcpp::export()]]
-arma::mat chols(arma::mat S){
-  arma::mat res(2,2);
-  res(0,0) = sqrt(S(0,0));
-  res(0,1) = S(1,0) / res(0,0);
-  res(1,1) = sqrt(S(1,1) - res(1,0) * res(1,0));
-  return res;
-}
-
-//[[Rcpp::export()]]
-arma::mat mvrnormArma(int n, arma::mat sigma) {
-  int ncols = sigma.n_cols;
-  arma::mat Y = randn(ncols,1);
-  return chols(sigma) * Y;
 }
 
 double coal_log_like_hetero(arma::vec ts, arma::vec traj, List gene){
@@ -192,7 +165,6 @@ arma::vec SIR_ODE(double X,double Y,double theta1,double theta2){
   return res;
 }
 
-
 //[[Rcpp::export()]]
 arma::mat ODE(arma::vec initial, arma::vec t, arma::vec param){
   int n = t.n_rows;
@@ -212,6 +184,7 @@ arma::mat ODE(arma::vec initial, arma::vec t, arma::vec param){
   }
   return OdeTraj;
 }
+
 
 //[[Rcpp::export()]]
 List Traj_sim(arma::vec initial, arma::mat OdeTraj, List Filter,double t_correct = 90){

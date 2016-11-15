@@ -1,6 +1,5 @@
 #include "basic_util.h"
 
-
 //[[Rcpp::export()]]
 arma::mat inv2(arma::mat a){
   arma::mat res(2,2);
