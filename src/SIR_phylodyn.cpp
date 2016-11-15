@@ -2,6 +2,8 @@
 //#include<RcppArmadilloExtensions/sample.h>
 #include<RcppArmadillo.h>
 #include "basic_util.h"
+#include "SIR_LNA.h"
+#include "SIR_log_LNA.h"
 //[[Rcpp::depends(RcppArmadillo)]]
 #include<Rcpp.h>
 #include<R.h>
@@ -11,12 +13,30 @@ using namespace Rcpp;
 using namespace arma;
 # define pi           3.1415926535897932384
 
-arma::mat Fm_log_LNA(double X,double Y,double theta1,double theta2){
-  arma::mat M;
-  M << theta1 * exp(Y-X)/2 << -theta1*exp(Y)-theta1/2*exp(Y-X) <<arma::endr
-    <<theta1*exp(X)-theta1*exp(X-Y)/2 << theta1*exp(X-Y)/2+theta2/2*exp(-Y)<<arma::endr;
-  return M;
+typedef arma::vec (*ODEfuncPtr)(double,double,double,double);
+typedef List (*IntSfun)(arma::mat,double,double,double);
+
+
+
+
+XPtr<ODEfuncPtr> putFunPtrInXPtr(std::string funname){
+  if(funname == "log"){
+    return(XPtr<ODEfuncPtr>(new ODEfuncPtr(&SIR_ODE)));
+  }else{
+    return(XPtr<ODEfuncPtr>(new ODEfuncPtr(&SIR_ODE2)));
+  }
 }
+
+
+XPtr<IntSfun> putIntSFun(std::string funname){
+  if(funname == "log"){
+    return XPtr<IntSfun>(new IntSfun(&IntSigma));
+  }else{
+    return XPtr<IntSfun>(new IntSfun(&IntSigma2));
+  }
+}
+
+
 
 double coal_log_like_hetero(arma::vec ts, arma::vec traj, List gene){
   return 1.0;
@@ -102,36 +122,9 @@ List IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2){
 }
 */
 
-List IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2){
-  arma::mat Sigma,F(2,2);
-  Sigma.zeros(2,2);
-  int k = Traj_par.n_rows;
-  arma::mat A;
-  arma::vec h(2);
-  A << -1 << 1 <<arma::endr<<0<<-1<<arma::endr;
-  arma::mat H,F0,Xinv;
-  F0.zeros(2,2);
-  for(int i = 0; i < k; i++){
-    h(0)= theta1*exp(Traj_par(i,1)+Traj_par(i,2));
-    h(1) = theta2*exp(Traj_par(i,2));
-    H = diagmat(h);
-    F = Fm_log_LNA(Traj_par(i,1),Traj_par(i,2),theta1,theta2);
-    arma::vec invec(2);
-    invec(0) = exp(-Traj_par(i,1));
-    invec(1) = exp(-Traj_par(i,2));
-    Xinv = diagmat(invec);
-    F0 = F0 + F*dt;
-    Sigma = Sigma + (Sigma * F.t() + F * Sigma + Xinv * A.t() * H * A * Xinv) * dt;
-  }
-  List Res;
-  Res["expF"] = expmat(F0);
-  Res["Simga"] = Sigma + 0.000000001 * eye(2,2);
-  return Res;
-}
-
-
 //[[Rcpp::export()]]
-List SIR_log_KOM_Filter2(arma::mat OdeTraj,double theta1,double theta2,int gridsize){
+List SIR_log_KOM_Filter2(arma::mat OdeTraj,double theta1,double theta2,int gridsize,std::string funname = "standard"){
+  XPtr<IntSfun> IntS = putIntSFun(funname);
   int n = OdeTraj.n_rows;
   double dt = (OdeTraj(1,0) - OdeTraj(0,0));
   int k = (n-1) / gridsize;
@@ -141,7 +134,7 @@ List SIR_log_KOM_Filter2(arma::mat OdeTraj,double theta1,double theta2,int grids
   for(int i=0;i<k;i++){
 //    Rcout<<i<<endl;
     Traj_part = OdeTraj.submat(i*gridsize,0,(i+1)*gridsize-1,2);
-    List tempres(IntSigma(Traj_part,dt,theta1,theta2));
+    List tempres((*IntS)(Traj_part,dt,theta1,theta2));
     Acube.slice(i) = as<arma::mat>(tempres[0]);
     Scube.slice(i) = as<arma::mat>(tempres[1]);
   }
@@ -152,21 +145,12 @@ List SIR_log_KOM_Filter2(arma::mat OdeTraj,double theta1,double theta2,int grids
 }
 
 // The deterministic part of SIR after Ito transformation
-//[[Rcpp::export()]]
-arma::vec SIR_ODE(double X,double Y,double theta1,double theta2){
-  double dx,dy,dz;
-  dx = -theta1 * exp(Y) - theta1*exp(Y-X)/2;
-  dy = theta1 * exp(X) - theta2 - theta1 * exp(X-Y)/2 - theta2 *exp(-Y)/2;
-//  dz = theta2*exp(Y-Z) - theta2*exp(Y-2*Z)/2;
- arma::vec res(2);
-  res(0) = dx;
-  res(1) = dy;
-//  res(2) = dz;
-  return res;
-}
+
+
 
 //[[Rcpp::export()]]
-arma::mat ODE(arma::vec initial, arma::vec t, arma::vec param){
+arma::mat ODE(arma::vec initial, arma::vec t, arma::vec param, std::string funname){
+  XPtr<ODEfuncPtr> SIR_ODEfun = putFunPtrInXPtr(funname);
   int n = t.n_rows;
   double dt = t[1] - t[0];
   arma::mat OdeTraj(n,3);
@@ -175,16 +159,15 @@ arma::mat ODE(arma::vec initial, arma::vec t, arma::vec param){
   arma::vec X0 = initial, k1=initial, k2=initial, k3=initial, k4=initial,X1=initial;
   for(int i = 1; i < n; i++){
     X0 = X1;
-    k1 = SIR_ODE(X0[0],X0[1],param[0],param[1]);
-    k2 = SIR_ODE(X0[0]+k1[0]*dt/2,X0[1]+k1[1]*dt/2,param[0],param[1]);
-    k3 = SIR_ODE(X0[0]+k2[0]*dt/2,X0[1]+k2[1]*dt/2,param[0],param[1]);
-    k4 = SIR_ODE(X0[0]+k3[0]*dt/2,X0[1]+k3[1]*dt/2,param[0],param[1]);
+    k1 = (*SIR_ODEfun)(X0[0],X0[1],param[0],param[1]);
+    k2 = (*SIR_ODEfun)(X0[0]+k1[0]*dt/2,X0[1]+k1[1]*dt/2,param[0],param[1]);
+    k3 = (*SIR_ODEfun)(X0[0]+k2[0]*dt/2,X0[1]+k2[1]*dt/2,param[0],param[1]);
+    k4 = (*SIR_ODEfun)(X0[0]+k3[0]*dt/2,X0[1]+k3[1]*dt/2,param[0],param[1]);
     X1 = X0 + (k1/6 + k2/3 + k3/3 + k4/6) * dt;
     OdeTraj.submat(i,1,i,2) = X1.t();
   }
   return OdeTraj;
 }
-
 
 //[[Rcpp::export()]]
 List Traj_sim(arma::vec initial, arma::mat OdeTraj, List Filter,double t_correct = 90){
@@ -235,12 +218,12 @@ List Traj_sim(arma::vec initial, arma::mat OdeTraj, List Filter,double t_correct
 // Simulate a LNA trajectory and give the corresponding loglikelihood at the same time
 //[[Rcpp::export()]]
 List Traj_sim_ez(arma::vec initial, arma::vec times,double theta1, double theta2,
-        int gridsize,double t_correct = 90){
+        int gridsize,double t_correct = 90,std::string funname = "standard"){
   int k = times.n_rows / gridsize;
   arma::vec param(2);
   param(0) = theta1;
   param(1) = theta2;
-  arma::mat OdeTraj_thin = ODE(initial,times,param);
+  arma::mat OdeTraj_thin = ODE(initial,times,param,funname);
   arma::mat OdeTraj(k+1,3);
   for(int i = 0; i< k + 1; i++){
     OdeTraj.submat(i,0,i,2) = OdeTraj_thin.submat(i*gridsize,0,i*gridsize,2);
@@ -297,7 +280,7 @@ List Traj_sim_ez(arma::vec initial, arma::vec times,double theta1, double theta2
  */
 //[[Rcpp::export()]]
 double log_like_traj2(arma::mat SdeTraj,arma::vec times,arma::vec state,
-                      double theta1,double theta2,int gridsize,double t_correct = 90){
+                      double theta1,double theta2,int gridsize,double t_correct = 90,std::string funname = "standard"){
 
 // generate the ODE path, calculate mean and covariance in the transition probability
   int k = SdeTraj.n_rows-1;
@@ -305,7 +288,7 @@ double log_like_traj2(arma::mat SdeTraj,arma::vec times,arma::vec state,
   param(0) = theta1;
   param(1) = theta2;
 
-  arma::mat OdeTraj_thin = ODE(state,times,param);
+  arma::mat OdeTraj_thin = ODE(state,times,param,funname);
   arma::mat OdeTraj(k+1,3);
   for(int i = 0; i< SdeTraj.n_rows; i++){
     OdeTraj.submat(i,0,i,2) = OdeTraj_thin.submat(i*gridsize,0,i*gridsize,2);
@@ -438,19 +421,24 @@ double coal_loglik_step(List init, arma::mat f1, double t_correct, double lambda
  */
 //[[Rcpp::export()]]
 arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
-                    List init, double t_correct, double lambda=10, int reps=1, int gridsize = 100){
+                 List init, double t_correct, double lambda=10, int reps=1, int gridsize = 100){
   // OdeTraj is the one with low resolution
   arma::mat newTraj(f_cur.n_rows, f_cur.n_cols);
+  double logy;
   for(int count = 0; count < reps; count ++){
     // centered the old trajectory without time grid
     arma::mat f_cur_centered = f_cur.cols(1,2) - OdeTraj.cols(1,2);
-
+    //f_cur_centered(0,1)=0;
+    //f_cur_centered(0,0)=0;
     //simulate a new trajectory
     List v = Traj_sim(state,OdeTraj,FTs);
     arma::mat v_traj = as<mat>(v[0]).cols(1,2) -  OdeTraj.cols(1,2);
-
+    if(v_traj.has_nan()){
+      Rcout<<v_traj<<endl;
+      Rcout<<OdeTraj<<endl;
+    }
     double u = R::runif(0,1);
-    double logy = coal_loglik(init,f_cur,t_correct,lambda,gridsize) + log(u);
+    logy = coal_loglik(init,f_cur,t_correct,lambda,gridsize) + log(u);
 
     double theta = R::runif(0,2 * pi);
     double theta_min = theta - 2*pi;
@@ -459,42 +447,71 @@ arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
     arma::mat f_prime = f_cur_centered * cos(theta) + v_traj * sin(theta);
     newTraj.col(0) = f_cur.col(0);
     newTraj.cols(1,2) = f_prime + OdeTraj.cols(1,2);
+    int i = 0;
     while(coal_loglik(init,newTraj,t_correct,lambda,gridsize) <= logy){
-    // shrink the bracket
-
-    if(theta < 0){
-      theta_min = theta;
-    }else{
-      theta_max = theta;
+      // shrink the bracket
+      i = 1;
+      if(theta < 0){
+        theta_min = theta;
+      }else{
+        theta_max = theta;
+      }
+      theta = R::runif(theta_min,theta_max);
+      f_prime = f_cur_centered * cos(theta) + v_traj * sin(theta);
+      // newTraj.col(0) = f_cur.col(0);
+      newTraj.cols(1,2) = f_prime + OdeTraj.cols(1,2);
     }
-    theta = R::runif(theta_min,theta_max);
-    f_prime = f_cur_centered * cos(theta) + v_traj * sin(theta);
-   // newTraj.col(0) = f_cur.col(0);
-    newTraj.cols(1,2) = f_prime + OdeTraj.cols(1,2);
     f_cur = newTraj;
-    }
+    //Rcout<< logy - coal_loglik(init,newTraj,t_correct,lambda,gridsize)<<"1"<<endl;
   }
   return newTraj;
 }
 
-/*
-List SampleS1(double s1,double s2,double state,double theta1,double theta2,
-              double lambda,bool init = true){
 
-  double s1_new;
-  if(init == true){
-    s1_new = s1 * exp(R::runif(-1,1));
-  }else{
-    s1_new = s1 + R::runif(-0.5,0.5) * 0.000002;
+//[[Rcpp::export()]]
+arma::mat ESlice2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
+                  List init, double t_correct, double lambda=10, int reps=1, int gridsize = 100){
+  // OdeTraj is the one with low resolution
+  arma::mat newTraj(f_cur.n_rows, f_cur.n_cols);
+  double logy;
+  for(int count = 0; count < reps; count ++){
+    // centered the old trajectory without time grid
+    arma::mat f_cur_centered = f_cur.cols(1,2) - OdeTraj.cols(1,2);
+    //f_cur_centered(0,1)=0;
+    //f_cur_centered(0,0)=0;
+    //simulate a new trajectory
+    List v = Traj_sim(state,OdeTraj,FTs);
+    arma::mat v_traj = as<mat>(v[0]).cols(1,2) -  OdeTraj.cols(1,2);
+    if(v_traj.has_nan()){
+      Rcout<<v_traj<<endl;
+      Rcout<<OdeTraj<<endl;
+    }
+    double u = R::runif(0,1);
+    logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
+
+    double theta = R::runif(0,2 * pi);
+    double theta_min = theta - 2*pi;
+    double theta_max = theta;
+
+    arma::mat f_prime = f_cur_centered * cos(theta) + v_traj * sin(theta);
+    newTraj.col(0) = f_cur.col(0);
+    newTraj.cols(1,2) = f_prime + OdeTraj.cols(1,2);
+    int i = 0;
+    while(newTraj.min() <=0 || coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize) <= logy){
+      // shrink the bracket
+      i = 1;
+      if(theta < 0){
+        theta_min = theta;
+      }else{
+        theta_max = theta;
+      }
+      theta = R::runif(theta_min,theta_max);
+      f_prime = f_cur_centered * cos(theta) + v_traj * sin(theta);
+      // newTraj.col(0) = f_cur.col(0);
+      newTraj.cols(1,2) = f_prime + OdeTraj.cols(1,2);
+    }
+    f_cur = newTraj;
+    //Rcout<< logy - coal_loglik(init,newTraj,t_correct,lambda,gridsize)<<"1"<<endl;
   }
-  arma::vec param_new(2);
-  param_new(0) = s1_new;
-  param_new(1) = s1_new * s2;
-  arma::mat Ode_Traj_thin_new = ODE(log(state),times,
-                           param_new);
+  return newTraj;
 }
-
- */
-
-
-
