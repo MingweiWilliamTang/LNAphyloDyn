@@ -382,6 +382,7 @@ double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int
 
 //[[Rcpp::export()]]
 double coal_loglik_step(List init, arma::mat f1, double t_correct, double lambda, int gridsize = 1){
+
   int n0 = 0;
   while(f1(n0,0) < t_correct){
     n0 ++;
@@ -490,12 +491,13 @@ arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
       Rcout<<OdeTraj<<endl;
     }
     double u = R::runif(0,1);
-    if(funname == "standard"){
+  //  if(funname == "standard"){
       logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
-    }else{
-      logy = coal_loglik(init,f_cur,t_correct,lambda,gridsize) + log(u);
-    }
+ //   }else{
+ //     logy = coal_loglik(init,f_cur,t_correct,lambda,gridsize) + log(u);
+  //    }
     double theta = R::runif(0,2 * pi);
+
     double theta_min = theta - 2*pi;
     double theta_max = theta;
 
@@ -503,9 +505,11 @@ arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
     newTraj.col(0) = f_cur.col(0);
     newTraj.cols(1,2) = f_prime + OdeTraj.cols(1,2);
     int i = 0;
-    while(newTraj.min() <=0 || coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize) <= logy){
+    while(newTraj.cols(1,2).min() <0 || coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize) <= logy){
       // shrink the bracket
-      i = 1;
+      i += 1;
+      if(i>20){break;
+        Rcout<<theta<<endl;}
       if(theta < 0){
         theta_min = theta;
       }else{
@@ -516,8 +520,11 @@ arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
       // newTraj.col(0) = f_cur.col(0);
       newTraj.cols(1,2) = f_prime + OdeTraj.cols(1,2);
     }
+
     f_cur = newTraj;
+   // Rcout<<coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize) <<endl;
     //Rcout<< logy - coal_loglik(init,newTraj,t_correct,lambda,gridsize)<<"1"<<endl;
   }
+  Rcout<<coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize) <<endl;
   return newTraj;
 }

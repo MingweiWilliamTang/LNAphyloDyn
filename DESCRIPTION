@@ -1,18 +1,27 @@
 Package: LNAPhyloDyn
 Type: Package
-Title: Bayesian inference on coalescent-based phylodynamics using linear noise approximation
+Title: Bayesian inference on coalescent-based phylodynamics using linear noise
+    approximation
 Version: 0.1.0
 Authors@R: c(
     person("Mingwei", "Tang", email = "mingwt@uw.edu", role = "cre"),
     person("Vladimir", "Minin", email = "vminin@uw.edu", role = "aut"))
 Maintainer: Mingwei Tang <mingwt@uw.edu>
-Description: Bayesian inference on coalescent-based phylodynamics using linear noise approximation
+Description: Bayesian inference on coalescent-based phylodynamics using linear
+    noise approximation
 License: What license is it under?
 LazyData: TRUE
 LinkingTo: Rcpp,RcppArmadillo
-Depends: R (>= 3.1.0), RcppArmadillo, Rcpp (>= 0.11.5),abind, smfsb, Matrix
+Depends:
+    R (>= 3.1.0),
 Imports:
-  Rcpp,
-  RcppArmadillo,
-  smfsb,
-  Matrix
+    Rcpp,
+    RcppArmadillo,
+    smfsb,
+    Matrix,
+    abind,
+    smfsb,
+    Matrix,
+    graphics,
+    stats
+RoxygenNote: 5.0.1

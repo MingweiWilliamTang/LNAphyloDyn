@@ -1,11 +1,4 @@
-#'
-#'
-#'@param eff_pop a two dimensional vector of time and the corresponding trajectory of infectious population
-#'@param t_correct the actual time point of sampled_time=0
-#'
-#'
-#'
-#'
+
 coalsim_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, lambda=1, ...)
 {
   coal_times = NULL
@@ -13,6 +6,8 @@ coalsim_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, lambda=1, 
 
   curr = 1
   active_lineages = n_sampled[curr]
+  samp_times = t_correct - samp_times[length(samp_times):1]
+  n_sampled = t_correct - n_sampled[length(n_sampled):1]
   time = samp_times[curr]
 
   traj = eff_pop[,2]/lambda
@@ -20,7 +15,7 @@ coalsim_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, lambda=1, 
   active_lineages = n_sampled[curr]
   # time = 0
   i = which.min(ts>=0) - 1
-
+  traj2 = traj[i:1]
   while (time <= max(samp_times) || active_lineages > 1)
   {
     if (active_lineages == 1)
@@ -31,11 +26,12 @@ coalsim_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, lambda=1, 
     }
 
     time = time + rexp(1, 0.5*active_lineages*(active_lineages-1))
-
+    if(time >= t_correct){
+      time = t_correct
+    }
     if(i==0) break
     while(time>ts[i]){
-      i = i-1
-      if(i==0) {
+     if(i==0) {
         i = 1
         break
       }
@@ -125,64 +121,6 @@ coal_loglik_hom = function(eff_pop,t_correct,gene,lambda){
 
 
 
-gene2 = coalsim_thin_sir(EP,45,samp_times = seq(0,30,length.out=50),rep(2,50),100)
-
-EP2=out2[,c(1,3)]
-gene2 = coalsim_thin_sir_Hom(EP2,80,200,1)
-
-plot(EP[,1],EP[,2],type="l",ylab="infected population",xlab = "coalesent time")
-points(45-gene2$coal_times,rep(100,length(gene2$coal_times)),pch=3,cex=0.5)
-
-lines(90-res_BNPR$data$time,exp(res_BNPR$data$E_log))
-
-
-EP = out[,c(1,3)]
-gene = coalsim_thin_sir_Hom(EP,80,200,1)
-plot(EP[,1],EP[,2],type="l",ylab="infected population",xlab = "coalesent time")
-points(80-gene$coal_times,rep(100,length(gene$coal_times)),pch=3,cex=0.5)
-
-# scaled by the population size
-EP3 = out[,c(1,3)]
-gene3 = coalsim_thin_sir(EP3,90,samp_times = seq(0,70,length.out=50),rep(1,50),10)
-plot(EP3[,1],EP3[,2],type="l",ylab="infected population",xlab = "coalesent time")
-points(90-gene3$coal_times,rep(50,length(gene3$coal_times)),pch=3,cex=0.5)
-
-s2 = coal_lik_init(seq(0,70,length.out=50),rep(1,50),gene3$coal_times,seq(0,100,by=0.5),t_correct = 90)
-
-
-EP = out2[,c(1,3)]
-
-gene2 = coalsim_thin_sir(EP,45,samp_times = seq(0,30,length.out=50),rep(2,50),100)
-plot(EP[,1],EP[,2],type="l",ylab="infected population",xlab = "coalesent time")
-points(45-gene2$coal_times,rep(1000,length(gene2$coal_times)),pch=3,cex=0.5)
-init2 = coal_lik_init(seq(0,30,length.out = 50),rep(1,50),gene2$coal_times,
-                      seq(0,50,by=0.2),t_correct = 45)
-
-
-coal_loglik(s2,out.log.coarse,90,10)
-coal_loglik(s2,tjj,90,10)
-
-res_BNPR = BNPR(data = gene, lengthout = 100)
-plot_BNPR(res_BNPR, traj = exp, main="BNPR", ylim = c(1, 700))
-nsamp = 500
-nburnin = 100
-res_MCMC = mcmc_sampling(data = gene, alg = 'splitHMC', nsamp = nsamp,
-                         nburnin = nburnin)
-plot_BNPR(BNPR_out = res_BNPR, traj = exp_traj, col = "blue", traj_col = "black")
-lines(res_MCMC$med_fun, pch="", col='red', lwd=1)
-lines(res_MCMC$low_fun, pch="", col='red', lwd=1, lty=1)
-lines(res_MCMC$up_fun,  pch="", col='red', lwd=1, lty=1)
-legend('topleft',c('Truth','BNPR',"splitHMC"),
-       col=c('black','blue','red'),lwd=c(1,2.5,2.5),bty='n', lty=c(2,1,1))
-
-traj = exp_traj
-samp_times = 0
-n_sampled  = 100
-gene = coalsim(samp_times = samp_times, n_sampled = n_sampled, traj = traj, lower_bound = 1/20)
-
-
-############################
-
 
 
 # f is log effective samplesize
@@ -221,8 +159,10 @@ coal_lik_init = function(samp_times, n_sampled, coal_times, grid, t_correct)
 {
   ns = length(samp_times)
   nc = length(coal_times)
+  samp_times = samp_times[ns:1]
+  coal_times = coal_times[nc:1]
 
-  n0 = which.min(grid < t_correct)
+  n0 = which.min(grid <= t_correct)
   grid = grid[1:n0]
   ng = length(grid)-1
 
