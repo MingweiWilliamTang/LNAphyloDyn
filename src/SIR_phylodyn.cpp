@@ -246,6 +246,9 @@ List Traj_sim_ez(arma::vec initial, arma::vec times,double theta1, double theta2
   for(int i = 0; i< k; i++){
 
     arma::mat Sig = Scube.slice((i));
+    if(Sig(0,0)<0){
+      Rcout<<i<<endl;
+    }
     //   arma::mat SigInv = inv2(Scube.slice(i).submat(0,0,1,1));
     arma::mat A = Acube.slice(i);
 
@@ -349,7 +352,7 @@ double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int
     }
   }
   ff((f1.n_rows-1) * gridsize) = f1(f1.n_rows-1,2);
-  while(tf(n0) < t_correct){
+  while(tf(n0) <= t_correct){
     n0 ++;
   }
 //  Rcout<<n0<<endl;
@@ -360,6 +363,7 @@ double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int
 //  Rcout<<f2.n_rows<<"\t"<<as<int>(init[9])<<endl;
   if(as<int>(init[9]) != f2.n_rows){
     Rcout<<"Incorrect length for f"<<endl;
+    Rcout<<f2.n_rows<<"\t"<<as<int>(init[9])<<endl;
   }
 
   arma::vec gridrep;
@@ -525,6 +529,6 @@ arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
    // Rcout<<coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize) <<endl;
     //Rcout<< logy - coal_loglik(init,newTraj,t_correct,lambda,gridsize)<<"1"<<endl;
   }
-  Rcout<<coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize) <<endl;
+//Rcout<<coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize) <<endl;
   return newTraj;
 }

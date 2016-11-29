@@ -27,7 +27,7 @@ arma::mat mvrnormArma(int n, arma::mat sigma) {
  arma::mat Y = randn(ncols,1);
   arma::mat res = chols(sigma) * Y;
   if(res.has_nan()){
-    Rcout<<"666"<<chols(sigma)<<endl;
+    Rcout<<"666"<<sigma<<endl;
   }
   return res;
 }

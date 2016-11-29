@@ -761,18 +761,22 @@ MCMC_initialize2 = function(MCMC_setting){ #, prior_par = c(10,20,-2.3,200,40)){
 
   S = MCMC_setting$N * alpha1 / (alpha1  + 1)
   I = MCMC_setting$N / (alpha1 + 1)
+  S=10000
+  I=1000
   state = c(X = S, Y = I)
 
   logMultiNorm = NaN
   ########
   while(is.nan(logMultiNorm)){
 
-    s1 = runif(1,1,10)
-    s2 = exp(rnorm(1,MCMC_setting$c1,0.4))
-    theta1 = s1 * s2 / MCMC_setting$N
-    theta2 = s2
-    #s2 = theta2
-    #s1 = theta1 * MCMC_setting$N / s2
+    #s1 = runif(1,1,10)
+    #s2 = exp(rnorm(1,MCMC_setting$c1,0.4))
+    #theta1 = s1 * s2 / MCMC_setting$N
+    #theta2 = s2
+    theta1 = 0.000015
+    theta2 = 0.05
+    s2 = theta2
+    s1 = theta1 * MCMC_setting$N / s2
     param = c(theta1 = theta1, theta2 = theta2)
 
     #Ode_Traj_thin <- ODE(log(state),times,param)
@@ -817,8 +821,8 @@ SIR_LNA_MCMC = function(coal_obs,times,t_correct,N,gridsize=1000,niter = 1000,bu
   # MCMC_obj$LatentTraj = Traj
   # MCMC_obj$LogS2 =
   # MCMC_obj$LogLambda
-  # MCMC_obj$par[1]=9999
-  # MCMC_obj$par[2]=1000
+   MCMC_obj$par[1]=10000
+   MCMC_obj$par[2]=1000
   params = matrix(nrow = niter, ncol = 5)
   l = numeric(niter)
   l1 = l
@@ -829,8 +833,8 @@ SIR_LNA_MCMC = function(coal_obs,times,t_correct,N,gridsize=1000,niter = 1000,bu
     if (i %% 100 == 0) {
       print(i)
     }
-    step1 = updateAlphas(MCMC_obj,MCMC_setting,i)#  MCMC_obj = step1$MCMC_obj
-    MCMC_obj = step1$MCMC_obj
+    #step1 = updateAlphas(MCMC_obj,MCMC_setting,i)#  MCMC_obj = step1$MCMC_obj
+  #  MCMC_obj = step1$MCMC_obj
     step2 = updateS1(MCMC_obj,MCMC_setting,i)
     # MCMC_obj = Like_Free(step2$MCMC_obj,MCMC_setting,i)$MCMC_obj
     MCMC_obj = step2$MCMC_obj

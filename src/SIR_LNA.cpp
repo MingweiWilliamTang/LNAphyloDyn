@@ -29,7 +29,10 @@ List IntSigma2(arma::mat Traj_par,double dt,double theta1,double theta2){
   }
   List Res;
   Res["expF"] = expM(F0);
-  Res["Simga"] = Sigma + 0.0000000001 * eye(2,2);
+  Res["Simga"] = (Sigma + 0.00000000001 * eye(2,2));
+  if(Sigma.has_nan()){
+    Rcout<<Traj_par<<endl;
+  }
   return Res;
 }
 

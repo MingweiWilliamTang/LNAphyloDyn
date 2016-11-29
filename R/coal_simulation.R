@@ -6,16 +6,15 @@ coalsim_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, lambda=1, 
 
   curr = 1
   active_lineages = n_sampled[curr]
-  samp_times = t_correct - samp_times[length(samp_times):1]
-  n_sampled = t_correct - n_sampled[length(n_sampled):1]
   time = samp_times[curr]
 
   traj = eff_pop[,2]/lambda
+  #traj[1]=0.00000000001
   ts = (t_correct-eff_pop[,1])
   active_lineages = n_sampled[curr]
   # time = 0
   i = which.min(ts>=0) - 1
-  traj2 = traj[i:1]
+
   while (time <= max(samp_times) || active_lineages > 1)
   {
     if (active_lineages == 1)
@@ -25,26 +24,27 @@ coalsim_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, lambda=1, 
       time = samp_times[curr]
     }
 
-    time = time + rexp(1, 0.5*active_lineages*(active_lineages-1))
-    if(time >= t_correct){
-      time = t_correct
-    }
-    if(i==0) break
+    time = time + rexp(1, 0.5*active_lineages*(active_lineages-1)*10)
+
+    i = which.min(ts>=0) - 1
     while(time>ts[i]){
-     if(i==0) {
+      i = i-1
+      if(i==0) {
+        print("i=0")
         i = 1
         break
       }
     }
-    thed = (traj[i] + traj[i+1])/2
+    thed = traj[i]
     if (curr < length(samp_times) && time >= samp_times[curr + 1])
     {
       curr = curr + 1
       active_lineages = active_lineages + n_sampled[curr]
       time = samp_times[curr]
     }
-    else if (runif(1) <= 1/thed)
+    else if (runif(1) <= 1/(10 * thed) )
     {
+      time = min(c(time,t_correct))
       coal_times = c(coal_times, time)
       lineages = c(lineages, active_lineages)
       active_lineages = active_lineages - 1
