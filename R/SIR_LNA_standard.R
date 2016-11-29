@@ -79,7 +79,7 @@ updateS1 = function(MCMC_obj, MCMC_setting, i){
   s1 = MCMC_obj$par[3] / MCMC_obj$par[4] * MCMC_setting$N
   #s1_new = pmin(pmax(s1 + runif(1,-0.5,0.5), 3),6)
   s1_new = s1 + runif(1,-0.25,0.25)
-  if(s1_new <3 || s1_new > 6){
+  if(s1_new <1 || s1_new > 10){
    # theta1_new = s1_new * MCMC_obj$par[4] / MCMC_setting$N
    # MCMC_obj$par[3] = theta1_new
     return(list(MCMC_obj = MCMC_obj, AR = 0))
@@ -331,6 +331,7 @@ SIR_LNA_MCMC_standard = function(coal_obs,times,t_correct,N,gridsize=1000, niter
   # MCMC_obj$LogLambda
    MCMC_obj$par[1] = 10000
    MCMC_obj$par[2] = 1000
+  # MCMC_obj$par[4] = 0.05
   params = matrix(nrow = niter, ncol = 5)
   l = numeric(niter)
   l1 = l
@@ -345,13 +346,13 @@ SIR_LNA_MCMC_standard = function(coal_obs,times,t_correct,N,gridsize=1000, niter
   #  print(c(MCMC_obj$coalLog,MCMC_obj$logMultiNorm))
     #  MCMC_obj = step1$MCMC_obj
    # MCMC_obj = step1$MCMC_obj
-   # step2 = updateS1(MCMC_obj,MCMC_setting,i)
-  #  MCMC_obj = step2$MCMC_obj
-   # step3 = updateS2(MCMC_obj,MCMC_setting,i)
-    #MCMC_obj = step3$MCMC_obj
+    step2 = updateS1(MCMC_obj,MCMC_setting,i)
+    MCMC_obj = step2$MCMC_obj
+    step3 = updateS2(MCMC_obj,MCMC_setting,i)
+    MCMC_obj = step3$MCMC_obj
    MCMC_obj = updateTraj(MCMC_obj,MCMC_setting,i)$MCMC_obj
-    step4 = updateLambda(MCMC_obj,MCMC_setting,i)
-    MCMC_obj = step4$MCMC_obj
+   # step4 = updateLambda(MCMC_obj,MCMC_setting,i)
+    #MCMC_obj = step4$MCMC_obj
     tjs = abind(tjs,MCMC_obj$LatentTraj,along = 3)
     params[i,] = MCMC_obj$par
     l[i] =  MCMC_obj$logMultiNorm #+ MCMC_obj$LogAlpha1 + MCMC_obj$LogAlpha2
