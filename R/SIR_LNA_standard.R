@@ -78,8 +78,8 @@ updateAlphas = function(MCMC_obj,MCMC_setting,i){
 updateS1 = function(MCMC_obj, MCMC_setting, i){
   s1 = MCMC_obj$par[3] / MCMC_obj$par[4] * MCMC_setting$N
   #s1_new = pmin(pmax(s1 + runif(1,-0.5,0.5), 3),6)
-  s1_new = s1 + runif(1,-0.25,0.25)
-  if(s1_new <1 || s1_new > 10){
+  s1_new = s1 + runif(1,-0.45,0.45)
+  if(s1_new <3 || s1_new > 6){
    # theta1_new = s1_new * MCMC_obj$par[4] / MCMC_setting$N
    # MCMC_obj$par[3] = theta1_new
     return(list(MCMC_obj = MCMC_obj, AR = 0))
@@ -227,6 +227,28 @@ updateLambda = function(MCMC_obj,MCMC_setting, i){
   return(list(MCMC_obj = MCMC_obj, AR = AR))
 }
 
+
+
+
+updateLambdaUnifProp = function(MCMC_obj,MCMC_setting, i){
+  lambda_new = MCMC_obj$par[5] + runif(1,-50,50)
+  if(lambda_new < 300 || lambda_new > 900){
+    return(list(MCMC_obj = MCMC_obj, AR = 0))
+  }
+  coalLog_new = coal_loglik(MCMC_setting$Init,LogTraj(MCMC_obj$LatentTraj),MCMC_setting$t_correct,lambda_new,MCMC_setting$gridsize)
+  a = min(c(exp(coalLog_new - MCMC_obj$coalLog), 1))
+  AR = 0
+  #print(coalLog_new - MCMC_obj$coalLog + dgamma(log(lambda_new),MCMC_setting$d1,MCMC_setting$d2,log = T) -
+  #       MCMC_obj$LogLambda)
+  if(runif(1,0,1) < a){
+    # rec[i,5] = 1
+    AR = 1
+    #MCMC_obj$LogLambda = dgamma(log(lambda_new),MCMC_setting$d1,MCMC_setting$d2,log = T)
+    MCMC_obj$coalLog = coalLog_new
+    MCMC_obj$par[5] = lambda_new
+  }
+  return(list(MCMC_obj = MCMC_obj, AR = AR))
+}
 
 
 updateTraj = function(MCMC_obj,MCMC_setting,i){
