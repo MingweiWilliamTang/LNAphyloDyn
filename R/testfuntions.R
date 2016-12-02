@@ -17,7 +17,6 @@ Geweke_S1_S2_Traj = function(gridsize,nn=100){
     param = c(theta1 = theta1, theta2 = theta2)
     Tjsim = Traj_sim_ez(state,times,theta1,theta2,gridsize,t_correct = 90,"standard")
     Traj2 = Tjsim$SimuTraj
-    print(Traj2)
     logMultiNorm = Tjsim$loglike
     G = coalsim_thin_sir(Traj2[,c(1,3)],t_correct = 90,
                          samp_times = c(seq(0,50,length.out=200)),c(rep(3,200)),500)

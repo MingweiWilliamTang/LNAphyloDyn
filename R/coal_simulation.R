@@ -125,36 +125,6 @@ coal_loglik_hom = function(eff_pop,t_correct,gene,lambda){
 
 # f is log effective samplesize
 
-
-coal_loglik = function(init, f, t_correct,lambda,grad=FALSE)
-{
-  n0 = which.min(f[,1] < t_correct)
-  f = f[(n0-1):1,3]
-
-  if (init$ng != length(f))
-    stop(paste("Incorrect length for f; should be", init$ng))
-
-
-
-  f = rep(f, init$gridrep)
-  llnocoal = init$D * init$C * exp(-f)*lambda
-  if (!grad)
-  {
-    lls = init$y * (-f+log(lambda)) - llnocoal
-    #print(lls)
-
-    ll = sum(lls[!is.nan(lls)])
-
-    return(ll)
-  }
-  else
-  {
-    dll = apply(init$rep_idx,1,function(idx)sum(-init$y[idx[1]:idx[2]]+llnocoal[idx[1]:idx[2]])) # gradient of log-likelihood wrt f_midpts
-
-    return(dll)
-  }
-}
-
 coal_lik_init = function(samp_times, n_sampled, coal_times, grid, t_correct)
 {
   ns = length(samp_times)
