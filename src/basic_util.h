@@ -15,5 +15,4 @@ arma::mat mvrnormArma(int n, arma::mat sigma);
 
 arma::mat expM(arma::mat A);
 
-
 #endif /* BASIC_UTIL_H_ */

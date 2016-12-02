@@ -1,4 +1,6 @@
-
+#' @useDynLib LNAPhyloDyn
+#' @importFrom Rcpp sourceCpp
+#'
 simuSIR = function(theta1,theta2,S,I,time){
   R = 0
   SIR = list()
