@@ -1,3 +1,4 @@
+//@copyright Mingwei
 #include "basic_util.h"
 
 //[[Rcpp::export()]]
@@ -61,5 +62,4 @@ arma::mat expM(arma::mat A){
   }
   return M;
 }
-
 

@@ -11,4 +11,4 @@ arma::mat LogTraj(arma::mat Traj);
 arma::vec SIR_ODE2(double X,double Y,double theta1,double theta2);
 
 
-#endif /* SIR_LNA_H_ */
+#endif /* SIR_LNA_H_*/

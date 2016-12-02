@@ -13,7 +13,7 @@ License: What license is it under?
 LazyData: TRUE
 LinkingTo: Rcpp,RcppArmadillo
 Depends:
-    R (>= 3.1.0), Rcpp, RcppArmadillo, abind
+    R (>= 3.1.0), Rcpp (>= 0.11.5), RcppArmadillo, abind
 Imports:
     Rcpp,
     RcppArmadillo,
@@ -25,3 +25,4 @@ Imports:
     graphics,
     stats
 RoxygenNote: 5.0.1
+VignetteBuilder: knitr

@@ -16,4 +16,4 @@ arma::mat expM(arma::mat A);
 
 //arma::mat ODE(arma::vec initial, arma::vec t, arma::vec param);
 
-#endif/* BASIC_UTIL_H_ */
+#endif /* BASIC_UTIL_H_ */
