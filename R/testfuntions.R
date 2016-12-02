@@ -1,6 +1,7 @@
 Geweke_S1_S2_Traj = function(gridsize,nn=100){
   times = seq(0,100,by=0.01)
   a = numeric(nn)
+  b = numeric(nn)
     #Traj2 = Traj_sim_ez(c(10000,1000),seq(0,100,by=0.01),0.000015,0.05,gridsize = 100,90,"standard")$Simu
     gridset = seq(1,length(times),by=gridsize)
     #coal_obj =  list(samp_times = c(seq(0,70,length.out=200)),n_sampled = c(rep(2,200)),
@@ -65,6 +66,7 @@ Geweke_S1_S2_Traj = function(gridsize,nn=100){
 Geweke_S1_Traj_lambda = function(gridsize,nn=100){
   times = seq(0,100,by=0.01)
   a = numeric(nn)
+  b = numeric(nn)
   #Traj2 = Traj_sim_ez(c(10000,1000),seq(0,100,by=0.01),0.000015,0.05,gridsize = 100,90,"standard")$Simu
   gridset = seq(1,length(times),by=gridsize)
   #coal_obj =  list(samp_times = c(seq(0,70,length.out=200)),n_sampled = c(rep(2,200)),
@@ -104,7 +106,7 @@ Geweke_S1_Traj_lambda = function(gridsize,nn=100){
                   LogAlpha1 = NULL, LogS2 = LogS2, LogLambda = NULL)
   for(i in 1:nn){
     MCMC_obj = updateS1(MCMC_obj,MCMC_setting,1)$MCMC_obj
-    MCMC_obj = updateLambdaUnifProp(MCMC_obj, MCMC_setting, 1)
+    MCMC_obj = updateLambdaUnifProp(MCMC_obj, MCMC_setting, 1)$MCMC_obj
     if(i %% 50 == 0){
       print(paste("finish ", i, " iterations"))
     }
