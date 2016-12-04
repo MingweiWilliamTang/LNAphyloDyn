@@ -180,12 +180,14 @@ updateS2 = function(MCMC_obj, MCMC_setting, i){
   if (is.nan(logMultiNorm_new)) {
     a = -1
   }else{
-    a = min(c(exp(dnorm(log(s2_new),MCMC_setting$c1,0.4,log = T) + logMultiNorm_new + coalLog_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog -
+    a = min(c(exp(dnorm(log(s2_new),MCMC_setting$c1,0.15,log = T) + logMultiNorm_new + coalLog_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog -
                     MCMC_obj$LogS2 ),1))
   }
   # print(theta2_new)
   AR = 0
-  if (runif(1,0,1) < a) {
+  if(is.na(a)){
+    AR = 0
+  }else if(runif(1,0,1) < a) {
     AR = 1
     MCMC_obj$par[3] = theta1_new
     MCMC_obj$par[4] = theta2_new
