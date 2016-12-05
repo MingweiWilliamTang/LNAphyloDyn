@@ -34,7 +34,7 @@ Geweke_S1_S2_Traj = function(gridsize,nn=100){
     FT = SIR_log_KOM_Filter2(Ode_Traj_thin,theta1,theta2,MCMC_setting$gridsize,"standard")
     lambda = 500
     coalLog = coal_loglik(MCMC_setting$Init,LogTraj(Traj2),MCMC_setting$t_correct,lambda,MCMC_setting$gridsize)
-    LogS2 = dnorm(log(s2),MCMC_setting$c1,0.4,log = T)
+    LogS2 = dnorm(log(s2),MCMC_setting$c1,0.15,log = T)
     MCMC_obj = list(par = c(S,I,theta1,theta2,lambda),LatentTraj = Traj2, logMultiNorm = logMultiNorm,
                     Ode_Traj_coarse = Ode_Traj_coarse, FT = FT, coalLog = coalLog,
                     LogAlpha1 = NULL, LogS2 = LogS2, LogLambda = NULL)
@@ -88,7 +88,7 @@ Geweke_S1_Traj_lambda = function(gridsize,nn=100){
                        samp_times = c(seq(0,50,length.out=200)),c(rep(3,200)),lambda)
   coal_obj = list(samp_times = c(seq(0,50,length.out=200)),n_sampled = c(rep(3,200)),
                   coal_times = G$coal_times )
-  MCMC_setting = MCMC_setup(coal_obj, times, 90,N, gridsize,niter=1000,burn = 0,thin=1,a1=10,a2=20,b1=60,b2=60,c1=-2.3,
+  MCMC_setting = MCMC_setup(coal_obj, times, 90,N, gridsize,niter=1000,burn = 0,thin=1,a1=10,a2=20,b1=60,b2=60,c1=-3,
                             d1=200,d2=40)
 
   Ode_Traj_thin = ODE(state, MCMC_setting$times,
@@ -99,7 +99,7 @@ Geweke_S1_Traj_lambda = function(gridsize,nn=100){
 
   FT = SIR_log_KOM_Filter2(Ode_Traj_thin,theta1,theta2,MCMC_setting$gridsize,"standard")
   coalLog = coal_loglik(MCMC_setting$Init,LogTraj(Traj2),MCMC_setting$t_correct,lambda,MCMC_setting$gridsize)
-  LogS2 = dnorm(log(s2),MCMC_setting$c1,0.4,log = T)
+  LogS2 = dnorm(log(s2),MCMC_setting$c1,0.15,log = T)
   MCMC_obj = list(par = c(S,I,theta1,theta2,lambda),LatentTraj = Traj2, logMultiNorm = logMultiNorm,
                   Ode_Traj_coarse = Ode_Traj_coarse, FT = FT, coalLog = coalLog,
                   LogAlpha1 = NULL, LogS2 = LogS2, LogLambda = NULL)
@@ -118,7 +118,7 @@ Geweke_S1_Traj_lambda = function(gridsize,nn=100){
                          samp_times = c(seq(0,50,length.out=200)),c(rep(3,200)),MCMC_obj$par[5])
     coal_obj = list(samp_times = c(seq(0,50,length.out=200)),n_sampled = c(rep(3,200)),
                     coal_times = G$coal_times)
-    MCMC_setting = MCMC_setup(coal_obj, times, 90,N,gridsize,niter = 1000, burn = 0,thin=1,a1=10,a2=20,b1=60,b2=60,c1=-2.3,
+    MCMC_setting = MCMC_setup(coal_obj, times, 90,N,gridsize,niter = 1000, burn = 0,thin=1,a1=10,a2=20,b1=60,b2=60,c1=-3,
                               d1=200,d2=40)
     a[i] = MCMC_obj$par[3] * 11000/ MCMC_obj$par[4]
     b[i] = MCMC_obj$par[5]
