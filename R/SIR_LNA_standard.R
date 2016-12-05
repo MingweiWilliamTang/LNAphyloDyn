@@ -187,13 +187,14 @@ updateS2 = function(MCMC_obj, MCMC_setting, i){
   AR = 0
   if(is.na(a)){
     AR = 0
+    print("NA appears")
   }else if(runif(1,0,1) < a) {
     AR = 1
     MCMC_obj$par[3] = theta1_new
     MCMC_obj$par[4] = theta2_new
     MCMC_obj$Ode_Traj_coarse = Ode_Traj_coarse_new
     MCMC_obj$logMultiNorm = logMultiNorm_new
-    MCMC_obj$LogS2 = dnorm(log(s2_new),MCMC_setting$c1,0.4,log = T)
+    MCMC_obj$LogS2 = dnorm(log(s2_new),MCMC_setting$c1,0.15,log = T)
     MCMC_obj$FT = FT_new
     MCMC_obj$coalLog = coalLog_new
     MCMC_obj$LatentTraj = LatentTraj_new
