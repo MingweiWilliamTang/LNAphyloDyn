@@ -26,7 +26,7 @@ List SIRS_IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2,doub
     h(1) = theta2 * Traj_par(i,2);
     h(2) = theta3 * Traj_par(i,3);
     H = diagmat(h);
-    F = Fm_LNA(Traj_par(i,1),Traj_par(i,2), Traj_par(i,3), theta1, theta2, theta3);
+    F = SIRS_Fm_LNA(Traj_par(i,1),Traj_par(i,2), Traj_par(i,3), theta1, theta2, theta3);
     F0 = F0 + F*dt;
     Sigma = Sigma + (Sigma * F.t() + F * Sigma +  A.t() * H * A ) * dt;
   }
