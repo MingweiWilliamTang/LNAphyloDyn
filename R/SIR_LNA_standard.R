@@ -148,7 +148,7 @@ updateS1 = function(MCMC_obj, MCMC_setting, i){
 
 
 updateS2 = function(MCMC_obj, MCMC_setting, i){
-  s2_new = MCMC_obj$par[4] * exp(rnorm(1,0,0.1))
+  s2_new = MCMC_obj$par[4] * exp(runif(1,-0.3,0.3))
   theta1_new = MCMC_obj$par[3] / MCMC_obj$par[4] * s2_new
   theta2_new = s2_new
 
@@ -234,7 +234,7 @@ updateLambda = function(MCMC_obj,MCMC_setting, i){
 
 
 updateLambdaUnifProp = function(MCMC_obj,MCMC_setting, i){
-  lambda_new = MCMC_obj$par[5] + runif(1,-50,50)
+  lambda_new = MCMC_obj$par[5] + runif(1,-100,100)
   if(lambda_new < 300 || lambda_new > 900){
     return(list(MCMC_obj = MCMC_obj, AR = 0))
   }
@@ -278,7 +278,7 @@ MCMC_setup = function(coal_obs,times,t_correct,N,gridsize=50,niter = 1000,burn =
                       gridsize=gridsize,gridset = gridset, niter = niter,burn = burn,thin = thin,
                       a1 = a1, a2 = a2,b1 =b1, b2 = b2, c1= c1,d1 = d1, d2 = d2,
                       reps=1)
-  cat("MCMC set up ready \n")
+  #cat("MCMC set up ready \n")
   return(MCMC_setting)
 }
 
