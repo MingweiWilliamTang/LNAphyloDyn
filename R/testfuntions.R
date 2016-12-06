@@ -77,7 +77,7 @@ Geweke_S1_S2_Traj = function(gridsize,nn=100){
     I = 1000
     N = 11000
     state = c(X = S, Y = I)
-    s1 = runif(1,3,6)
+    s1 = runif(1,3,7)
     s2 = 0.05
     theta1 = s1 * s2 / N
     theta2 = s2
@@ -144,7 +144,7 @@ Geweke_S1_Traj_lambda = function(gridsize,nn=100){
   state = c(X = S, Y = I)
   s1 = runif(1,3,6)
   s2 = 0.05
-  lambda = runif(1,300,900)
+  lambda = runif(1,500,1000)
   theta1 = s1 * s2 / N
   theta2 = s2
   param = c(theta1 = theta1, theta2 = theta2)
