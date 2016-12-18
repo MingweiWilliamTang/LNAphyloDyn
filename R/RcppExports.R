@@ -53,15 +53,35 @@ log_like_traj2 <- function(SdeTraj, times, state, theta1, theta2, gridsize, t_co
     .Call('LNAPhyloDyn_log_like_traj2', PACKAGE = 'LNAPhyloDyn', SdeTraj, times, state, theta1, theta2, gridsize, t_correct, funname)
 }
 
+coal_loglik2 <- function(init, f1, t_correct, lambda, gridsize = 1L) {
+    .Call('LNAPhyloDyn_coal_loglik2', PACKAGE = 'LNAPhyloDyn', init, f1, t_correct, lambda, gridsize)
+}
+
 coal_loglik <- function(init, f1, t_correct, lambda, gridsize = 1L) {
     .Call('LNAPhyloDyn_coal_loglik', PACKAGE = 'LNAPhyloDyn', init, f1, t_correct, lambda, gridsize)
 }
 
-coal_loglik_step <- function(init, f1, t_correct, lambda, gridsize = 1L) {
-    .Call('LNAPhyloDyn_coal_loglik_step', PACKAGE = 'LNAPhyloDyn', init, f1, t_correct, lambda, gridsize)
-}
-
 ESlice <- function(f_cur, OdeTraj, FTs, state, init, t_correct, lambda = 10, reps = 1L, gridsize = 100L, funname = "standard") {
     .Call('LNAPhyloDyn_ESlice', PACKAGE = 'LNAPhyloDyn', f_cur, OdeTraj, FTs, state, init, t_correct, lambda, reps, gridsize, funname)
+}
+
+SIRS_IntSigma <- function(Traj_par, dt, theta1, theta2, theta3, alpha) {
+    .Call('LNAPhyloDyn_SIRS_IntSigma', PACKAGE = 'LNAPhyloDyn', Traj_par, dt, theta1, theta2, theta3, alpha)
+}
+
+SIRS_ODE <- function(states, param, t) {
+    .Call('LNAPhyloDyn_SIRS_ODE', PACKAGE = 'LNAPhyloDyn', states, param, t)
+}
+
+SIRS_KOM_Filter <- function(OdeTraj, param, gridsize) {
+    .Call('LNAPhyloDyn_SIRS_KOM_Filter', PACKAGE = 'LNAPhyloDyn', OdeTraj, param, gridsize)
+}
+
+ODE2 <- function(initial, t, param) {
+    .Call('LNAPhyloDyn_ODE2', PACKAGE = 'LNAPhyloDyn', initial, t, param)
+}
+
+Traj_sim_SIRS <- function(initial, OdeTraj, Filter, t_correct = 90) {
+    .Call('LNAPhyloDyn_Traj_sim_SIRS', PACKAGE = 'LNAPhyloDyn', initial, OdeTraj, Filter, t_correct)
 }
 

@@ -79,7 +79,7 @@ updateS1 = function(MCMC_obj, MCMC_setting, i){
   s1 = MCMC_obj$par[3] / MCMC_obj$par[4] * MCMC_setting$N
   #s1_new = pmin(pmax(s1 + runif(1,-0.5,0.5), 3),6)
   s1_new = s1 + runif(1,-0.45,0.45)
-  if(s1_new <3 || s1_new > 6){
+  if(s1_new <1 || s1_new > 10){
    # theta1_new = s1_new * MCMC_obj$par[4] / MCMC_setting$N
    # MCMC_obj$par[3] = theta1_new
     return(list(MCMC_obj = MCMC_obj, AR = 0))
@@ -123,7 +123,11 @@ updateS1 = function(MCMC_obj, MCMC_setting, i){
     ),1))
   }
   AR = 0
-  if (runif(1,0,1) < a) {
+  if(is.na(a)){
+    AR = 0
+    print("NA appears when update s1")
+    print(s1)
+  }else if (runif(1,0,1) < a) {
     AR = 1
     MCMC_obj$par[3] = theta1_new
     MCMC_obj$Ode_Traj_coarse = Ode_Traj_coarse_new
@@ -218,8 +222,10 @@ updateLambda = function(MCMC_obj,MCMC_setting, i){
   a = min(c(exp(coalLog_new - MCMC_obj$coalLog + dgamma(log(lambda_new),MCMC_setting$d1,MCMC_setting$d2,log = T) -
                   MCMC_obj$LogLambda), 1))
   AR = 0
+
   #print(coalLog_new - MCMC_obj$coalLog + dgamma(log(lambda_new),MCMC_setting$d1,MCMC_setting$d2,log = T) -
   #       MCMC_obj$LogLambda)
+
   if(runif(1,0,1) < a){
     # rec[i,5] = 1
     AR = 1
@@ -227,6 +233,7 @@ updateLambda = function(MCMC_obj,MCMC_setting, i){
     MCMC_obj$coalLog = coalLog_new
     MCMC_obj$par[5] = lambda_new
   }
+
   return(list(MCMC_obj = MCMC_obj, AR = AR))
 }
 
@@ -234,7 +241,7 @@ updateLambda = function(MCMC_obj,MCMC_setting, i){
 
 
 updateLambdaUnifProp = function(MCMC_obj,MCMC_setting, i){
-  lambda_new = MCMC_obj$par[5] + runif(1,-100,100)
+  lambda_new = MCMC_obj$par[5] + runif(1,-50,50)
   if(lambda_new < 500 || lambda_new > 1000){
     return(list(MCMC_obj = MCMC_obj, AR = 0))
   }
@@ -273,7 +280,7 @@ MCMC_setup = function(coal_obs,times,t_correct,N,gridsize=50,niter = 1000,burn =
                       a1 = 10, a2 = 20,b1 = 60, b2= 60, c1=-2.3,d1 = 200, d2 =40){
   gridset = seq(1,length(times),by=gridsize)
   grid = times[gridset]
-  Init = coal_lik_init(coal_obs$samp_times, coal_obs$n_sampled, coal_obs$coal_times, times, t_correct)
+  Init = coal_lik_init(coal_obs$samp_times, coal_obs$n_sampled, coal_obs$coal_times, grid, t_correct)
   MCMC_setting = list(Init = Init,times = times,t_correct = t_correct,N = N,
                       gridsize=gridsize,gridset = gridset, niter = niter,burn = burn,thin = thin,
                       a1 = a1, a2 = a2,b1 =b1, b2 = b2, c1= c1,d1 = d1, d2 = d2,
@@ -370,18 +377,18 @@ SIR_LNA_MCMC_standard = function(coal_obs,times,t_correct,N,gridsize=1000, niter
    step1 = updateAlphas(MCMC_obj,MCMC_setting,i)
   #  print(c(MCMC_obj$coalLog,MCMC_obj$logMultiNorm))
       MCMC_obj = step1$MCMC_obj
-    step2 = updateS1(MCMC_obj,MCMC_setting,i)
-    MCMC_obj = step2$MCMC_obj
+ #  step2 = updateS1(MCMC_obj,MCMC_setting,i)
+  #  MCMC_obj = step2$MCMC_obj
     #step3 = updateS2(MCMC_obj,MCMC_setting,i)
     #MCMC_obj = step3$MCMC_obj
    MCMC_obj = updateTraj(MCMC_obj,MCMC_setting,i)$MCMC_obj
    step4 = updateLambda(MCMC_obj,MCMC_setting,i)
-    MCMC_obj = step4$MCMC_obj
+  MCMC_obj = step4$MCMC_obj
     tjs = abind(tjs,MCMC_obj$LatentTraj,along = 3)
     params[i,] = MCMC_obj$par
     l[i] =  MCMC_obj$logMultiNorm #+ MCMC_obj$LogAlpha1 + MCMC_obj$LogAlpha2
     l1[i] = MCMC_obj$coalLog
-    l2[i] = MCMC_obj$LogAlpha1
+    l2[i] = MCMC_obj$logMultiNorm + MCMC_obj$coalLog
     l3[i] = MCMC_obj$LogAlpha1 + MCMC_obj$logMultiNorm + MCMC_obj$LogS2 + MCMC_obj$coalLog + MCMC_obj$LogLambda
   }
   return(list(par = params,Trajectory = tjs,l=l,l1=l1,l2 = l2, l3 =l3))

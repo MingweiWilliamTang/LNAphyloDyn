@@ -183,6 +183,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// coal_loglik2
+double coal_loglik2(List init, arma::mat f1, double t_correct, double lambda, int gridsize);
+RcppExport SEXP LNAPhyloDyn_coal_loglik2(SEXP initSEXP, SEXP f1SEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP gridsizeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type init(initSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type f1(f1SEXP);
+    Rcpp::traits::input_parameter< double >::type t_correct(t_correctSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< int >::type gridsize(gridsizeSEXP);
+    rcpp_result_gen = Rcpp::wrap(coal_loglik2(init, f1, t_correct, lambda, gridsize));
+    return rcpp_result_gen;
+END_RCPP
+}
 // coal_loglik
 double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int gridsize);
 RcppExport SEXP LNAPhyloDyn_coal_loglik(SEXP initSEXP, SEXP f1SEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP gridsizeSEXP) {
@@ -195,21 +210,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< int >::type gridsize(gridsizeSEXP);
     rcpp_result_gen = Rcpp::wrap(coal_loglik(init, f1, t_correct, lambda, gridsize));
-    return rcpp_result_gen;
-END_RCPP
-}
-// coal_loglik_step
-double coal_loglik_step(List init, arma::mat f1, double t_correct, double lambda, int gridsize);
-RcppExport SEXP LNAPhyloDyn_coal_loglik_step(SEXP initSEXP, SEXP f1SEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP gridsizeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type init(initSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type f1(f1SEXP);
-    Rcpp::traits::input_parameter< double >::type t_correct(t_correctSEXP);
-    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< int >::type gridsize(gridsizeSEXP);
-    rcpp_result_gen = Rcpp::wrap(coal_loglik_step(init, f1, t_correct, lambda, gridsize));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -230,6 +230,75 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type gridsize(gridsizeSEXP);
     Rcpp::traits::input_parameter< std::string >::type funname(funnameSEXP);
     rcpp_result_gen = Rcpp::wrap(ESlice(f_cur, OdeTraj, FTs, state, init, t_correct, lambda, reps, gridsize, funname));
+    return rcpp_result_gen;
+END_RCPP
+}
+// SIRS_IntSigma
+List SIRS_IntSigma(arma::mat Traj_par, double dt, double theta1, double theta2, double theta3, double alpha);
+RcppExport SEXP LNAPhyloDyn_SIRS_IntSigma(SEXP Traj_parSEXP, SEXP dtSEXP, SEXP theta1SEXP, SEXP theta2SEXP, SEXP theta3SEXP, SEXP alphaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Traj_par(Traj_parSEXP);
+    Rcpp::traits::input_parameter< double >::type dt(dtSEXP);
+    Rcpp::traits::input_parameter< double >::type theta1(theta1SEXP);
+    Rcpp::traits::input_parameter< double >::type theta2(theta2SEXP);
+    Rcpp::traits::input_parameter< double >::type theta3(theta3SEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    rcpp_result_gen = Rcpp::wrap(SIRS_IntSigma(Traj_par, dt, theta1, theta2, theta3, alpha));
+    return rcpp_result_gen;
+END_RCPP
+}
+// SIRS_ODE
+arma::vec SIRS_ODE(arma::vec states, arma::vec param, double t);
+RcppExport SEXP LNAPhyloDyn_SIRS_ODE(SEXP statesSEXP, SEXP paramSEXP, SEXP tSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type states(statesSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type param(paramSEXP);
+    Rcpp::traits::input_parameter< double >::type t(tSEXP);
+    rcpp_result_gen = Rcpp::wrap(SIRS_ODE(states, param, t));
+    return rcpp_result_gen;
+END_RCPP
+}
+// SIRS_KOM_Filter
+List SIRS_KOM_Filter(arma::mat OdeTraj, arma::vec param, int gridsize);
+RcppExport SEXP LNAPhyloDyn_SIRS_KOM_Filter(SEXP OdeTrajSEXP, SEXP paramSEXP, SEXP gridsizeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type OdeTraj(OdeTrajSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type param(paramSEXP);
+    Rcpp::traits::input_parameter< int >::type gridsize(gridsizeSEXP);
+    rcpp_result_gen = Rcpp::wrap(SIRS_KOM_Filter(OdeTraj, param, gridsize));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ODE2
+arma::mat ODE2(arma::vec initial, arma::vec t, arma::vec param);
+RcppExport SEXP LNAPhyloDyn_ODE2(SEXP initialSEXP, SEXP tSEXP, SEXP paramSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type initial(initialSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type t(tSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type param(paramSEXP);
+    rcpp_result_gen = Rcpp::wrap(ODE2(initial, t, param));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Traj_sim_SIRS
+List Traj_sim_SIRS(arma::vec initial, arma::mat OdeTraj, List Filter, double t_correct);
+RcppExport SEXP LNAPhyloDyn_Traj_sim_SIRS(SEXP initialSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP t_correctSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type initial(initialSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type OdeTraj(OdeTrajSEXP);
+    Rcpp::traits::input_parameter< List >::type Filter(FilterSEXP);
+    Rcpp::traits::input_parameter< double >::type t_correct(t_correctSEXP);
+    rcpp_result_gen = Rcpp::wrap(Traj_sim_SIRS(initial, OdeTraj, Filter, t_correct));
     return rcpp_result_gen;
 END_RCPP
 }

@@ -39,7 +39,7 @@ List SIRS_IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2,doub
   return Res;
 }
 
-
+/*
 //[[Rcpp::export()]]
 arma::vec SIRS_ODE(double X,double Y, double Z, double theta1,double theta2, double theta3){
   double dx, dy, dz;
@@ -53,4 +53,4 @@ arma::vec SIRS_ODE(double X,double Y, double Z, double theta1,double theta2, dou
   //  res(2) = dz;
   return res;
 }
-
+*/

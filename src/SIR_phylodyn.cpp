@@ -338,7 +338,7 @@ double log_like_traj2(arma::mat SdeTraj,arma::vec times,arma::vec state,
  *
  */
 //[[Rcpp::export()]]
-double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int gridsize = 1){
+double coal_loglik2(List init, arma::mat f1, double t_correct, double lambda, int gridsize = 1){
   int n0 = 0;
   arma::vec ff((f1.n_rows-1) * gridsize + 1), tf((f1.n_rows-1) * gridsize + 1);
   for(int j = 0; j < (f1.n_rows - 1); j++){
@@ -385,10 +385,10 @@ double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int
 
 
 //[[Rcpp::export()]]
-double coal_loglik_step(List init, arma::mat f1, double t_correct, double lambda, int gridsize = 1){
+double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int gridsize = 1){
 
   int n0 = 0;
-  while(f1(n0,0) < t_correct){
+  while(f1(n0,0) <= t_correct){
     n0 ++;
   }
   //  Rcout<<n0<<endl;
