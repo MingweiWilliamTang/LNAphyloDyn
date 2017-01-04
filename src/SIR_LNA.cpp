@@ -38,9 +38,10 @@ List IntSigma2(arma::mat Traj_par,double dt,double theta1,double theta2){
 
 //[[Rcpp::export()]]
 arma::mat LogTraj(arma::mat Traj){
+  int p = Traj.n_cols - 1;
   arma::mat logTraj(Traj.n_rows, Traj.n_cols);
   logTraj.col(0) = Traj.col(0);
-  logTraj.cols(1,2) = log(Traj.cols(1,2));
+  logTraj.cols(1,p) = log(Traj.cols(1,p));
   return logTraj;
 }
 

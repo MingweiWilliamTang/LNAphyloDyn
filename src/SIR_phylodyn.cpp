@@ -36,11 +36,36 @@ XPtr<IntSfun> putIntSFun(std::string funname){
   }
 }
 
-
-
-double coal_log_like_hetero(arma::vec ts, arma::vec traj, List gene){
-  return 1.0;
+//[[Rcpp::export()]]
+arma::mat SIR_BD_period_SDE(arma::vec init, double N, arma::vec param, arma::vec t, double period = 40){
+  int n = t.size();
+  int p = init.size();
+  arma::mat H;
+  arma::mat Traj(n,p + 1);
+  Traj.col(0) = t;
+  Traj.submat(0,1,0,p) = init.t();
+  double dt  = t(1) - t(0);
+  double gamma = param(1);
+  double alpha = param(2);
+  double mu = param(3);
+  double F = param(4);
+  double beta = param(0) * (mu + gamma);
+  for( int i = 0; i < n-1; i ++){
+   // double S_new, I_new, R_new;
+    double betat = beta * (1 + alpha * (sin(2 * pi * t(i) / period)));
+    arma::mat noises = randn(2,1);
+    Traj(i+1,1) = Traj(i,1) + (mu * N - mu*Traj(i,1) - (betat*Traj(i,1)*Traj(i,2)/N)) * dt +
+      F*(betat*Traj(i,1)*Traj(i,2)/N) * sqrt(dt) * noises(0,0);
+    Traj(i+1,2) = Traj(i,2) + (betat*Traj(i,1)*Traj(i,2)/N - gamma*Traj(i,2) - mu*Traj(i,2)) * dt +
+      F*(betat*Traj(i,1)*Traj(i,2)/N) * sqrt(dt) * noises(1,0);
+    Traj(i+1,3) = Traj(i,3) + (gamma * Traj(i,2) - mu*Traj(i,3)) * dt;
+  }
+  return Traj;
 }
+
+
+
+
 
 //[[Rcpp::export()]]
 double log_like_traj(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
