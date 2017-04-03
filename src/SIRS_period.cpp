@@ -7,12 +7,45 @@ arma::mat SIRS_Fm_LNA_period(double X,double Y, double Z, double theta1,double t
   arma::mat M;
   double th1 = theta1 * (1 + alpha * sin(t / 40 * 2 * pi));
   M << -th1 * Y << - th1 * X << theta3 <<arma::endr
-    <<th1 * Y<< th1*X - theta2<< 0 <<arma::endr
+    <<th1 * Y << th1 * X -theta2 <<0 <<arma::endr
     <<0 << theta2 << - theta3 <<endr;
+
   return M;
 }
 
+//[[Rcpp::export()]]
+double DegenerateDet3(arma::mat M){
+  return (M(1,1) - M(0,1)) * (M(2,2) - M(0,2)) - (M(1,2) - M(0,1)) * (M(1,2) - M(0,2));
+}
 
+//[[Rcpp::export()]]
+arma::mat PseudoInverse(arma::mat M){
+  double lambda1, lambda2;
+  double delta = (M(1,1) + M(2,2) - M(0,1) - M(0,2)) * (M(1,1) + M(2,2) - M(0,1) - M(0,2)) -
+    4 * ((M(1,1) - M(0,1)) * (M(2,2) - M(0,2)) - (M(1,2) - M(0,1)) * (M(1,2) - M(0,2)));
+  if(delta<0.00000001){
+    Rcout<<delta<<endl;
+  }
+  lambda1 = ((M(1,1) + M(2,2) - M(0,1) - M(0,2)) + sqrt(delta))/2;
+  lambda2 = ((M(1,1) + M(2,2) - M(0,1) - M(0,2)) - sqrt(delta))/2;
+  arma::vec eig1(3), eig2(3);
+  eig1(0) = 1 - ((M(1,2) - M(0,1)) / (M(1,1) - M(0,1) - lambda1));
+  eig1(1) = (M(1,2) - M(0,1)) / (M(1,1) - M(0,1) - lambda1);
+  eig1(2) = -1;
+  eig1 /= arma::norm(eig1);
+  eig2(0) = 1 - ((M(1,2) - M(0,1)) / (M(1,1) - M(0,1) - lambda2));
+  eig2(1) = (M(1,2) - M(0,1)) / (M(1,1) - M(0,1) - lambda2);
+  eig2(2) = -1;
+  eig2 /= arma::norm(eig2);
+  arma::mat invs(3,3);
+  invs.col(0) = eig1;
+  invs.col(1) = eig2;
+  invs.col(2) = sqrt(3) / 3 * arma::ones(3,1);
+  arma::mat invmid = diagmat(arma::zeros(3));
+  invmid(0,0) = 1 / lambda1;
+  invmid(1,1) = 1 / lambda2;
+  return invs * invmid * invs.t();
+}
 //[[Rcpp::export()]]
 List SIRS_IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2,double theta3,double alpha){
   arma::mat Sigma,F(3,3);
@@ -38,19 +71,58 @@ List SIRS_IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2,doub
   }
   List Res;
   Res["expF"] = arma::expmat(F0);
-  Res["Simga"] = (Sigma + 0.00000000001 * eye(3,3));
+  Res["Simga"] = Sigma;
   if(Sigma.has_nan()){
     Rcout<<Traj_par<<endl;
   }
   return Res;
 }
 
+//[[Rcpp::export()]]
+double log_like_trajSIRS(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
+                     int gridsize,double t_correct = 90){
+  arma::cube Acube = as<arma::cube>(Filter[0]);
+  arma::cube Scube = as<arma::cube>(Filter[1]);
+
+  int k = SdeTraj.n_rows - 1;
+  int p = SdeTraj.n_cols - 1;
+  double loglik = 0;
+  //  int id1,id0;
+  arma:vec Xd1, Xd0;
+
+  Xd0 = Xd1 = (SdeTraj.submat(0,1,0,p)-OdeTraj.submat(0,1,0,p)).t();
+  // Xd0 = Xd1 = (SdeTraj.submat(0,1,0,3) - OdeTraj.submat(0,1,0,3)).t();
+  for(int i = 0; i < k; i++){
+    Xd0 = Xd1;
+    //  id0 = i * gridsize;
+    //  id1 = (i+1) * gridsize - 1;
+
+    arma::mat SigInv = PseudoInverse(Scube.slice(i) );
+    arma::mat A = Acube.slice(i);
+
+    Xd1 = (SdeTraj.submat((i+1),1,(i+1),p)-OdeTraj.submat(i+1,1,i+1,p)).t();
+
+    if(SdeTraj(i+1,0) <= t_correct){
+      arma::mat INexp = ((Xd1 - A * Xd0).t() * SigInv * (Xd1 - A * Xd0));
+      // Rcout <<  ((Xd1 - A * Xd0).t() * SigInv * (Xd1 - A * Xd0)) <<endl;
+      loglik += -log(DegenerateDet3(Scube.slice(i))) - 0.5 * INexp(0,0);
+    }
+    /*
+     arma::mat A = Acube.slice(i);
+     arma::mat SigInv = inv2(Scube.slice(i)+0.00001 * eye(3,3));
+     arma::mat INexp = ((Xd1 - A * Xd0).t() * SigInv * (Xd1 - A * Xd0));
+     loglik += log(arma::det(SigInv)) * 1.5 - 0.5 * INexp(0,0);
+     */
+  }
+
+  return loglik;
+}
 
 //[[Rcpp::export()]]
 arma::vec SIRS_ODE(arma::vec states, arma::vec param,double t){
   double dx, dy, dz;
   double th1 = param[0] * (1 + param[3] * sin(2 * pi * t / 40.0));
-  //Rcout<< th1 <<endl;
+//double th1 = exp(param[0] + param[3] * sin(2 * pi * t / 40.0));
   dx = - th1 * states[0] * states[1] + param[2] * states[2];
   dy = th1 * states[0] * states[1] - param[1] * states[1];
   dz = param[1] * states[1] - param[2] * states[2];
@@ -142,10 +214,10 @@ List Traj_sim_SIRS(arma::vec initial, arma::mat OdeTraj, List Filter,double t_co
     X1 = A * (X0 - eta0) + eta1 + noise;
     //Rcout<<noise.submat(0,0,1,0)<<endl;
     if(OdeTraj(i+1,0) <= t_correct){
-      arma::mat l1 = (-0.5) * noise.t() * arma::inv(Sig) * noise;
+      arma::mat l1 = (-0.5) * noise.t() * PseudoInverse(Sig) * noise;
       //     arma::mat l1  = (-0.5) * noise.t() * inv2(Sig + eye(3,3)*0.00001) * noise;
       //    loglike += -1.5 * log(det(Sig+eye(3,3)*0.00001)) + l1(0,0);
-      loglike += -log(det(Sig)) + l1(0,0);
+      loglike += -log(DegenerateDet3(Sig)) + l1(0,0);
     }
     //    Rcout<<"test3"<<endl;
     LNA_traj(i+1,0) = OdeTraj((i+1), 0);
@@ -165,7 +237,7 @@ List Traj_sim_SIRS_ez(arma::vec initial, arma::vec times, arma::vec param,
   int p = initial.n_elem;
   int k = times.n_rows / gridsize;
   arma::mat OdeTraj_thin = ODE2(initial,times,param);
-  arma::mat OdeTraj(k+1,3);
+  arma::mat OdeTraj(k+1,p+1);
   for(int i = 0; i< k + 1; i++){
     OdeTraj.submat(i,0,i,p) = OdeTraj_thin.submat(i*gridsize,0,i*gridsize,p);
   }
@@ -196,16 +268,15 @@ List Traj_sim_SIRS_ez(arma::vec initial, arma::vec times, arma::vec param,
 
     eta0 = eta1;
     eta1 = OdeTraj.submat(i+1, 1, i+1, p).t();
-    //    Rcout<<"test2"<<endl;
     arma::mat noise = mvrnormArma(p,Sig);
 
     X1 = A * (X0 - eta0) + eta1 + noise;
     //Rcout<<noise.submat(0,0,1,0)<<endl;
     if(OdeTraj((i+1), 0) <= t_correct){
-      arma::mat l1 = (-0.5) * noise.t() * arma::inv(Sig) * noise;
+      arma::mat l1 = (-0.5) * noise.t() * PseudoInverse(Sig) * noise;
       //     arma::mat l1  = (-0.5) * noise.t() * inv2(Sig + eye(3,3)*0.00001) * noise;
       //    loglike += -1.5 * log(det(Sig+eye(3,3)*0.00001)) + l1(0,0);
-      loglike += -log(det(Sig)) + l1(0,0);
+      loglike += -log(DegenerateDet3(Sig)) + l1(0,0);
     }
     //    Rcout<<"test3"<<endl;
     LNA_traj(i+1,0) = OdeTraj((i+1), 0);
@@ -221,9 +292,9 @@ List Traj_sim_SIRS_ez(arma::vec initial, arma::vec times, arma::vec param,
 
 //[[Rcpp::export()]]
 arma::mat ESlice_SIRS(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
-                 List init, double t_correct, double lambda=10, int reps=1, int gridsize = 100,std::string funname = "standard"){
+                 List init, double t_correct, double lambda=10, int reps=1, int gridsize = 100, bool volz = false, double beta = 0){
   // OdeTraj is the one with low resolution
-  int p = f_cur.n_rows - 1;
+  int p = f_cur.n_cols - 1;
   arma::mat newTraj(f_cur.n_rows, f_cur.n_cols);
   double logy;
   for(int count = 0; count < reps; count ++){
@@ -240,7 +311,12 @@ arma::mat ESlice_SIRS(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec st
     }
     double u = R::runif(0,1);
     //  if(funname == "standard"){
-    logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
+   // logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
+    if(volz){
+      logy = volz_loglik(init, LogTraj(f_cur), t_correct, beta, gridsize) + log(u);
+    }else{
+      logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
+    }
     //   }else{
     //     logy = coal_loglik(init,f_cur,t_correct,lambda,gridsize) + log(u);
     //    }
@@ -251,13 +327,20 @@ arma::mat ESlice_SIRS(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec st
 
     arma::mat f_prime = f_cur_centered * cos(theta) + v_traj * sin(theta);
     newTraj.col(0) = f_cur.col(0);
-    newTraj.cols(1,2) = f_prime + OdeTraj.cols(1,2);
+    newTraj.cols(1,p) = f_prime + OdeTraj.cols(1,p);
     int i = 0;
-    while(newTraj.cols(1,2).min() <0 || coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize) <= logy){
+    double loglike;
+    if(volz){
+      loglike = volz_loglik(init, LogTraj(newTraj), t_correct, beta, gridsize);
+    }else{
+      loglike = coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize);
+    }
+    while(newTraj.cols(1,p).min() <0 || loglike <= logy){
       // shrink the bracket
       i += 1;
-      if(i>20){break;
+      if(i>20){
         Rcout<<theta<<endl;
+        break;
         }
       if(theta < 0){
         theta_min = theta;
@@ -268,6 +351,11 @@ arma::mat ESlice_SIRS(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec st
       f_prime = f_cur_centered * cos(theta) + v_traj * sin(theta);
       // newTraj.col(0) = f_cur.col(0);
       newTraj.cols(1,p) = f_prime + OdeTraj.cols(1,p);
+      if(volz){
+        loglike = volz_loglik(init, LogTraj(newTraj), t_correct, beta, gridsize);
+      }else{
+        loglike = coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize);
+      }
     }
 
     f_cur = newTraj;
