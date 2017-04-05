@@ -45,18 +45,22 @@ SI_traj_initialize_stan2 = function(input,R0,gamma,mu,A,Alpha){
   state[2] = input$N - state[1]
   beta = R0 * gamma / input$N
   traj = Traj_sim_SIR_BD_ez(state, input$ts, param = c(beta,gamma,input$mu,A), input$gridsize, input$N,
-                            max(input$ts), input$period)$Simu
+                            max(input$ts), input$period)$Simu[2:length(input$tt),]
   plot(traj[,1],traj[,3],type="l")
   return(traj[,2:3])
 }
 
 
 
-para_init_stan = function(input,mu = 0.2){
-  R0 = runif(1,3,6)
+para_init_stan = function(input,mu = 0.2,chains=1){
+  res = list()
+  for(i in 1:chains){
+  R0 = runif(1,1,7)
   gamma = exp(rnorm(1,-3,0.4))
   Alpha = rnorm(1,4,0.5)
   A = runif(1,0,1)
   trajlist = SI_traj_initialize_stan2(input, R0, gamma, mu, A, Alpha)
-  return(list(list(R0=R0,gamma=gamma,Alpha=Alpha,A = A,SI = trajlist)))
+  res[[i]] = list(R0=R0,gamma=gamma,Alpha=Alpha,A = A,SI = trajlist)
+  }
+  return(res)
 }
