@@ -30,7 +30,7 @@ random_trajectory = function(timegrid,trMatrix,color="grey",ylab="infected popul
   k = dim(trMatrix)[2]
   if(is.null(ylim)){
   plot(timegrid,trMatrix[,1],lwd=lwd,col=color,ylab=ylab,
-       ylim=c(min(trMatrix[,1])-500,max(trMatrix[,1])+500),
+       ylim=c(min(trMatrix[,1],na.rm = T)-500,max(trMatrix[,1],na.rm = T)+500),
        main="infectious population vs time",type="l")
   }else{
     plot(timegrid,trMatrix[,1],lwd=lwd,col=color,ylab=ylab,
@@ -51,11 +51,11 @@ random_trajectory_line = function(t,gridsize,trMatrix,color="yellow",lwd=0.5, yl
 
     lines(timegrid,trMatrix[,1],lwd=lwd,col=color,
           ylim=c(min(trMatrix[,1])-500,max(trMatrix[,1])+500),
-          main="infectious population vs time",type="l")
+          main="population vs time",type="l")
   }else{
     lines(timegrid,trMatrix[,1],lwd=lwd,col=color,
           ylim=c(min(trMatrix[,1])-500,max(trMatrix[,1])+500),
-          main="infectious population vs time",type="l")
+          main="population vs time",type="l")
 
   }
   for(i in 2:k){

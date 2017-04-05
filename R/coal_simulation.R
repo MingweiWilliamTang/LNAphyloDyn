@@ -264,5 +264,9 @@ coal_lik_init = function(samp_times, n_sampled, coal_times, grid, t_correct)
   if(gridrep[ng] == 0){
     grid_idx = grid_idx[1:(length(grid_idx)-1)]
   }
-  return(list(t=t, l=l, C=C, D=D, y=y, count=count, gridrep=gridrep, ns=sum(n_sampled), nc=nc, ng=ng, rep_idx=rep_idx, args=list(samp_times=samp_times, n_sampled=n_sampled, coal_times=coal_times, grid=grid),grid_idx = grid_idx))
+  return(list(t=t, l=l, C=C, D=D, y=y, count=count, gridrep=gridrep,
+              ns=sum(n_sampled), nc=nc, ng=ng, rep_idx=rep_idx,
+              args=list(samp_times=samp_times, n_sampled=n_sampled, coal_times=coal_times,
+                        grid=grid),
+              grid_idx = grid_idx))
 }

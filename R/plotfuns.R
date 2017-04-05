@@ -3,27 +3,6 @@
 #source('~/Dropbox/Research/GP/code/LNAPhyloDyn/R/coal_simulation.R', echo=TRUE)
 #source('~/Dropbox/Research/GP/code/LNAPhyloDyn/R/SIR_LNA_standard.R', echo=TRUE)
 
-random_trajectory = function(t,gridsize,trMatrix,color="grey",ylab="infected population",lwd=0.5,margin=500){
-  timegrid = seq(0,t,by=gridsize)
-  k = dim(trMatrix)[2]
-  plot(timegrid,trMatrix[,1],lwd=lwd,col=color,ylab=ylab,
-       ylim=c(min(trMatrix[,1])-margin,max(trMatrix[,1])+margin),
-       main="infectious population vs time",type="l")
-  for(i in 2:k){
-    lines(timegrid,trMatrix[,i],lwd=lwd,col=color)
-  }
-}
-
-
-random_trajectory_line = function(t,gridsize,trMatrix,color="yellow",lwd=0.5){
-  timegrid = seq(0,t,by=gridsize)
-  k = dim(trMatrix)[2]
-  lines(timegrid,trMatrix[,1],lwd=lwd,col=color,ylim=c(min(trMatrix[,1])-500,max(trMatrix[,1])+500),
-        main="infectious population vs time",type="l")
-  for(i in 2:k){
-    lines(timegrid,trMatrix[,i],lwd=lwd,col=color)
-  }
-}
 plot3 = function(traj){
   dev.off()
   par(mfrow = c(2,2),mar=c(4,4,1,1))
