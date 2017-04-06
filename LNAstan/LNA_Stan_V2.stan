@@ -254,7 +254,7 @@ model{
       S[i] = IntSigma(ts[(1+(i-1) * gridsize) : i * gridsize], etas[i], gridsize, theta);
       //SI[i] ~ multi_normal(to_vector(etas[i][gridsize]),S[i]);
 
-       SI[i] ~ multi_normal(to_vector(etas[i]),Si[i]);
+       SI[i] ~ multi_normal(to_vector(etas[i][gridsize]),S[i]);
     }
   }
   increment_log_prob(coal_log_stan(w, C, y, to_vector(tt), tids, append_row(to_row_vector(Init_State),SI), theta, nc));
