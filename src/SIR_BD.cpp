@@ -3,7 +3,7 @@
 #define pi 3.14159265358979323846264338327950288
 
 //[[Rcpp::export()]]
-arma::vec SIR_BD_period_ODE_one(arma::vec states, double N, arma::vec param, double t, double period = 40){
+arma::vec SIR_BD_period_ODE_one(arma::vec states, double N, arma::vec param, double t, double period){
   double dx, dy, dz;
   double th1 = param[0] * (1 + param[3] * sin(2 * pi * t / period));
   //double th1 = exp(param[0] + param[3] * sin(2 * pi * t / 40.0));
@@ -18,7 +18,7 @@ arma::vec SIR_BD_period_ODE_one(arma::vec states, double N, arma::vec param, dou
 }
 
 //[[Rcpp::export()]]
-arma::vec SIR_BD_period_ODE_one2(arma::vec states, double N, arma::vec param, double t, double period = 40){
+arma::vec SIR_BD_period_ODE_one2(arma::vec states, double N, arma::vec param, double t, double period){
   double dx, dy;
   double th1 = param[0] * (1 + param[3] * sin(2 * pi * t / period));
   //double th1 = exp(param[0] + param[3] * sin(2 * pi * t / 40.0));
@@ -33,7 +33,7 @@ arma::vec SIR_BD_period_ODE_one2(arma::vec states, double N, arma::vec param, do
 
 //[[Rcpp::export()]]
 arma::mat SIR_BD_Fm_LNA(double X,double Y, double theta1,double theta2, double mu,double alpha,
-                        double t, double period = 40){
+                        double t, double period){
   arma::mat M;
   double th1 = theta1 * (1 + alpha * sin(t / period * 2 * pi));
   M << - th1 * Y - mu<< - th1 * X <<arma::endr
@@ -43,7 +43,7 @@ arma::mat SIR_BD_Fm_LNA(double X,double Y, double theta1,double theta2, double m
 
 //[[Rcpp::export()]]
 List SIR_BD_IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2,double theta3,double alpha,
-                     double N, double period = 40){
+                     double N, double period){
   arma::mat Sigma,F(2,2);
   Sigma.zeros(2,2);
   int k = Traj_par.n_rows;
@@ -78,7 +78,7 @@ List SIR_BD_IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2,do
 
 //[[Rcpp::export()]]
 arma::mat SIR_BD_ODE(arma::vec initial, arma::vec t, arma::vec param,
-                     double N, double period = 40){
+                     double N, double period){
   // XPtr<ODEfuncPtr> SIR_ODEfun = putFunPtrInXPtr(funname);
   //double N = initial[0] + initial[1] + initial[2];
   int n = t.n_rows;
@@ -101,10 +101,10 @@ arma::mat SIR_BD_ODE(arma::vec initial, arma::vec t, arma::vec param,
   }else{
       for(int i = 1; i < n; i++){
         X0 = X1;
-        k1 = SIR_BD_period_ODE_one(X0,N,param,t[i-1]);
-        k2 = SIR_BD_period_ODE_one(X0 + k1 * dt / 2, N,param, t[i-1]);
-        k3 = SIR_BD_period_ODE_one(X0 + k2 * dt / 2, N,param, t[i-1]);
-        k4 = SIR_BD_period_ODE_one(X0 + k3 * dt / 2, N,param, t[i-1]);
+        k1 = SIR_BD_period_ODE_one(X0,N,param,t[i-1],period);
+        k2 = SIR_BD_period_ODE_one(X0 + k1 * dt / 2, N,param, t[i-1],period);
+        k3 = SIR_BD_period_ODE_one(X0 + k2 * dt / 2, N,param, t[i-1],period);
+        k4 = SIR_BD_period_ODE_one(X0 + k3 * dt / 2, N,param, t[i-1],period);
         X1 = X0 + (k1/6 + k2/3 + k3/3 + k4/6) * dt;
         OdeTraj.submat(i,1,i,p) = X1.t();
     }
@@ -115,7 +115,7 @@ arma::mat SIR_BD_ODE(arma::vec initial, arma::vec t, arma::vec param,
 
 
 //[[Rcpp::export()]]
-arma::mat SIR_BD_SDE(arma::vec init, double N, arma::vec param, arma::vec t, double period = 40){
+arma::mat SIR_BD_SDE(arma::vec init, double N, arma::vec param, arma::vec t, double period){
   int n = t.size();
   int p = init.size();
   arma::mat H;
@@ -156,7 +156,7 @@ arma::mat SIR_BD_SDE(arma::vec init, double N, arma::vec param, arma::vec t, dou
 
 
 //[[Rcpp::export()]]
-arma::mat SIR_BD_period_SDE(arma::vec init, double N, arma::vec param, arma::vec t, double period = 40){
+arma::mat SIR_BD_period_SDE(arma::vec init, double N, arma::vec param, arma::vec t, double period ){
   int n = t.size();
   int p = init.size();
   arma::mat H;
@@ -185,7 +185,7 @@ arma::mat SIR_BD_period_SDE(arma::vec init, double N, arma::vec param, arma::vec
 
 
 //[[Rcpp::export()]]
-List SIR_BD_KOM_Filter(arma::mat OdeTraj, arma::vec param,int gridsize, double N, double period = 40){
+List SIR_BD_KOM_Filter(arma::mat OdeTraj, arma::vec param,int gridsize, double N, double period){
   int n = OdeTraj.n_rows;
   double dt = (OdeTraj(1,0) - OdeTraj(0,0));
   int k = (n-1) / gridsize;
@@ -211,7 +211,7 @@ List SIR_BD_KOM_Filter(arma::mat OdeTraj, arma::vec param,int gridsize, double N
 
 //[[Rcpp::export()]]
 double log_like_trajSIR_BD(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
-                           int gridsize,double t_correct = 90){
+                           int gridsize,double t_correct){
   arma::cube Acube = as<arma::cube>(Filter[0]);
   arma::cube Scube = as<arma::cube>(Filter[1]);
 
@@ -252,7 +252,7 @@ double log_like_trajSIR_BD(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
 
 
 //[[Rcpp::export()]]
-List Traj_sim_SIR_BD(arma::vec initial, arma::mat OdeTraj, List Filter,double t_correct = 90){
+List Traj_sim_SIR_BD(arma::vec initial, arma::mat OdeTraj, List Filter,double t_correct){
   arma::cube Acube = as<arma::cube>(Filter[0]);
   arma::cube Scube = as<arma::cube>(Filter[1]);
   int k = OdeTraj.n_rows - 1;
@@ -301,8 +301,8 @@ List Traj_sim_SIR_BD(arma::vec initial, arma::mat OdeTraj, List Filter,double t_
 
 //[[Rcpp::export()]]
 List Traj_sim_SIR_BD_ez(arma::vec initial, arma::vec times, arma::vec param,
-                        int gridsize, double N,double t_correct = 90,
-                        double period = 40){
+                        int gridsize, double N,double t_correct,
+                        double period){
   //int p = initial.n_elem;
   int p = 2;
   int k = times.n_rows / gridsize;
@@ -311,7 +311,7 @@ List Traj_sim_SIR_BD_ez(arma::vec initial, arma::vec times, arma::vec param,
   for(int i = 0; i< k + 1; i++){
     OdeTraj.submat(i,0,i,p) = OdeTraj_thin.submat(i*gridsize,0,i*gridsize,p);
   }
-  List Filter = SIR_BD_KOM_Filter(OdeTraj_thin,param,gridsize,N);
+  List Filter = SIR_BD_KOM_Filter(OdeTraj_thin,param,gridsize,N,period);
 
   arma::cube Acube = as<arma::cube>(Filter[0]);
   arma::cube Scube = as<arma::cube>(Filter[1]);
@@ -375,7 +375,7 @@ arma::mat ESlice_SIR_BD(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec 
     //f_cur_centered(0,1)=0;
     //f_cur_centered(0,0)=0;
     //simulate a new trajectory
-    List v = Traj_sim_SIR_BD(state,OdeTraj,FTs);
+    List v = Traj_sim_SIR_BD(state,OdeTraj,FTs,t_correct);
     arma::mat v_traj = as<mat>(v[0]).cols(1,p) -  OdeTraj.cols(1,p);
     if(v_traj.has_nan()){
       Rcout<<v_traj<<endl;
@@ -544,7 +544,7 @@ List SIR_BD_SMC(arma::vec params,double N, List init, int D, arma::vec TimeGrid,
         OdeTraj.submat(d,0,d,1) = OdeTrajTemp.submat(int(Pid(d)),0,int(Pid(d)),1);
         arma::mat OneStepODE = SIR_BD_ODE(OdeTraj.submat(d,0,d,1).t(),
                                             ts,params.subvec(0,3), N,period);
-        List tempres = SIR_BD_IntSigma(OneStepODE,dt,beta0,gamma,mu,A, N);
+        List tempres = SIR_BD_IntSigma(OneStepODE,dt,beta0,gamma,mu,A, N,period);
         OdeTrajTemp.submat(d,0,d,1) = OneStepODE.submat(OdeSize,1,OdeSize,2);
         arma::mat F = as<arma::mat>(tempres[0]);
         arma::mat Sigma = as<arma::mat>(tempres[1]);

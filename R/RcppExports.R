@@ -21,47 +21,47 @@ expM <- function(A) {
     .Call('LNAPhyloDyn_expM', PACKAGE = 'LNAPhyloDyn', A)
 }
 
-SIR_BD_period_ODE_one <- function(states, N, param, t, period = 40) {
+SIR_BD_period_ODE_one <- function(states, N, param, t, period) {
     .Call('LNAPhyloDyn_SIR_BD_period_ODE_one', PACKAGE = 'LNAPhyloDyn', states, N, param, t, period)
 }
 
-SIR_BD_period_ODE_one2 <- function(states, N, param, t, period = 40) {
+SIR_BD_period_ODE_one2 <- function(states, N, param, t, period) {
     .Call('LNAPhyloDyn_SIR_BD_period_ODE_one2', PACKAGE = 'LNAPhyloDyn', states, N, param, t, period)
 }
 
-SIR_BD_Fm_LNA <- function(X, Y, theta1, theta2, mu, alpha, t, period = 40) {
+SIR_BD_Fm_LNA <- function(X, Y, theta1, theta2, mu, alpha, t, period) {
     .Call('LNAPhyloDyn_SIR_BD_Fm_LNA', PACKAGE = 'LNAPhyloDyn', X, Y, theta1, theta2, mu, alpha, t, period)
 }
 
-SIR_BD_IntSigma <- function(Traj_par, dt, theta1, theta2, theta3, alpha, N, period = 40) {
+SIR_BD_IntSigma <- function(Traj_par, dt, theta1, theta2, theta3, alpha, N, period) {
     .Call('LNAPhyloDyn_SIR_BD_IntSigma', PACKAGE = 'LNAPhyloDyn', Traj_par, dt, theta1, theta2, theta3, alpha, N, period)
 }
 
-SIR_BD_ODE <- function(initial, t, param, N, period = 40) {
+SIR_BD_ODE <- function(initial, t, param, N, period) {
     .Call('LNAPhyloDyn_SIR_BD_ODE', PACKAGE = 'LNAPhyloDyn', initial, t, param, N, period)
 }
 
-SIR_BD_SDE <- function(init, N, param, t, period = 40) {
+SIR_BD_SDE <- function(init, N, param, t, period) {
     .Call('LNAPhyloDyn_SIR_BD_SDE', PACKAGE = 'LNAPhyloDyn', init, N, param, t, period)
 }
 
-SIR_BD_period_SDE <- function(init, N, param, t, period = 40) {
+SIR_BD_period_SDE <- function(init, N, param, t, period) {
     .Call('LNAPhyloDyn_SIR_BD_period_SDE', PACKAGE = 'LNAPhyloDyn', init, N, param, t, period)
 }
 
-SIR_BD_KOM_Filter <- function(OdeTraj, param, gridsize, N, period = 40) {
+SIR_BD_KOM_Filter <- function(OdeTraj, param, gridsize, N, period) {
     .Call('LNAPhyloDyn_SIR_BD_KOM_Filter', PACKAGE = 'LNAPhyloDyn', OdeTraj, param, gridsize, N, period)
 }
 
-log_like_trajSIR_BD <- function(SdeTraj, OdeTraj, Filter, gridsize, t_correct = 90) {
+log_like_trajSIR_BD <- function(SdeTraj, OdeTraj, Filter, gridsize, t_correct) {
     .Call('LNAPhyloDyn_log_like_trajSIR_BD', PACKAGE = 'LNAPhyloDyn', SdeTraj, OdeTraj, Filter, gridsize, t_correct)
 }
 
-Traj_sim_SIR_BD <- function(initial, OdeTraj, Filter, t_correct = 90) {
+Traj_sim_SIR_BD <- function(initial, OdeTraj, Filter, t_correct) {
     .Call('LNAPhyloDyn_Traj_sim_SIR_BD', PACKAGE = 'LNAPhyloDyn', initial, OdeTraj, Filter, t_correct)
 }
 
-Traj_sim_SIR_BD_ez <- function(initial, times, param, gridsize, N, t_correct = 90, period = 40) {
+Traj_sim_SIR_BD_ez <- function(initial, times, param, gridsize, N, t_correct, period) {
     .Call('LNAPhyloDyn_Traj_sim_SIR_BD_ez', PACKAGE = 'LNAPhyloDyn', initial, times, param, gridsize, N, t_correct, period)
 }
 
@@ -101,15 +101,15 @@ SIR_ODE <- function(X, Y, theta1, theta2) {
     .Call('LNAPhyloDyn_SIR_ODE', PACKAGE = 'LNAPhyloDyn', X, Y, theta1, theta2)
 }
 
-betaDyn <- function(beta, alpha, times, period = 40) {
+betaDyn <- function(beta, alpha, times, period) {
     .Call('LNAPhyloDyn_betaDyn', PACKAGE = 'LNAPhyloDyn', beta, alpha, times, period)
 }
 
-SIRS2_period_SDE <- function(init, N, param, t, period = 40) {
+SIRS2_period_SDE <- function(init, N, param, t, period) {
     .Call('LNAPhyloDyn_SIRS2_period_SDE', PACKAGE = 'LNAPhyloDyn', init, N, param, t, period)
 }
 
-log_like_traj <- function(SdeTraj, OdeTraj, Filter, gridsize, t_correct = 90) {
+log_like_traj <- function(SdeTraj, OdeTraj, Filter, gridsize, t_correct) {
     .Call('LNAPhyloDyn_log_like_traj', PACKAGE = 'LNAPhyloDyn', SdeTraj, OdeTraj, Filter, gridsize, t_correct)
 }
 
@@ -121,15 +121,15 @@ ODE <- function(initial, t, param, funname) {
     .Call('LNAPhyloDyn_ODE', PACKAGE = 'LNAPhyloDyn', initial, t, param, funname)
 }
 
-Traj_sim <- function(initial, OdeTraj, Filter, t_correct = 90) {
+Traj_sim <- function(initial, OdeTraj, Filter, t_correct) {
     .Call('LNAPhyloDyn_Traj_sim', PACKAGE = 'LNAPhyloDyn', initial, OdeTraj, Filter, t_correct)
 }
 
-Traj_sim_ez <- function(initial, times, theta1, theta2, gridsize, t_correct = 90, funname = "standard") {
+Traj_sim_ez <- function(initial, times, theta1, theta2, gridsize, t_correct, funname = "standard") {
     .Call('LNAPhyloDyn_Traj_sim_ez', PACKAGE = 'LNAPhyloDyn', initial, times, theta1, theta2, gridsize, t_correct, funname)
 }
 
-log_like_traj2 <- function(SdeTraj, times, state, theta1, theta2, gridsize, t_correct = 90, funname = "standard") {
+log_like_traj2 <- function(SdeTraj, times, state, theta1, theta2, gridsize, t_correct, funname = "standard") {
     .Call('LNAPhyloDyn_log_like_traj2', PACKAGE = 'LNAPhyloDyn', SdeTraj, times, state, theta1, theta2, gridsize, t_correct, funname)
 }
 

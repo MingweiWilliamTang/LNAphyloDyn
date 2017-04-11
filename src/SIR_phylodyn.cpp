@@ -37,7 +37,7 @@ XPtr<IntSfun> putIntSFun(std::string funname){
 }
 
 //[[Rcpp::export()]]
-arma::vec betaDyn(double beta, double alpha, arma::vec times, double period = 40){
+arma::vec betaDyn(double beta, double alpha, arma::vec times, double period ){
    arma::vec betat(times.n_elem);
   for(int i = 0; i < times.n_elem; i ++){
    betat[i] = beta * (1 + alpha * sin(2 * pi * times[i] / period));
@@ -47,7 +47,7 @@ arma::vec betaDyn(double beta, double alpha, arma::vec times, double period = 40
 
 
 //[[Rcpp::export()]]
-arma::mat SIRS2_period_SDE(arma::vec init, double N, arma::vec param, arma::vec t, double period = 40){
+arma::mat SIRS2_period_SDE(arma::vec init, double N, arma::vec param, arma::vec t, double period){
   int n = t.size();
   int p = init.size();
   arma::mat H;
@@ -90,7 +90,7 @@ arma::mat SIRS2_period_SDE(arma::vec init, double N, arma::vec param, arma::vec 
 
 //[[Rcpp::export()]]
 double log_like_traj(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
-                     int gridsize,double t_correct = 90){
+                     int gridsize,double t_correct){
   arma::cube Acube = as<arma::cube>(Filter[0]);
   arma::cube Scube = as<arma::cube>(Filter[1]);
 
@@ -219,7 +219,7 @@ arma::mat ODE(arma::vec initial, arma::vec t, arma::vec param, std::string funna
 }
 
 //[[Rcpp::export()]]
-List Traj_sim(arma::vec initial, arma::mat OdeTraj, List Filter,double t_correct = 90){
+List Traj_sim(arma::vec initial, arma::mat OdeTraj, List Filter,double t_correct){
   arma::cube Acube = as<arma::cube>(Filter[0]);
   arma::cube Scube = as<arma::cube>(Filter[1]);
   int k = OdeTraj.n_rows-1;
@@ -268,7 +268,7 @@ List Traj_sim(arma::vec initial, arma::mat OdeTraj, List Filter,double t_correct
 
 //[[Rcpp::export()]]
 List Traj_sim_ez(arma::vec initial, arma::vec times,double theta1, double theta2,
-        int gridsize,double t_correct = 90,std::string funname = "standard"){
+        int gridsize,double t_correct,std::string funname = "standard"){
   int k = times.n_rows / gridsize;
   arma::vec param(2);
   param(0) = theta1;
@@ -333,7 +333,7 @@ List Traj_sim_ez(arma::vec initial, arma::vec times,double theta1, double theta2
  */
 //[[Rcpp::export()]]
 double log_like_traj2(arma::mat SdeTraj,arma::vec times,arma::vec state,
-                      double theta1,double theta2,int gridsize,double t_correct = 90,std::string funname = "standard"){
+                      double theta1,double theta2,int gridsize,double t_correct,std::string funname = "standard"){
 
 // generate the ODE path, calculate mean and covariance in the transition probability
   int k = SdeTraj.n_rows-1;
@@ -628,7 +628,7 @@ arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
     //f_cur_centered(0,1)=0;
     //f_cur_centered(0,0)=0;
     //simulate a new trajectory
-    List v = Traj_sim(state,OdeTraj,FTs);
+    List v = Traj_sim(state,OdeTraj,FTs, t_correct);
     arma::mat v_traj = as<mat>(v[0]).cols(1,2) -  OdeTraj.cols(1,2);
     if(v_traj.has_nan()){
       Rcout<<v_traj<<endl;
@@ -686,7 +686,7 @@ arma::mat ESlice2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
     //f_cur_centered(0,1)=0;
     //f_cur_centered(0,0)=0;
     //simulate a new trajectory
-    List v = Traj_sim(state,OdeTraj,FTs);
+    List v = Traj_sim(state,OdeTraj,FTs,t_correct);
     arma::mat v_traj = as<mat>(v[0]).cols(1,2) -  OdeTraj.cols(1,2);
     if(v_traj.has_nan()){
       Rcout<<v_traj<<endl;

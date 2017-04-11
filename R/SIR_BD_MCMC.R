@@ -524,7 +524,7 @@ MCMC_initialize2 = function(MCMC_setting){ #, prior_par = c(10,20,-2.3,200,40)){
 
 
     if(is.null(MCMC_setting$control$traj)){
-      Latent = Traj_sim_SIR_BD(state,Ode_Traj_coarse,FT)
+      Latent = Traj_sim_SIR_BD(state,Ode_Traj_coarse,FT,MCMC_setting$t_correct)
       LatentTraj = Latent$SimuTraj
       logMultiNorm = Latent$loglike
     }else{
