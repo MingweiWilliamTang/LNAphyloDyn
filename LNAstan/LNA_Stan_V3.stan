@@ -1,5 +1,5 @@
 functions{
-  real[] SIR_BD_period_ODE_onestep(real t,
+    real[] SIR_BD_period_ODE_onestep(real t,
     real [] X,
     real [] theta,
     real[] x_r, int [] x_i){
@@ -36,6 +36,23 @@ functions{
     dX[2] = betat * X[1] * X[2] - mu * X[2] - gamma * X[2];
     return dX;
 	  }
+
+
+  matrix submatrix(matrix X, int [] index ,int col_indexing){
+    matrix[size(index),cols(X)] M1;
+    matrix[rows(X),size(index)] M2;
+    if(col_indexing == 1){
+      for(i in 1:size(index)){
+        M2[,i] = X[,index[i]];
+      }
+      return M2;
+    }else{
+      for(i in 1:size(index)){
+        M1[i] = X[index[i]];
+      }
+      return M1;
+    }
+  }
 
  real coal_log_stan(vector w, vector C, vector y, vector tt, int[] tids,
       matrix SI,real [] theta,int nc){
@@ -122,9 +139,6 @@ functions{
 	     return diag_matrix(h);
 	}
 
-
-
-
 matrix [] SIR_FT(real [] ts, real [] Init_State,int gridsize, int ngrid,
       real R0, real gamma, real mu, real a, real period,real N,
       real [] x_r, int [] x_i){
@@ -147,7 +161,7 @@ matrix [] SIR_FT(real [] ts, real [] Init_State,int gridsize, int ngrid,
   int id;
   matrix[4,2] A;    // reaction matrix A
   matrix [2,2] FF;
-  matrix[2,2] B[2 * ngrid]; // linear transform matrix in LNA   // variance matrix in LNA
+  matrix[2,2] B[3 * ngrid]; // linear transform matrix in LNA   // variance matrix in LNA
   matrix[gridsize*ngrid + 1,2] eta;
   theta = {R0, gamma, mu, a, period, N};
   dt = ts[2] - ts[1];
@@ -171,7 +185,7 @@ matrix [] SIR_FT(real [] ts, real [] Init_State,int gridsize, int ngrid,
   B[(ngrid+1)] stores the 2*2 matrices for the gaussian noise
 
   Need firstly need to initialize all element to zero
-  */
+
 
     B[i][1,1] = 0;
     B[i][2,1] = 0;
@@ -181,6 +195,9 @@ matrix [] SIR_FT(real [] ts, real [] Init_State,int gridsize, int ngrid,
     B[ngrid + i][2,1] = 0;
     B[ngrid + i][1,2] = 0;
     B[ngrid + i][2,2] = 0;
+*/
+    B[i] = to_matrix({{0,0},{0,0}});
+    B[ngrid + i] = to_matrix({{0,0}, {0,0}});
 
    for(j in 1:gridsize){
       id = (i-1) * gridsize + j;
@@ -192,11 +209,11 @@ matrix [] SIR_FT(real [] ts, real [] Init_State,int gridsize, int ngrid,
       B[ngrid + i] = B[ngrid + i] + dt * (FF * B[ngrid + i] + B[ngrid + i] * FF' + A' * diff_Var(ts[id],eta[id],theta) * A);
     }
       B[i] = matrix_exp(B[i]);
+      B[2 * ngrid + i][1] = to_row_vector(eta[id + 1]);
     }
     //print(B[ngrid + 1]);
     return B;
   }
-
 
 }
 
@@ -264,15 +281,15 @@ transformed parameters{
   S: Covariance matrices in LNA
 */
  real Init_State[2];
- matrix[ngrid,2] eta;
+ //matrix[ngrid,2] eta;
  real betatN[n];
- matrix [2,2] FT[2*ngrid];
+ matrix [2,2] FT[3*ngrid];
   real theta[6];
 
  theta = {R0,gamma,mu,A,period,N};
  Init_State[1] = N * Alpha / (1 + Alpha);
  Init_State[2] = N - Init_State[1];
- eta = to_matrix(integrate_ode_rk45(SIR_BD_period_ODE_onestep,Init_State,ts[1],tt[2:(ngrid+1)],theta,x_r,x_i));
+ //eta = to_matrix(integrate_ode_rk45(SIR_BD_period_ODE_onestep,Init_State,ts[1],tt[2:(ngrid+1)],theta,x_r,x_i));
  FT = SIR_FT(ts,Init_State,gridsize,ngrid, R0, gamma, mu, A, period,N,x_r,x_i);
 }
 
@@ -286,13 +303,32 @@ model{
   A ~ uniform(0,1);
   for(i in 1:ngrid){
     if(i == 1){
-      SI[i] ~ multi_normal(to_vector(eta[i]), FT[i + ngrid]);
+      SI[i] ~ multi_normal(to_vector(FT[i + 2*ngrid][1]), FT[i + ngrid]);
     }else{
       //print(to_vector(eta[1 + (i-1) * gridsize]) + FT[i-1] * (SI[i-1] - eta[1 + (i-2) * gridsize])');
-      SI[i] ~ multi_normal(to_vector(eta[i]) + FT[i] * (SI[i] - eta[i])', FT[i + ngrid]);
+      SI[i] ~ multi_normal(to_vector(FT[i + 2*ngrid][1]) + FT[i] * (SI[i] - FT[i + 2*ngrid][1])', FT[i + ngrid]);
     }
   }
   increment_log_prob(coal_log_stan(w, C, y, to_vector(tt), tids, append_row(to_row_vector(Init_State),SI), theta, nc));
 }
+
+
+/*
+data{
+  int<lower=1> T;
+  real y0[2];
+  real t0;
+  real ts[T];
+  real theta[6];
+}
+generated quantities {
+  matrix [T+1,2] y_hat;
+  y_hat = append_row(to_row_vector(y0),to_matrix(integrate_ode_rk45(SIR_BD_period_ODE_onestep, y0, t0, ts, theta, x_r, x_i)));
+      // add measurement error
+      for (t in 1:T) {
+        y_hat[t, 1] = y_hat[t, 1] + normal_rng(0, 0.0001);
+        y_hat[t, 2] = y_hat[t, 2] + normal_rng(0, 0.0001);
+      }
+*/
 
 

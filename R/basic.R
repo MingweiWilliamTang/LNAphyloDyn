@@ -44,8 +44,8 @@ random_trajectory = function(timegrid,trMatrix,color="grey",ylab="infected popul
 
 
 
-random_trajectory_line = function(t,gridsize,trMatrix,color="yellow",lwd=0.5, ylim = NULL){
-  timegrid = seq(t0,t,by=gridsize)
+random_trajectory_line = function(timegrid,trMatrix,color="yellow",lwd=0.5, ylim = NULL){
+ # timegrid = seq(t0,t,by=gridsize)
   k = dim(trMatrix)[2]
   if(is.null(ylim)){
 

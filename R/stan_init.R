@@ -64,3 +64,56 @@ para_init_stan = function(input,mu = 0.2,chains=1){
   }
   return(res)
 }
+
+stan_res_convert = function(fit,N){
+
+  R0 = As.mcmc.list(fit, pars = "R0")[[1]]
+  nrep = length(R0)
+  SI_matrix = matrix(As.mcmc.list(fit,pars = "SI")[[1]], byrow = T, ncol = nrep)
+  gamma1 = As.mcmc.list(fit, pars = "gamma")[[1]]
+  A = As.mcmc.list(fit, pars = "A")[[1]]
+  Alpha = as.numeric(As.mcmc.list(fit, pars = "Alpha")[[1]])
+  ngrid = dim(SI_matrix)[1] / 2
+  nrep = length(R0)
+  LNATraj = array(dim = c(ngrid+1,2,nrep))
+
+  for(i in 1:nrep){
+
+    LNATraj[1,1,i] = N * Alpha[i] /(1 + Alpha[i])
+    LNATraj[1,2,i] = N - LNATraj[1,1,i]
+
+    for(j in 1:ngrid){
+      LNATraj[j+1,,i] = SI_matrix[(2*j-1):(2*j),i]
+    }
+  }
+  beta = R0 * gamma1 / N
+  return(list(beta = beta, R0 = R0, gamma = gamma1, A = A, Alpha = Alpha,
+              latentTraj = LNATraj))
+}
+
+stan_res_convert0 = function(fit,N){
+
+  R0 = As.mcmc.list(fit, pars = "R0")[[1]]
+  nrep = length(R0)
+  #SI_matrix = matrix(As.mcmc.list(fit,pars = "SI")[[1]], byrow = T, ncol = nrep)
+  gamma1 = As.mcmc.list(fit, pars = "gamma")[[1]]
+  A = As.mcmc.list(fit, pars = "A")[[1]]
+  Alpha = as.numeric(As.mcmc.list(fit, pars = "Alpha")[[1]])
+  #ngrid = dim(SI_matrix)[1] / 2
+  nrep = length(R0)
+  #LNATraj = array(dim = c(ngrid+1,2,nrep))
+
+  #for(i in 1:nrep){
+
+   # LNATraj[1,1,i] = N * Alpha[i] /(1 + Alpha[i])
+  #  LNATraj[1,2,i] = N - LNATraj[1,1,i]
+
+   # for(j in 1:ngrid){
+    #  LNATraj[j+1,,i] = SI_matrix[(2*j-1):(2*j),i]
+    #}
+  #}
+  beta = R0 * gamma1 / N
+  return(list(beta = beta, R0 = R0, gamma = gamma1, A = A, Alpha = Alpha))
+}
+
+

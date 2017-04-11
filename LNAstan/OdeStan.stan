@@ -149,7 +149,7 @@ model{
   R0 ~ uniform(3,8);
  // gamma ~ lognormal(-3,0.4);
   //Alpha ~ lognormal(1,10);
-  gamma ~ lognormal(-3,0.4);
+  gamma ~ lognormal(-2.5,0.2);
   Alpha ~ lognormal(2,2);
   A ~ uniform(0,1);
   increment_log_prob(coal_log_stan(w, C, y, to_vector(tt), tids, SIs, theta, nc));
