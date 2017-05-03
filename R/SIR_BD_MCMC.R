@@ -67,7 +67,7 @@ updateS1_SIR_BD = function(MCMC_obj, MCMC_setting, i){
   s1 = MCMC_obj$par[3] / MCMC_obj$par[4] * MCMC_setting$N
   #s1_new = pmin(pmax(s1 + runif(1,-0.5,0.5), 3),6)
   s1_new = s1 + runif(1,-MCMC_setting$ps1, MCMC_setting$ps1)
-  if(s1_new <1 || s1_new > 20){
+  if(s1_new <1 || s1_new > 100){
     # theta1_new = s1_new * MCMC_obj$par[4] / MCMC_setting$N
     # MCMC_obj$par[3] = theta1_new
     return(list(MCMC_obj = MCMC_obj, AR = 0))
@@ -147,7 +147,7 @@ updateS2_SIR_BD = function(MCMC_obj, MCMC_setting, i){
 
   if(MCMC_setting$likelihood == "volz"){
     coalLog_new = volz_loglik_nh(MCMC_setting$Init, LogTraj(LatentTraj_new),
-                                 betaDyn(MCMC_obj$par[3],MCMC_obj$par[6],Ode_Traj_coarse_new[,1],MCMC_setting$period) * MCMC_setting$N,
+                                 betaDyn(theta1_new,MCMC_obj$par[6],Ode_Traj_coarse_new[,1],MCMC_setting$period) * MCMC_setting$N,
                                  MCMC_setting$t_correct,
                                  MCMC_setting$gridsize)
   }else{
@@ -159,8 +159,8 @@ updateS2_SIR_BD = function(MCMC_obj, MCMC_setting, i){
   if (is.nan(logMultiNorm_new)) {
     a = -Inf
   }else{
-    a = dnorm(log(s2_new),MCMC_setting$c1,MCMC_setting$c2,log = T) + logMultiNorm_new + coalLog_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog -
-                    MCMC_obj$LogS2
+    a = dnorm(log(s2_new),MCMC_setting$c1,MCMC_setting$c2,log = T) + log(s2_new) + logMultiNorm_new + coalLog_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog -
+                    MCMC_obj$LogS2 - log(MCMC_obj$par[4])
   }
   # print(theta2_new)
   AR = 0
@@ -188,7 +188,7 @@ updateS1S2_SIR_BD = function(MCMC_obj, MCMC_setting, i){
   s1 = MCMC_obj$par[3] / MCMC_obj$par[4] * MCMC_setting$N
   #s1_new = pmin(pmax(s1 + runif(1,-0.5,0.5), 3),6)
   s1_new = s1 + runif(1,-MCMC_setting$ps1, MCMC_setting$ps1)
-  if(s1_new <1 || s1_new > 20){
+  if(s1_new <1 || s1_new > 100){
     # theta1_new = s1_new * MCMC_obj$par[4] / MCMC_setting$N
     # MCMC_obj$par[3] = theta1_new
     return(list(MCMC_obj = MCMC_obj, AR = 0))
@@ -227,14 +227,19 @@ updateS1S2_SIR_BD = function(MCMC_obj, MCMC_setting, i){
   if (is.nan(logMultiNorm_new)) {
     a = -Inf
   }else{
-    a = dnorm(log(s2_new),MCMC_setting$c1,MCMC_setting$c2,log = T) + logMultiNorm_new + coalLog_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog -
-      MCMC_obj$LogS2
+    a = dlnorm(s2_new,MCMC_setting$c1,MCMC_setting$c2,log = T) + log(s2_new) + logMultiNorm_new + coalLog_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog -
+      MCMC_obj$LogS2 - log(MCMC_obj$par[4])
   }
   # print(theta2_new)
   AR = 0
   if(is.na(a)){
     AR = 0
+    if(is.na(coalLog_new)){
+      print("NA appears in likelihood")
+      print(LatentTraj_new)
+    }else{
     print("NA appears in S1 S2")
+    }
   }else if(log(runif(1,0,1)) < a) {
     AR = 1
     MCMC_obj$par[3] = theta1_new
@@ -367,7 +372,7 @@ update_Scale_SIR_BD = function(MCMC_obj, MCMC_setting, i){
   AR = 0
   if(is.na(a)){
     AR = 0
-    print("NA appears when update mu")
+    print("NA appears when update A")
     print(A_new)
   }else if (log(runif(1,0,1)) < a) {
     AR = 1

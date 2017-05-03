@@ -16,7 +16,7 @@ plot3 = function(traj){
 
 effpopfun = function(Traj,beta=0,lambda=1, volz = FALSE){
   if(volz){
-    return(1 /(2 * Traj[,2] * beta / Traj[,3]))
+    return(1 /(2 * Traj[,3] * beta / Traj[,2]))
   }else{
     return(Traj[,3] / lambda)
   }
@@ -57,6 +57,13 @@ medianCur = function(MCMC_obj,ids,scale=1,col="red",row=3){
 }
 
 
+effpopfun = function(Traj,beta=0,lambda=1, volz = FALSE,N=1){
+  if(volz){
+    return(1 /(2 * Traj[,3] * beta * N / Traj[,2]))
+  }else{
+    return(Traj[,3] / lambda)
+  }
+}
 
 
 
@@ -95,3 +102,12 @@ CI_Curve = function(MCMC_obj,ids,scale = 1, col = "black", fill_col = "grey", ro
             y = c(upper,rev(lower)),col = fill_col)
   }
 }
+
+vlineCI = function(data){
+  s = sd(data)
+  m = mean(data)
+  abline(v = m + 1.96*s,col="blue",lwd=2,lty=2)
+  abline(v = m - 1.96*s,col="blue",lwd=2,lty=2)
+  abline(v = m ,col="blue",lwd=2)
+}
+

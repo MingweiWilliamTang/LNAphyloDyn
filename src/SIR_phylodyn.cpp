@@ -354,7 +354,7 @@ double log_like_traj2(arma::mat SdeTraj,arma::vec times,arma::vec state,
   double loglik = 0;
   //  int id1,id0;
 
-  arma:vec Xd1, Xd0;
+  arma::vec Xd1, Xd0;
   Xd0 = Xd1 = (SdeTraj.submat(0,1,0,2)-OdeTraj.submat(0,1,0,2)).t();
   // Xd0 = Xd1 = (SdeTraj.submat(0,1,0,3) - OdeTraj.submat(0,1,0,3)).t();
 

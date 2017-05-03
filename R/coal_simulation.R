@@ -217,11 +217,11 @@ coal_lik_init = function(samp_times, n_sampled, coal_times, grid, t_correct)
   if (length(samp_times) != length(n_sampled))
     stop("samp_times vector of differing length than n_sampled vector.")
 
-  if (length(coal_times) != sum(n_sampled) - 1)
-    stop("Incorrect length of coal_times: should be sum(n_sampled) - 1.")
+#  if (length(coal_times) != sum(n_sampled) - 1)
+#    stop("Incorrect length of coal_times: should be sum(n_sampled) - 1.")
 
-  if (max(samp_times, coal_times) > max(grid))
-    stop("Grid does not envelop all sampling and/or coalescent times.")
+#  if (max(samp_times, coal_times) > max(grid))
+ #   stop("Grid does not envelop all sampling and/or coalescent times.")
 
   t = sort(unique(c(samp_times, coal_times, grid)))
   l = rep(0, length(t))

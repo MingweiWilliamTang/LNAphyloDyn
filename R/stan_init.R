@@ -117,3 +117,37 @@ stan_res_convert0 = function(fit,N){
 }
 
 
+Prevalence_Stan_data = function(y,tt,gridsize,N,mu,period=1){
+  if(length(y) != length(tt)){
+    stop('the size of observation not equal to size of time')
+  }
+  ngrid = length(y) - 1
+  n = ngrid * gridsize + 1
+  ts = numeric(0)
+  for(i in 1:ngrid){
+    ts = c(ts, seq(tt[i],tt[i+1],length.out = gridsize + 1)[-(gridsize + 1)])
+  }
+  ts = c(ts, tt[ngrid + 1])
+  if(n != length(ts)){
+    stop("grid not equal")
+  }
+
+  return(list(n=n, ngrid = ngrid, gridsize = gridsize, period = period, N = N,
+              ts = ts, tt = tt, mu = mu, y = y))
+}
+
+Prevalence_Stan_Initialize = function(input, nchain = 1){
+  res = list()
+  for(i in 1:nchain){
+    R0 = 5
+    gamma = exp(rnorm(1,-2,0.2))
+    A = runif(1,0,1)
+    rho = rbeta(1,2,2)
+    Alpha = exp(rnorm(1,0,2))
+    trajlist = SI_traj_initialize_stan(input, R0, gamma, input$mu, A, Alpha)
+    res[[i]] = list(R0=R0,gamma=gamma,Alpha=Alpha,A = A,SI = trajlist, rho = rho)
+  }
+  return(res)
+}
+
+

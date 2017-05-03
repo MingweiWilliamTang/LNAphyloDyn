@@ -27,7 +27,12 @@ double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int
 arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
                  List init, double t_correct, double lambda=10, int reps=1,
                  int gridsize = 100,std::string funname  = "standard");
+
+arma::vec betaDyn(double beta, double alpha, arma::vec times, double period);
+
 double volz_loglik(List init, arma::mat f1, double t_correct, double beta, int gridsize = 1);
+
 double volz_loglik_nh(List init, arma::mat f1, arma::vec betaN, double t_correct, int gridsize = 1);
+
 #endif /* SIR_PHYLODYN_H_ */
 
