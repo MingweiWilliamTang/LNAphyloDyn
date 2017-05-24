@@ -35,9 +35,9 @@ updateAlphas_BD = function(MCMC_obj,MCMC_setting,i){
     logMultiNorm_new = -Inf
     # countInf = countInf + 1
   }
-  a = dnorm(log(alpha1_new),MCMC_setting$b1,MCMC_setting$a1,log = T) + coalLog_new + #dgamma(log(alpha2_new),MCMC_setting$b2,MCMC_setting$a2,log = T) +
+  a = dlnorm(alpha1_new,MCMC_setting$b1,MCMC_setting$a1,log = T) - 2*log(1+alpha1_new) + coalLog_new + #dgamma(log(alpha2_new),MCMC_setting$b2,MCMC_setting$a2,log = T) +
                   logMultiNorm_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog -
-                  ( MCMC_obj$LogAlpha1)
+                  ( MCMC_obj$LogAlpha1) +  2*log(1+alpha1)
 
   #print(logMultiNorm_new-log_like_traj2(MCMC_obj$LatentTraj,MCMC_setting$times,log(state_new),MCMC_obj$par[3],MCMC_obj$par[4],MCMC_setting$gridsize,MCMC_setting$t_correct ))
 
@@ -53,7 +53,7 @@ updateAlphas_BD = function(MCMC_obj,MCMC_setting,i){
     MCMC_obj$Ode_Traj_coarse = Ode_Traj_coarse_new
     MCMC_obj$logMultiNorm = logMultiNorm_new
     MCMC_obj$FT = FT_new
-    MCMC_obj$LogAlpha1 = dnorm(log(alpha1_new),MCMC_setting$b1,MCMC_setting$a1,log = T)
+    MCMC_obj$LogAlpha1 = dlnorm(alpha1_new,MCMC_setting$b1,MCMC_setting$a1,log = T)
     #    MCMC_obj$LogAlpha2 = dgamma(log(alpha2_new),MCMC_setting$b2,MCMC_setting$a2,log = T)
     MCMC_obj$coalLog = coalLog_new
     MCMC_obj$LatentTraj = LatentTraj_new
@@ -67,7 +67,7 @@ updateS1_SIR_BD = function(MCMC_obj, MCMC_setting, i){
   s1 = MCMC_obj$par[3] / MCMC_obj$par[4] * MCMC_setting$N
   #s1_new = pmin(pmax(s1 + runif(1,-0.5,0.5), 3),6)
   s1_new = s1 + runif(1,-MCMC_setting$ps1, MCMC_setting$ps1)
-  if(s1_new <1 || s1_new > 100){
+  if(s1_new <1 || s1_new > 10){
     # theta1_new = s1_new * MCMC_obj$par[4] / MCMC_setting$N
     # MCMC_obj$par[3] = theta1_new
     return(list(MCMC_obj = MCMC_obj, AR = 0))
@@ -215,7 +215,7 @@ updateS1S2_SIR_BD = function(MCMC_obj, MCMC_setting, i){
 
   if(MCMC_setting$likelihood == "volz"){
     coalLog_new = volz_loglik_nh(MCMC_setting$Init, LogTraj(LatentTraj_new),
-                                 betaDyn(MCMC_obj$par[3],MCMC_obj$par[6],Ode_Traj_coarse_new[,1],MCMC_setting$period) * MCMC_setting$N,
+                                 betaDyn(theta1_new,MCMC_obj$par[6],Ode_Traj_coarse_new[,1],MCMC_setting$period) * MCMC_setting$N,
                                  MCMC_setting$t_correct,
                                  MCMC_setting$gridsize)
   }else{
@@ -236,7 +236,7 @@ updateS1S2_SIR_BD = function(MCMC_obj, MCMC_setting, i){
     AR = 0
     if(is.na(coalLog_new)){
       print("NA appears in likelihood")
-      print(LatentTraj_new)
+     # print(LatentTraj_new)
     }else{
     print("NA appears in S1 S2")
     }
@@ -246,7 +246,7 @@ updateS1S2_SIR_BD = function(MCMC_obj, MCMC_setting, i){
     MCMC_obj$par[4] = theta2_new
     MCMC_obj$Ode_Traj_coarse = Ode_Traj_coarse_new
     MCMC_obj$logMultiNorm = logMultiNorm_new
-    MCMC_obj$LogS2 = dnorm(log(s2_new),MCMC_setting$c1,MCMC_setting$c2,log = T)
+    MCMC_obj$LogS2 = dlnorm(s2_new,MCMC_setting$c1,MCMC_setting$c2,log = T)
     MCMC_obj$FT = FT_new
     MCMC_obj$coalLog = coalLog_new
     MCMC_obj$LatentTraj = LatentTraj_new
@@ -398,7 +398,8 @@ update_Scale_SIR_BD = function(MCMC_obj, MCMC_setting, i){
 updateLambda_SIR_BD = function(MCMC_obj,MCMC_setting, i){
   lambda_new = MCMC_obj$par[7] * exp(runif(1,-0.3,0.3))
   coalLog_new = coal_loglik(MCMC_setting$Init,LogTraj(MCMC_obj$LatentTraj),MCMC_setting$t_correct,lambda_new,MCMC_setting$gridsize)
-  a = coalLog_new - MCMC_obj$coalLog + dgamma(log(lambda_new),MCMC_setting$d1,MCMC_setting$d2,log = T) -
+
+  a = coalLog_new - MCMC_obj$coalLog + dnorm(lambda_new,MCMC_setting$d1,MCMC_setting$d2,log = T) -
                   MCMC_obj$LogLambda
   AR = 0
 
@@ -409,7 +410,7 @@ updateLambda_SIR_BD = function(MCMC_obj,MCMC_setting, i){
   }else if(log(runif(1,0,1)) < a){
     # rec[i,5] = 1
     AR = 1
-    MCMC_obj$LogLambda = dgamma(log(lambda_new),MCMC_setting$d1,MCMC_setting$d2,log = T)
+    MCMC_obj$LogLambda = dnorm(lambda_new,MCMC_setting$d1,MCMC_setting$d2,log = T)
     MCMC_obj$coalLog = coalLog_new
     MCMC_obj$par[7] = lambda_new
   }
@@ -441,7 +442,7 @@ updateTraj_BD = function(MCMC_obj,MCMC_setting,i){
                                  MCMC_setting$t_correct,
                                  MCMC_setting$gridsize)
   }else{
-    MCMC_obj$coalLog = coal_loglik(MCMC_setting$Init,LogTraj(MCMC_obj$LatentTraj ),MCMC_setting$t_correct,
+    MCMC_obj$coalLog = coal_loglik(MCMC_setting$Init,LogTraj(MCMC_obj$LatentTraj ),MCMC_setting$t_correct,lambda =
                               MCMC_obj$par[7],MCMC_setting$gridsize)
   }
 
@@ -470,7 +471,7 @@ MCMC_setup = function(coal_obs,times,t_correct,N,gridsize=50,niter = 1000,burn =
 }
 
 
-MCMC_initialize2 = function(MCMC_setting){ #, prior_par = c(10,20,-2.3,200,40)){
+MCMC_initialize_BD = function(MCMC_setting){ #, prior_par = c(10,20,-2.3,200,40)){
 
   logMultiNorm = NaN
   coalLog = NaN
@@ -542,7 +543,7 @@ MCMC_initialize2 = function(MCMC_setting){ #, prior_par = c(10,20,-2.3,200,40)){
     }
 
     if(is.null(MCMC_setting$control$lambda)){
-      lambda = exp(rgamma(1,MCMC_setting$d1,MCMC_setting$d2))
+      lambda = rnorm(1,MCMC_setting$d1,MCMC_setting$d2)
     }else{
       lambda = MCMC_setting$control$lambda
     }
@@ -554,22 +555,22 @@ MCMC_initialize2 = function(MCMC_setting){ #, prior_par = c(10,20,-2.3,200,40)){
 
       #print(MCMC_setting$t_correct)
     }else{
-      coalLog= coal_loglik(MCMC_setting$Init,LogTraj(LatentTraj ),MCMC_setting$t_correct,
+      coalLog= coal_loglik(MCMC_setting$Init,LogTraj(LatentTraj),MCMC_setting$t_correct,
                            lambda,MCMC_setting$gridsize)
     }
 
     print(coalLog)
 
     if(!is.nan((coalLog))){
-      coalLog = ifelse(coalLog<= - 10000000,NaN, coalLog)
+      coalLog = ifelse(coalLog<= - 100000000,NaN, coalLog)
     }
    plot(LatentTraj[,1],LatentTraj[,3],type="l")
   }
-  LogAlpha1 = dnorm(log(alpha1),MCMC_setting$b1,MCMC_setting$a1,log = T)
-  LogMu = dnorm(log(theta3), MCMC_setting$e1, MCMC_setting$e2, log = T)
+  LogAlpha1 = dlnorm(alpha1,MCMC_setting$b1,MCMC_setting$a1,log = T)
+  LogMu = dlnorm(theta3, MCMC_setting$e1, MCMC_setting$e2, log = T)
   #LogAlpha2 = dgamma(log(alpha2),MCMC_setting$b1,MCMC_setting$a2,log = T)
-  LogS2 = dnorm(log(s2),MCMC_setting$c1,MCMC_setting$c2,log = T)
-  LogLambda = dgamma(log(lambda),MCMC_setting$d1,MCMC_setting$d2,log = T)
+  LogS2 = dlnorm(s2,MCMC_setting$c1,MCMC_setting$c2,log = T)
+  LogLambda = dnorm(lambda,MCMC_setting$d1,MCMC_setting$d2,log = T)
 
   #print(log_like_trajSIR_BD(LatentTraj,Ode_Traj_coarse,FT,MCMC_setting$gridsize,90))
   #print()
@@ -601,7 +602,7 @@ SIR_BD_LNA_MCMC = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 100
   MCMC_setting = MCMC_setup(coal_obs,times,t_correct,N,gridsize,niter,burn,thin,period = period,
                             a1, a2,b1,b2,c1,c2,d1, d2,e1,e2,
                             pa,ps1,ps2,pga,pA,control = control,likelihood = likelihood)
-  MCMC_obj = MCMC_initialize2(MCMC_setting)
+  MCMC_obj = MCMC_initialize_BD(MCMC_setting)
   if(MCMC_setting$likelihood == "volz"){
     params = matrix(nrow = niter, ncol = 6)
     ARMS = matrix(nrow = niter, ncol = 6)
@@ -617,6 +618,7 @@ SIR_BD_LNA_MCMC = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 100
   for (i in 1:MCMC_setting$niter) {
     if (i %% 100 == 0) {
       print(i)
+      print(MCMC_obj$par)
        plot(MCMC_obj$LatentTraj[,1],MCMC_obj$LatentTraj[,3],type="l")
     }
     ARvec = numeric(dim(ARMS)[2])
@@ -672,13 +674,5 @@ SIR_BD_LNA_MCMC = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 100
   return(list(par = params,Trajectory = tjs,l=l,l1=l1,l2 = l2, l3 =l3,AR = ARMS))
 }
 
-
-effpopfun = function(Traj,beta=0,lambda=1, volz = FALSE){
-  if(volz){
-    return(1 /(2 * Traj[,3] * beta / Traj[,2]))
-  }else{
-    return(Traj[,3] / lambda)
-  }
-}
 
 

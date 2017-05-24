@@ -33,7 +33,7 @@ volz_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, betaN, ...)
       time = samp_times[curr]
     }
 
-    time = time + rexp(1, 0.5*active_lineages*(active_lineages-1)*10)
+    time = time + rexp(1, 0.5*active_lineages*(active_lineages-1))
 
     i = which.min(ts>=0) - 1
     while(time>ts[i]){
@@ -52,7 +52,7 @@ volz_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, betaN, ...)
       active_lineages = active_lineages + n_sampled[curr]
       time = samp_times[curr]
     }
-    else if (runif(1) <= 1/(10 * thed) )
+    else if (runif(1) <= 1/(thed) )
     {
       time = min(c(time,t_correct))
       coal_times = c(coal_times, time)
@@ -68,7 +68,7 @@ volz_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, betaN, ...)
 
 
 
-coalsim_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, lambda=1, ...)
+coalsim_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, lambda=1,lower = 0.1, ...)
 {
   coal_times = NULL
   lineages = NULL
@@ -93,7 +93,7 @@ coalsim_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, lambda=1, 
       time = samp_times[curr]
     }
 
-    time = time + rexp(1, 0.5*active_lineages*(active_lineages-1)*10)
+    time = time + rexp(1, 0.5*active_lineages*(active_lineages-1)/lower)
 
     i = which.min(ts>=0) - 1
     while(time>ts[i]){
@@ -111,7 +111,7 @@ coalsim_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, lambda=1, 
       active_lineages = active_lineages + n_sampled[curr]
       time = samp_times[curr]
     }
-    else if (runif(1) <= 1/(10 * thed) )
+    else if (runif(1) <= lower/( thed) )
     {
       time = min(c(time,t_correct))
       coal_times = c(coal_times, time)

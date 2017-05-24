@@ -27,9 +27,9 @@ updateAlphas = function(MCMC_obj,MCMC_setting,i){
     logMultiNorm_new = -Inf
     # countInf = countInf + 1
   }
-  a = min(c(exp(dnorm(log(alpha1_new),MCMC_setting$b1,MCMC_setting$a1,log = T) + coalLog_new + #dgamma(log(alpha2_new),MCMC_setting$b2,MCMC_setting$a2,log = T) +
+  a = min(c(exp(dlnorm(alpha1_new,MCMC_setting$b1,MCMC_setting$a1,log = T) - 2*log(1+alpha1_new) + coalLog_new + #dgamma(log(alpha2_new),MCMC_setting$b2,MCMC_setting$a2,log = T) +
                   logMultiNorm_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog -
-                  ( MCMC_obj$LogAlpha1)
+                  ( MCMC_obj$LogAlpha1) + 2*log(1+alpha1)
   ),1))
 
   #print(logMultiNorm_new-log_like_traj2(MCMC_obj$LatentTraj,MCMC_setting$times,log(state_new),MCMC_obj$par[3],MCMC_obj$par[4],MCMC_setting$gridsize,MCMC_setting$t_correct ))
@@ -58,6 +58,7 @@ updateAlphas = function(MCMC_obj,MCMC_setting,i){
 
 
 updateS1 = function(MCMC_obj, MCMC_setting, i){
+
   s1 = MCMC_obj$par[3] / MCMC_obj$par[4] * MCMC_setting$N
   #s1_new = pmin(pmax(s1 + runif(1,-0.5,0.5), 3),6)
   s1_new = s1 + runif(1, -MCMC_setting$ps1, MCMC_setting$ps1)
@@ -100,7 +101,8 @@ updateS1 = function(MCMC_obj, MCMC_setting, i){
   }else{
    # a = min(c(exp((logMultiNorm_new - MCMC_obj$logMultiNorm + coalLog_new - MCMC_obj$coalLog)
    # ),1))
-    a = logMultiNorm_new - MCMC_obj$logMultiNorm + coalLog_new - MCMC_obj$coalLog
+    a = dlnorm(s2_new,MCMC_setting$c1,MCMC_setting$c2,log = T) + log(s2_new) + logMultiNorm_new + coalLog_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog -
+      MCMC_obj$LogS2 - log(MCMC_obj$par[4])
   }
   AR = 0
   if(is.na(a)){
@@ -272,7 +274,7 @@ updateTraj = function(MCMC_obj,MCMC_setting,i){
 
 
 
-MCMC_setup = function(coal_obs,times,t_correct,N,gridsize=50,niter = 1000,burn = 500,thin = 5,
+MCMC_setup_standard = function(coal_obs,times,t_correct,N,gridsize=50,niter = 1000,burn = 500,thin = 5,
                       a1 = 10, a2 = 20,b1 = 60, b2= 60, c1=-2.3, c2 = 0.2,d1 = 200, d2 =40,
                       pa = 0.1, ps1 = 0.25, ps2 = 0.5,control = list()){
   gridset = seq(1,length(times),by=gridsize)
@@ -365,7 +367,7 @@ MCMC_initialize2 = function(MCMC_setting){
     FT = SIR_log_KOM_Filter2(Ode_Traj_thin,theta1,theta2,MCMC_setting$gridsize,"standard")
 
     if(is.null(MCMC_setting$control$traj)){
-      Latent = Traj_sim(state,Ode_Traj_coarse,FT)
+      Latent = Traj_sim(state,Ode_Traj_coarse,FT,MCMC_setting$t_correct)
       LatentTraj = Latent$SimuTraj
       logMultiNorm = Latent$loglike
     }else{
@@ -409,7 +411,7 @@ MCMC_initialize2 = function(MCMC_setting){
 SIR_LNA_MCMC_standard = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000, burn = 0, thin = 5,
                         a1 = 10, a2 = 20, b1 = 60 , b2 = 60, c1 = -2.3, c2 = 0.4, d1 = 200, d2 = 40,
                         pa = 0.1, ps1 = 0.25, ps2 = 0.5, control = list(), updateVec = c(1,1,1,1)){
-  MCMC_setting = MCMC_setup(coal_obs,times,t_correct,N,gridsize,niter,burn,thin,
+  MCMC_setting = MCMC_setup_standard(coal_obs,times,t_correct,N,gridsize,niter,burn,thin,
                             a1, a2,b1,b2,c1,c2,d1, d2,
                             pa , ps1 , ps2,control = control)
   MCMC_obj = MCMC_initialize2(MCMC_setting)

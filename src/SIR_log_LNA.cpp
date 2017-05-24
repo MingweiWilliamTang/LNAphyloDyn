@@ -33,7 +33,7 @@ List IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2){
     Sigma = Sigma + (Sigma * F.t() + F * Sigma + Xinv * A.t() * H * A * Xinv) * dt;
   }
   List Res;
-  Res["expF"] = expmat(F0);
+  Res["expF"] = expM(F0);
   Res["Simga"] = Sigma + 0.000000001 * eye(2,2);
   return Res;
 }
@@ -41,7 +41,7 @@ List IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2){
 
 //[[Rcpp::export()]]
 arma::vec SIR_ODE(double X,double Y,double theta1,double theta2){
-  double dx,dy,dz;
+  double dx,dy;
   dx = -theta1 * exp(Y) - theta1*exp(Y-X)/2;
   dy = theta1 * exp(X) - theta2 - theta1 * exp(X-Y)/2 - theta2 *exp(-Y)/2;
   //  dz = theta2*exp(Y-Z) - theta2*exp(Y-2*Z)/2;

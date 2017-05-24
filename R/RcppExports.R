@@ -157,6 +157,10 @@ ESlice2 <- function(f_cur, OdeTraj, FTs, state, init, t_correct, lambda = 10, re
     .Call('LNAPhyloDyn_ESlice2', PACKAGE = 'LNAPhyloDyn', f_cur, OdeTraj, FTs, state, init, t_correct, lambda, reps, gridsize, funname, volz, beta)
 }
 
+ESlice2_log <- function(f_cur, OdeTraj, FTs, state, init, t_correct, lambda = 10, reps = 1L, gridsize = 100L, funname = "standard", volz = FALSE, beta = 0) {
+    .Call('LNAPhyloDyn_ESlice2_log', PACKAGE = 'LNAPhyloDyn', f_cur, OdeTraj, FTs, state, init, t_correct, lambda, reps, gridsize, funname, volz, beta)
+}
+
 DegenerateDet3 <- function(M) {
     .Call('LNAPhyloDyn_DegenerateDet3', PACKAGE = 'LNAPhyloDyn', M)
 }

@@ -33,6 +33,7 @@ arma::mat res = chols(sigma) * Y;
   }
   return res;
 }
+
 //[[Rcpp::export()]]
 arma::mat mvrnormArma2(int n, arma::mat sigma) {
   int ncols = sigma.n_cols;

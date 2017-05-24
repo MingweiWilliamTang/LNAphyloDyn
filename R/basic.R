@@ -76,3 +76,7 @@ random_trajectory3D = function(t,gridsize,trCube){
     legend("topright",legend=c("samplepath",paste("mean ",picName[i])),col=c("grey","blue"))
   }
 }
+
+Convert_R0 = function(MCMC_obj,beta_row_id = 3, gamma_row_id=4,sample_id,S0){
+  return(MCMC_obj$par[sample_id,beta_row_id]/MCMC_obj$par[sample_id,gamma_row_id]*S0)
+}

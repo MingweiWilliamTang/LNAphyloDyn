@@ -608,6 +608,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// ESlice2_log
+arma::mat ESlice2_log(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, double t_correct, double lambda, int reps, int gridsize, std::string funname, bool volz, double beta);
+RcppExport SEXP LNAPhyloDyn_ESlice2_log(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP funnameSEXP, SEXP volzSEXP, SEXP betaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type f_cur(f_curSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type OdeTraj(OdeTrajSEXP);
+    Rcpp::traits::input_parameter< List >::type FTs(FTsSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type state(stateSEXP);
+    Rcpp::traits::input_parameter< List >::type init(initSEXP);
+    Rcpp::traits::input_parameter< double >::type t_correct(t_correctSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< int >::type reps(repsSEXP);
+    Rcpp::traits::input_parameter< int >::type gridsize(gridsizeSEXP);
+    Rcpp::traits::input_parameter< std::string >::type funname(funnameSEXP);
+    Rcpp::traits::input_parameter< bool >::type volz(volzSEXP);
+    Rcpp::traits::input_parameter< double >::type beta(betaSEXP);
+    rcpp_result_gen = Rcpp::wrap(ESlice2_log(f_cur, OdeTraj, FTs, state, init, t_correct, lambda, reps, gridsize, funname, volz, beta));
+    return rcpp_result_gen;
+END_RCPP
+}
 // DegenerateDet3
 double DegenerateDet3(arma::mat M);
 RcppExport SEXP LNAPhyloDyn_DegenerateDet3(SEXP MSEXP) {

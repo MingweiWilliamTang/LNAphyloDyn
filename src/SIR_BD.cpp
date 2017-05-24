@@ -44,15 +44,15 @@ arma::mat SIR_BD_Fm_LNA(double X,double Y, double theta1,double theta2, double m
 //[[Rcpp::export()]]
 List SIR_BD_IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2,double theta3,double alpha,
                      double N, double period){
-  arma::mat Sigma,F(2,2);
+  arma::mat Sigma,F(2,2),F0(2,2);
   Sigma.zeros(2,2);
   int k = Traj_par.n_rows;
   arma::mat A;
   arma::vec h(4);
   A << -1 << 1  <<arma::endr<<0<< -1 << arma::endr
     << 1 <<0  <<arma::endr << 0 << -1 << arma::endr;
-  arma::mat H,F0,Xinv;
-  F0.zeros(2,2);
+  arma::mat H,Xinv;
+  F0 << 1 <<0 <<arma::endr << 0 << 1 <<endr;
   double t;
   for(int i = 0; i < k; i++){
     t = Traj_par(i,0);
@@ -63,11 +63,11 @@ List SIR_BD_IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2,do
     h(3) = theta3 * Traj_par(i,2);
     H = diagmat(h);
     F = SIR_BD_Fm_LNA(Traj_par(i,1),Traj_par(i,2), theta1, theta2, theta3,alpha,t,period);
-    F0 = F0 + F*dt;
+    F0 = F0 + (F * F0) * dt;
     Sigma = Sigma + (Sigma * F.t() + F * Sigma +  A.t() * H * A ) * dt;
   }
   List Res;
-  Res["expF"] = arma::expmat(F0);
+  Res["expF"] = F0;
   Res["Simga"] = Sigma;
   if(Sigma.has_nan()){
     Rcout<<Traj_par<<endl;
@@ -237,7 +237,7 @@ double log_like_trajSIR_BD(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
     if(SdeTraj(i+1,0) <= t_correct && i != 0){
       arma::mat INexp = ((Xd1 - A * Xd0).t() * SigInv * (Xd1 - A * Xd0));
       // Rcout <<  ((Xd1 - A * Xd0).t() * SigInv * (Xd1 - A * Xd0)) <<endl;
-      loglik += -log(arma::det(Scube.slice(i))) - 0.5 * INexp(0,0) ;
+      loglik += -log(arma::det(Scube.slice(i))) / 2 - 0.5 * INexp(0,0) ;
     }
     /*
     arma::mat A = Acube.slice(i);
@@ -285,7 +285,7 @@ List Traj_sim_SIR_BD(arma::vec initial, arma::mat OdeTraj, List Filter,double t_
       arma::mat l1 = (-0.5) * noise.t() * inv2(Sig) * noise;
       //     arma::mat l1  = (-0.5) * noise.t() * inv2(Sig + eye(3,3)*0.00001) * noise;
       //    loglike += -1.5 * log(det(Sig+eye(3,3)*0.00001)) + l1(0,0);
-      loglike += -log(arma::det(Sig)) + l1(0,0);
+      loglike += -log(arma::det(Sig))/2 + l1(0,0);
     }
     //    Rcout<<"test3"<<endl;
     LNA_traj(i+1,0) = OdeTraj((i+1), 0);
@@ -346,7 +346,7 @@ List Traj_sim_SIR_BD_ez(arma::vec initial, arma::vec times, arma::vec param,
       arma::mat l1 = (-0.5) * noise.t() * inv2(Sig) * noise;
       //     arma::mat l1  = (-0.5) * noise.t() * inv2(Sig + eye(3,3)*0.00001) * noise;
       //    loglike += -1.5 * log(det(Sig+eye(3,3)*0.00001)) + l1(0,0);
-      loglike += -log(arma::det(Sig)) + l1(0,0);
+      loglike += -log(arma::det(Sig))/2 + l1(0,0);
     }
     //    Rcout<<"test3"<<endl;
     LNA_traj(i+1,0) = OdeTraj((i+1), 0);
@@ -425,6 +425,7 @@ arma::mat ESlice_SIR_BD(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec 
       // newTraj.col(0) = f_cur.col(0);
       newTraj.cols(1,p) = f_prime + OdeTraj.cols(1,p);
       if(volz){
+        Rcout <<"vvvvv"<<endl;
         loglike = volz_loglik_nh(init, LogTraj(newTraj), betaN, t_correct, gridsize);
       }else{
         loglike = coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize);

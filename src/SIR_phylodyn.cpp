@@ -181,7 +181,6 @@ List SIR_log_KOM_Filter2(arma::mat OdeTraj,double theta1,double theta2,int grids
   arma::cube Scube(2,2,k);
   arma::mat Traj_part;
   for(int i=0;i<k;i++){
-//    Rcout<<i<<endl;
     Traj_part = OdeTraj.submat(i*gridsize,0,(i+1)*gridsize-1,2);
     List tempres((*IntS)(Traj_part,dt,theta1,theta2));
     Acube.slice(i) = as<arma::mat>(tempres[0]);
@@ -440,12 +439,13 @@ double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int
   while(f1(n0,0) < t_correct){
     n0 ++;
   }
+  //Rcout<<f1(n0,0)<<endl;
   //  Rcout<<n0<<endl;
   arma::vec f2(n0 + 1);
   for(int i = n0; i>0; i--){
     f2(n0-i) = f1(i,2);
   }
-  //  Rcout<<f2.n_rows<<"\t"<<as<int>(init[9])<<endl;
+   // Rcout<<f2.n_rows<<"\t"<<as<int>(init[9])<<endl;
   if(as<int>(init[9]) != f2.n_rows){
     Rcout<<"Incorrect length for f"<<endl;
   }
@@ -508,7 +508,7 @@ double volz_loglik(List init, arma::mat f1, double t_correct, double betaN, int 
 
   arma::vec ll = -2 * betaN * (as<vec>(init[2]) % as<vec>(init[3]) % (arma::exp(-f)) % (arma::exp(s))) +\
     as<vec>(init[4]) % (log(betaN) -f+s);
-  Rcout<< (arma::exp(-f)) % (arma::exp(s))<<endl;
+ // Rcout<< (arma::exp(-f)) % (arma::exp(s))<<endl;
   return sum(ll);
 }
 
@@ -689,8 +689,9 @@ arma::mat ESlice2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
     List v = Traj_sim(state,OdeTraj,FTs,t_correct);
     arma::mat v_traj = as<mat>(v[0]).cols(1,2) -  OdeTraj.cols(1,2);
     if(v_traj.has_nan()){
-      Rcout<<v_traj<<endl;
-      Rcout<<OdeTraj<<endl;
+      Rcout << "NA in traj" <<endl;
+      //Rcout<<v_traj<<endl;
+      //Rcout<<OdeTraj<<endl;
     }
     double u = R::runif(0,1);
     //  if(funname == "standard"){
@@ -747,5 +748,81 @@ arma::mat ESlice2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
   //Rcout<<coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize) <<endl;
   return newTraj;
 }
+
+
+//[[Rcpp::export()]]
+arma::mat ESlice2_log(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
+                  List init, double t_correct, double lambda=10, int reps=1, int gridsize = 100,std::string funname = "standard",
+                  bool volz = false, double beta = 0){
+  // OdeTraj is the one with low resolution
+  arma::mat newTraj(f_cur.n_rows, f_cur.n_cols);
+  double logy;
+  for(int count = 0; count < reps; count ++){
+    // centered the old trajectory without time grid
+    arma::mat f_cur_centered = f_cur.cols(1,2) - OdeTraj.cols(1,2);
+
+    List v = Traj_sim(state,OdeTraj,FTs,t_correct);
+    arma::mat v_traj = as<mat>(v[0]).cols(1,2) -  OdeTraj.cols(1,2);
+    if(v_traj.has_nan()){
+      return f_cur;
+      //Rcout<<v_traj<<endl;
+      //Rcout<<OdeTraj<<endl;
+    }
+    double u = R::runif(0,1);
+
+    if(volz){
+      logy = volz_loglik(init, f_cur, t_correct, beta, gridsize) + log(u);
+    }else{
+      logy = coal_loglik(init,f_cur,t_correct,lambda,gridsize) + log(u);
+    }
+
+    //   }else{
+    //     logy = coal_loglik(init,f_cur,t_correct,lambda,gridsize) + log(u);
+    //    }
+    double theta = R::runif(0,2 * pi);
+
+    double theta_min = theta - 2*pi;
+    double theta_max = theta;
+
+    arma::mat f_prime = f_cur_centered * cos(theta) + v_traj * sin(theta);
+    newTraj.col(0) = f_cur.col(0);
+    newTraj.cols(1,2) = f_prime + OdeTraj.cols(1,2);
+    int i = 0;
+    double loglike;
+    if(volz){
+      loglike = volz_loglik(init, newTraj, t_correct, beta, gridsize);
+    }else{
+      loglike = coal_loglik(init,newTraj,t_correct,lambda,gridsize);
+    }
+    while(newTraj.cols(1,2).min() <0 || loglike <= logy){
+      // shrink the bracket
+      i += 1;
+      if(i>20){break;
+        Rcout<<theta<<endl;}
+      if(theta < 0){
+        theta_min = theta;
+      }else{
+        theta_max = theta;
+      }
+      theta = R::runif(theta_min,theta_max);
+      f_prime = f_cur_centered * cos(theta) + v_traj * sin(theta);
+
+      newTraj.cols(1,2) = f_prime + OdeTraj.cols(1,2);
+      if(volz){
+        loglike = volz_loglik(init, newTraj, t_correct, beta, gridsize);
+      }else{
+        loglike = coal_loglik(init,newTraj,t_correct,lambda,gridsize);
+      }
+    }
+
+    f_cur = newTraj;
+    // Rcout<<coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize) <<endl;
+    //Rcout<< logy - coal_loglik(init,newTraj,t_correct,lambda,gridsize)<<"1"<<endl;
+  }
+
+  return newTraj;
+}
+
+
 
 

@@ -1,0 +1,1098 @@
+In file included from fileb0303b0277f2.cpp:8:
+In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math.hpp:4:
+In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:4:
+In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math/rev/core.hpp:12:
+In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5:
+In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math/rev/core/var.hpp:7:
+In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/BH/include/boost/math/tools/config.hpp:13:
+In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/BH/include/boost/config.hpp:39:
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/BH/include/boost/config/compiler/clang.hpp:196:11: warning: 'BOOST_NO_CXX11_RVALUE_REFERENCES' macro redefined [-Wmacro-redefined]
+#  define BOOST_NO_CXX11_RVALUE_REFERENCES
+          ^
+<command line>:6:9: note: previous definition is here
+#define BOOST_NO_CXX11_RVALUE_REFERENCES 1
+        ^
+fileb0303b0277f2.cpp:167:36: error: no matching function for call to 'integrate_ode_bdf'
+            stan::math::assign(X1, integrate_ode_bdf(SIR_changepoint_onestep_functor__(), Init, t0, static_cast<std::vector<fun_scalar_t__> >(stan::math::array_builder<fun_scalar_t__ >().add(t1).array()), theta, x_k, x_i, pstream__));
+                                   ^~~~~~~~~~~~~~~~~
+fileb0303b0277f2.cpp:662:72: note: in instantiation of function template specialization 'modelb030a27ccfb_LNA_Stan_change_point_namespace::LNA_rs_onestep<stan::math::var, double, double, stan::math::var, double>' requested here
+                        stan::math::assign(get_base1_lhs(FT,i,"FT",1), LNA_rs_onestep(to_row_vector(Init_State),get_base1(tt,i,"tt",1),get_base1(tt,(i + 1),"tt",1),theta,x_k,x_i, pstream__));
+                                                                       ^
+fileb0303b0277f2.cpp:693:14: note: in instantiation of function template specialization 'modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point::log_prob<true, true, stan::math::var>' requested here
+      return log_prob<propto,jacobian,T_>(vec_params_r, vec_params_i, pstream);
+             ^
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/src/stan/model/model_functional.hpp:21:31: note: in instantiation of function template specialization 'modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point::log_prob<true, true, stan::math::var>' requested here
+        return model.template log_prob<true, true, T>(x, o);
+                              ^
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math/rev/mat/functor/gradient.hpp:51:22: note: in instantiation of function template specialization 'stan::model::model_functional<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point>::operator()<stan::math::var>' requested here
+        var fx_var = f(x_var);
+                     ^
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/src/stan/model/gradient.hpp:30:21: note: in instantiation of function template specialization 'stan::math::gradient<stan::model::model_functional<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point> >' requested here
+        stan::math::gradient(model_functional<M>(model, &ss), x, f, grad_f);
+                    ^
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/src/stan/services/init/initialize_state.hpp:131:24: note: (skipping 1 context in backtrace; use -ftemplate-backtrace-limit=0 to see all)
+          stan::model::gradient(model, cont_params, init_log_prob,
+                       ^
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/src/stan/services/init/initialize_state.hpp:177:16: note: in instantiation of function template specialization 'stan::services::init::initialize_state_values<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point>' requested here
+        return initialize_state_values(cont_params, model, writer);
+               ^
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/src/stan/services/init/initialize_state.hpp:429:20: note: in instantiation of function template specialization 'stan::services::init::initialize_state_zero<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point>' requested here
+            return initialize_state_zero(cont_params, model, writer);
+                   ^
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/rstan/include/rstan/stan_fit.hpp:700:36: note: in instantiation of function template specialization 'stan::services::init::initialize_state<rstan::io::rlist_ref_var_context_factory, modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::additive_combine_engine<boost::random::linear_congruential_engine<unsigned int, 40014, 0, 2147483563>, boost::random::linear_congruential_engine<unsigned int, 40692, 0, 2147483399> > >' requested here
+        if (!stan::services::init::initialize_state(init,
+                                   ^
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/rstan/include/rstan/stan_fit.hpp:1496:13: note: in instantiation of function template specialization 'rstan::(anonymous namespace)::sampler_command<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::additive_combine_engine<boost::random::linear_congruential_engine<unsigned int, 40014, 0, 2147483563>, boost::random::linear_congruential_engine<unsigned int, 40692, 0, 2147483399> > >' requested here
+      ret = sampler_command(args, model_, holder, names_oi_tidx_,
+            ^
+fileb0303b0277f2.cpp:946:148: note: in instantiation of member function 'rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::additive_combine_engine<boost::random::linear_congruential_engine<unsigned int, 40014, 0, 2147483563>, boost::random::linear_congruential_engine<unsigned int, 40692, 0, 2147483399> > >::call_sampler' requested here
+            &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::call_sampler)
+                                                                                                                                                   ^
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math/rev/mat/functor/integrate_ode_bdf.hpp:83:5: note: candidate function [with F = modelb030a27ccfb_LNA_Stan_change_point_namespace::SIR_changepoint_onestep_functor__, T_initial = stan::math::var, T_param = stan::math::var] not viable: no known conversion from 'vector<fun_scalar_t__>' to 'const vector<double>' for 4th argument
+    integrate_ode_bdf(const F& f,
+    ^
+fileb0303b0277f2.cpp:662:72: error: no matching function for call to 'LNA_rs_onestep'
+                        stan::math::assign(get_base1_lhs(FT,i,"FT",1), LNA_rs_onestep(to_row_vector(Init_State),get_base1(tt,i,"tt",1),get_base1(tt,(i + 1),"tt",1),theta,x_k,x_i, pstream__));
+                                                                       ^~~~~~~~~~~~~~
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/src/stan/model/log_prob_grad.hpp:44:28: note: in instantiation of function template specialization 'modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point::log_prob<true, false, stan::math::var>' requested here
+          = model.template log_prob<propto, jacobian_adjust_transform>
+                           ^
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/src/stan/optimization/bfgs.hpp:348:17: note: in instantiation of function template specialization 'stan::model::log_prob_grad<true, false, modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point>' requested here
+          f = - log_prob_grad<true, false>(_model, _x, _params_i, _g, _msgs);
+                ^
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/src/stan/optimization/bfgs.hpp:152:15: note: in instantiation of member function 'stan::optimization::ModelAdaptor<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point>::operator()' requested here
+        ret = _func(_xk, _fk, _gk);
+              ^
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/src/stan/optimization/bfgs.hpp:411:19: note: in instantiation of member function 'stan::optimization::BFGSMinimizer<stan::optimization::ModelAdaptor<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point>, stan::optimization::LBFGSUpdate<double, -1>, double, -1>::initialize' requested here
+        BFGSBase::initialize(x);
+                  ^
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/src/stan/optimization/bfgs.hpp:403:9: note: in instantiation of member function 'stan::optimization::BFGSLineSearch<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, stan::optimization::LBFGSUpdate<double, -1>, double, -1>::initialize' requested here
+        initialize(params_r);
+        ^
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/rstan/include/rstan/stan_fit.hpp:902:21: note: in instantiation of member function 'stan::optimization::BFGSLineSearch<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, stan::optimization::LBFGSUpdate<double, -1>, double, -1>::BFGSLineSearch' requested here
+          Optimizer lbfgs(model, cont_vector, disc_vector, &rstan::io::rcout);
+                    ^
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/rstan/include/rstan/stan_fit.hpp:1496:13: note: in instantiation of function template specialization 'rstan::(anonymous namespace)::sampler_command<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::additive_combine_engine<boost::random::linear_congruential_engine<unsigned int, 40014, 0, 2147483563>, boost::random::linear_congruential_engine<unsigned int, 40692, 0, 2147483399> > >' requested here
+      ret = sampler_command(args, model_, holder, names_oi_tidx_,
+            ^
+fileb0303b0277f2.cpp:946:148: note: in instantiation of member function 'rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::additive_combine_engine<boost::random::linear_congruential_engine<unsigned int, 40014, 0, 2147483563>, boost::random::linear_congruential_engine<unsigned int, 40692, 0, 2147483399> > >::call_sampler' requested here
+            &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::call_sampler)
+                                                                                                                                                   ^
+fileb0303b0277f2.cpp:136:1: note: candidate template ignored: substitution failure [with T0__ = stan::math::var, T1__ = double, T2__ = double, T3__ = stan::math::var, T4__ = double]
+LNA_rs_onestep(const Eigen::Matrix<T0__, 1,Eigen::Dynamic>& SI,
+^
+In file included from fileb0303b0277f2.cpp:935:
+In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/rstan/include/rstan/rstaninc.hpp:3:
+In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/rstan/include/rstan/stan_fit.hpp:28:
+In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/src/stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp:6:
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/src/stan/model/log_prob_propto.hpp:45:28: error: no matching member function for call to 'log_prob'
+          = model.template log_prob<true, jacobian_adjust_transform>
+            ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Frameworks/R.framework/Versions/3.3/Resources/library/rstan/include/rstan/stan_fit.hpp:1419:42: note: in instantiation of function template specialization 'stan::model::log_prob_propto<false, modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point>' requested here
+          return Rcpp::wrap(stan::model::log_prob_propto<false>(model_, par_r, par_i, &rstan::io::rcout));
+                                         ^
+fileb0303b0277f2.cpp:964:148: note: in instantiation of member function 'rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::additive_combine_engine<boost::random::linear_congruential_engine<unsigned int, 40014, 0, 2147483563>, boost::random::linear_congruential_engine<unsigned int, 40692, 0, 2147483399> > >::log_prob' requested here
+            &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::log_prob)
+                                                                                                                                                   ^
+fileb0303b0277f2.cpp:540:9: note: candidate template ignored: substitution failure [with propto__ = true, jacobian__ = false, T__ = stan::math::var]
+    T__ log_prob(vector<T__>& params_r__,
+        ^
+fileb0303b0277f2.cpp:686:8: note: candidate function template not viable: requires at most 2 arguments, but 3 were provided
+    T_ log_prob(Eigen::Matrix<T_,Eigen::Dynamic,1>& params_r,
+       ^
+1 warning and 3 errors generated.
+make: *** [fileb0303b0277f2.o] Error 1
+
+ERROR(s) during compilation: source code errors or compiler configuration errors!
+
+Program source:
+  1: 
+  2: // includes from the plugin
+  3: 
+  4: 
+  5: // user includes
+  6: #define STAN__SERVICES__COMMAND_HPP// Code generated by Stan version 2.14
+  7: 
+  8: #include <stan/model/model_header.hpp>
+  9: 
+ 10: namespace modelb030a27ccfb_LNA_Stan_change_point_namespace {
+ 11: 
+ 12: using std::istream;
+ 13: using std::string;
+ 14: using std::stringstream;
+ 15: using std::vector;
+ 16: using stan::io::dump;
+ 17: using stan::math::lgamma;
+ 18: using stan::model::prob_grad;
+ 19: using namespace stan::math;
+ 20: 
+ 21: typedef Eigen::Matrix<double,Eigen::Dynamic,1> vector_d;
+ 22: typedef Eigen::Matrix<double,1,Eigen::Dynamic> row_vector_d;
+ 23: typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> matrix_d;
+ 24: 
+ 25: static int current_statement_begin__;
+ 26: 
+ 27: template <typename T0__, typename T1__, typename T2__, typename T3__>
+ 28: std::vector<typename boost::math::tools::promote_args<T0__, T1__, T2__, T3__>::type>
+ 29: SIR_changepoint_onestep(const T0__& t,
+ 30:                             const std::vector<T1__>& X,
+ 31:                             const std::vector<T2__>& theta,
+ 32:                             const std::vector<T3__>& x_k,
+ 33:                             const std::vector<int>& x_i, std::ostream* pstream__) {
+ 34:     typedef typename boost::math::tools::promote_args<T0__, T1__, T2__, T3__>::type fun_scalar_t__;
+ 35:     typedef fun_scalar_t__ fun_return_scalar_t__;
+ 36:     const static bool propto__ = true;
+ 37:     (void) propto__;
+ 38:         fun_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
+ 39:         (void) DUMMY_VAR__;  // suppress unused var warning
+ 40: 
+ 41:     int current_statement_begin__ = -1;
+ 42:     try {
+ 43:         {
+ 44:             fun_scalar_t__ betat;
+ 45:             (void) betat;  // dummy to suppress unused var warning
+ 46:             stan::math::initialize(betat, std::numeric_limits<double>::quiet_NaN());
+ 47:             stan::math::fill(betat,DUMMY_VAR__);
+ 48:             fun_scalar_t__ gamma;
+ 49:             (void) gamma;  // dummy to suppress unused var warning
+ 50:             stan::math::initialize(gamma, std::numeric_limits<double>::quiet_NaN());
+ 51:             stan::math::fill(gamma,DUMMY_VAR__);
+ 52:             fun_scalar_t__ N;
+ 53:             (void) N;  // dummy to suppress unused var warning
+ 54:             stan::math::initialize(N, std::numeric_limits<double>::quiet_NaN());
+ 55:             stan::math::fill(N,DUMMY_VAR__);
+ 56:             vector<fun_scalar_t__> dX(5);
+ 57:             stan::math::initialize(dX, std::numeric_limits<double>::quiet_NaN());
+ 58:             stan::math::fill(dX,DUMMY_VAR__);
+ 59:             Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic>  A(static_cast<Eigen::VectorXd::Index>(2),static_cast<Eigen::VectorXd::Index>(2));
+ 60:             (void) A;  // dummy to suppress unused var warning
+ 61:             stan::math::initialize(A, std::numeric_limits<double>::quiet_NaN());
+ 62:             stan::math::fill(A,DUMMY_VAR__);
+ 63:             Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic>  S(static_cast<Eigen::VectorXd::Index>(2),static_cast<Eigen::VectorXd::Index>(2));
+ 64:             (void) S;  // dummy to suppress unused var warning
+ 65:             stan::math::initialize(S, std::numeric_limits<double>::quiet_NaN());
+ 66:             stan::math::fill(S,DUMMY_VAR__);
+ 67:             Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic>  F(static_cast<Eigen::VectorXd::Index>(2),static_cast<Eigen::VectorXd::Index>(2));
+ 68:             (void) F;  // dummy to suppress unused var warning
+ 69:             stan::math::initialize(F, std::numeric_limits<double>::quiet_NaN());
+ 70:             stan::math::fill(F,DUMMY_VAR__);
+ 71:             Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1>  h(static_cast<Eigen::VectorXd::Index>(2));
+ 72:             (void) h;  // dummy to suppress unused var warning
+ 73:             stan::math::initialize(h, std::numeric_limits<double>::quiet_NaN());
+ 74:             stan::math::fill(h,DUMMY_VAR__);
+ 75: 
+ 76: 
+ 77:             current_statement_begin__ = 33;
+ 78:             stan::math::assign(A, to_matrix(static_cast<std::vector<std::vector<int> > >(stan::math::array_builder<std::vector<int> >().add(static_cast<std::vector<int> >(stan::math::array_builder<int >().add(-(1)).add(1).array())).add(static_cast<std::vector<int> >(stan::math::array_builder<int >().add(0).add(-(1)).array())).array())));
+ 79:             current_statement_begin__ = 34;
+ 80:             stan::math::assign(S, to_matrix(static_cast<std::vector<std::vector<fun_scalar_t__> > >(stan::math::array_builder<std::vector<fun_scalar_t__> >().add(static_cast<std::vector<fun_scalar_t__> >(stan::math::array_builder<fun_scalar_t__ >().add(get_base1(X,3,"X",1)).add(get_base1(X,4,"X",1)).array())).add(static_cast<std::vector<fun_scalar_t__> >(stan::math::array_builder<fun_scalar_t__ >().add(get_base1(X,4,"X",1)).add(get_base1(X,5,"X",1)).array())).array())));
+ 81:             current_statement_begin__ = 36;
+ 82:             stan::math::assign(N, 10000000);
+ 83:             current_statement_begin__ = 37;
+ 84:             stan::math::assign(betat, (((get_base1(theta,1,"theta",1) + (logical_gt(t,0.69999999999999996) * get_base1(theta,3,"theta",1))) * get_base1(theta,2,"theta",1)) / N));
+ 85:             current_statement_begin__ = 38;
+ 86:             stan::math::assign(gamma, get_base1(theta,2,"theta",1));
+ 87:             current_statement_begin__ = 40;
+ 88:             stan::math::assign(get_base1_lhs(h,1,"h",1), ((betat * get_base1(X,1,"X",1)) * get_base1(X,2,"X",1)));
+ 89:             current_statement_begin__ = 41;
+ 90:             stan::math::assign(get_base1_lhs(h,2,"h",1), (gamma * get_base1(X,2,"X",1)));
+ 91:             current_statement_begin__ = 43;
+ 92:             stan::math::assign(get_base1_lhs(F,1,1,"F",1), (-(betat) * get_base1(X,2,"X",1)));
+ 93:             current_statement_begin__ = 44;
+ 94:             stan::math::assign(get_base1_lhs(F,1,2,"F",1), (-(betat) * get_base1(X,1,"X",1)));
+ 95:             current_statement_begin__ = 45;
+ 96:             stan::math::assign(get_base1_lhs(F,2,1,"F",1), (betat * get_base1(X,2,"X",1)));
+ 97:             current_statement_begin__ = 46;
+ 98:             stan::math::assign(get_base1_lhs(F,2,2,"F",1), ((betat * get_base1(X,1,"X",1)) - gamma));
+ 99:             current_statement_begin__ = 49;
+100:             stan::math::assign(S, add(add(multiply(F,S),multiply(S,transpose(F))),multiply(multiply(transpose(A),diag_matrix(h)),A)));
+101:             current_statement_begin__ = 50;
+102:             stan::math::assign(get_base1_lhs(dX,1,"dX",1), ((-(betat) * get_base1(X,1,"X",1)) * get_base1(X,2,"X",1)));
+103:             current_statement_begin__ = 51;
+104:             stan::math::assign(get_base1_lhs(dX,2,"dX",1), (((betat * get_base1(X,1,"X",1)) * get_base1(X,2,"X",1)) - (gamma * get_base1(X,2,"X",1))));
+105:             current_statement_begin__ = 53;
+106:             stan::math::assign(get_base1_lhs(dX,3,"dX",1), get_base1(S,1,1,"S",1));
+107:             current_statement_begin__ = 54;
+108:             stan::math::assign(get_base1_lhs(dX,4,"dX",1), get_base1(S,1,2,"S",1));
+109:             current_statement_begin__ = 55;
+110:             stan::math::assign(get_base1_lhs(dX,5,"dX",1), get_base1(S,2,2,"S",1));
+111:             current_statement_begin__ = 57;
+112:             return stan::math::promote_scalar<fun_return_scalar_t__>(dX);
+113:         }
+114:     } catch (const std::exception& e) {
+115:         stan::lang::rethrow_located(e,current_statement_begin__);
+116:         // Next line prevents compiler griping about no return
+117:         throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***");
+118:     }
+119: }
+120: 
+121: 
+122: struct SIR_changepoint_onestep_functor__ {
+123:     template <typename T0__, typename T1__, typename T2__, typename T3__>
+124:         std::vector<typename boost::math::tools::promote_args<T0__, T1__, T2__, T3__>::type>
+125:     operator()(const T0__& t,
+126:                             const std::vector<T1__>& X,
+127:                             const std::vector<T2__>& theta,
+128:                             const std::vector<T3__>& x_k,
+129:                             const std::vector<int>& x_i, std::ostream* pstream__) const {
+130:         return SIR_changepoint_onestep(t, X, theta, x_k, x_i, pstream__);
+131:     }
+132: };
+133: 
+134: template <typename T0__, typename T1__, typename T2__, typename T3__, typename T4__>
+135: Eigen::Matrix<typename boost::math::tools::promote_args<T0__, T1__, T2__, T3__, typename boost::math::tools::promote_args<T4__>::type>::type, Eigen::Dynamic,Eigen::Dynamic>
+136: LNA_rs_onestep(const Eigen::Matrix<T0__, 1,Eigen::Dynamic>& SI,
+137:                    const T1__& t0,
+138:                    const T2__& t1,
+139:                    const std::vector<T3__>& theta,
+140:                    const std::vector<T4__>& x_k,
+141:                    const std::vector<int>& x_i, std::ostream* pstream__) {
+142:     typedef typename boost::math::tools::promote_args<T0__, T1__, T2__, T3__, typename boost::math::tools::promote_args<T4__>::type>::type fun_scalar_t__;
+143:     typedef fun_scalar_t__ fun_return_scalar_t__;
+144:     const static bool propto__ = true;
+145:     (void) propto__;
+146:         fun_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
+147:         (void) DUMMY_VAR__;  // suppress unused var warning
+148: 
+149:     int current_statement_begin__ = -1;
+150:     try {
+151:         {
+152:             vector<vector<fun_scalar_t__> > X1(1, (vector<fun_scalar_t__>(5)));
+153:             stan::math::initialize(X1, std::numeric_limits<double>::quiet_NaN());
+154:             stan::math::fill(X1,DUMMY_VAR__);
+155:             vector<fun_scalar_t__> Init(5);
+156:             stan::math::initialize(Init, std::numeric_limits<double>::quiet_NaN());
+157:             stan::math::fill(Init,DUMMY_VAR__);
+158:             Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic>  res(static_cast<Eigen::VectorXd::Index>(3),static_cast<Eigen::VectorXd::Index>(2));
+159:             (void) res;  // dummy to suppress unused var warning
+160:             stan::math::initialize(res, std::numeric_limits<double>::quiet_NaN());
+161:             stan::math::fill(res,DUMMY_VAR__);
+162: 
+163: 
+164:             current_statement_begin__ = 64;
+165:             stan::math::assign(Init, static_cast<std::vector<fun_scalar_t__> >(stan::math::array_builder<fun_scalar_t__ >().add(get_base1(SI,1,"SI",1)).add(get_base1(SI,2,"SI",1)).add(0.0).add(0.0).add(0.0).array()));
+166:             current_statement_begin__ = 66;
+167:             stan::math::assign(X1, integrate_ode_bdf(SIR_changepoint_onestep_functor__(), Init, t0, static_cast<std::vector<fun_scalar_t__> >(stan::math::array_builder<fun_scalar_t__ >().add(t1).array()), theta, x_k, x_i, pstream__));
+168:             current_statement_begin__ = 71;
+169:             stan::math::assign(get_base1_lhs(res,1,1,"res",1), get_base1(get_base1(X1,1,"X1",1),1,"X1",2));
+170:             current_statement_begin__ = 72;
+171:             stan::math::assign(get_base1_lhs(res,1,2,"res",1), get_base1(get_base1(X1,1,"X1",1),2,"X1",2));
+172:             current_statement_begin__ = 74;
+173:             stan::math::assign(get_base1_lhs(res,2,1,"res",1), get_base1(get_base1(X1,1,"X1",1),3,"X1",2));
+174:             current_statement_begin__ = 75;
+175:             stan::math::assign(get_base1_lhs(res,2,2,"res",1), get_base1(get_base1(X1,1,"X1",1),4,"X1",2));
+176:             current_statement_begin__ = 76;
+177:             stan::math::assign(get_base1_lhs(res,3,1,"res",1), get_base1(get_base1(X1,1,"X1",1),4,"X1",2));
+178:             current_statement_begin__ = 77;
+179:             stan::math::assign(get_base1_lhs(res,3,2,"res",1), get_base1(get_base1(X1,1,"X1",1),5,"X1",2));
+180:             current_statement_begin__ = 78;
+181:             return stan::math::promote_scalar<fun_return_scalar_t__>(res);
+182:         }
+183:     } catch (const std::exception& e) {
+184:         stan::lang::rethrow_located(e,current_statement_begin__);
+185:         // Next line prevents compiler griping about no return
+186:         throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***");
+187:     }
+188: }
+189: 
+190: 
+191: struct LNA_rs_onestep_functor__ {
+192:     template <typename T0__, typename T1__, typename T2__, typename T3__, typename T4__>
+193:         Eigen::Matrix<typename boost::math::tools::promote_args<T0__, T1__, T2__, T3__, typename boost::math::tools::promote_args<T4__>::type>::type, Eigen::Dynamic,Eigen::Dynamic>
+194:     operator()(const Eigen::Matrix<T0__, 1,Eigen::Dynamic>& SI,
+195:                    const T1__& t0,
+196:                    const T2__& t1,
+197:                    const std::vector<T3__>& theta,
+198:                    const std::vector<T4__>& x_k,
+199:                    const std::vector<int>& x_i, std::ostream* pstream__) const {
+200:         return LNA_rs_onestep(SI, t0, t1, theta, x_k, x_i, pstream__);
+201:     }
+202: };
+203: 
+204: template <typename T0__, typename T1__, typename T2__, typename T3__, typename T5__, typename T6__, typename T8__>
+205: typename boost::math::tools::promote_args<T0__, T1__, T2__, T3__, typename boost::math::tools::promote_args<T5__, T6__, T8__>::type>::type
+206: coal_log_stan(const Eigen::Matrix<T0__, Eigen::Dynamic,1>& w,
+207:                   const Eigen::Matrix<T1__, Eigen::Dynamic,1>& C,
+208:                   const Eigen::Matrix<T2__, Eigen::Dynamic,1>& y,
+209:                   const Eigen::Matrix<T3__, Eigen::Dynamic,1>& tt,
+210:                   const std::vector<int>& tids,
+211:                   const Eigen::Matrix<T5__, Eigen::Dynamic,Eigen::Dynamic>& SI,
+212:                   const std::vector<T6__>& theta,
+213:                   const int& nc,
+214:                   const std::vector<T8__>& x_r, std::ostream* pstream__) {
+215:     typedef typename boost::math::tools::promote_args<T0__, T1__, T2__, T3__, typename boost::math::tools::promote_args<T5__, T6__, T8__>::type>::type fun_scalar_t__;
+216:     typedef fun_scalar_t__ fun_return_scalar_t__;
+217:     const static bool propto__ = true;
+218:     (void) propto__;
+219:         fun_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
+220:         (void) DUMMY_VAR__;  // suppress unused var warning
+221: 
+222:     int current_statement_begin__ = -1;
+223:     try {
+224:         {
+225:             fun_scalar_t__ log_like;
+226:             (void) log_like;  // dummy to suppress unused var warning
+227:             stan::math::initialize(log_like, std::numeric_limits<double>::quiet_NaN());
+228:             stan::math::fill(log_like,DUMMY_VAR__);
+229:             fun_scalar_t__ Ne_inv;
+230:             (void) Ne_inv;  // dummy to suppress unused var warning
+231:             stan::math::initialize(Ne_inv, std::numeric_limits<double>::quiet_NaN());
+232:             stan::math::fill(Ne_inv,DUMMY_VAR__);
+233:             fun_scalar_t__ t;
+234:             (void) t;  // dummy to suppress unused var warning
+235:             stan::math::initialize(t, std::numeric_limits<double>::quiet_NaN());
+236:             stan::math::fill(t,DUMMY_VAR__);
+237:             fun_scalar_t__ betat;
+238:             (void) betat;  // dummy to suppress unused var warning
+239:             stan::math::initialize(betat, std::numeric_limits<double>::quiet_NaN());
+240:             stan::math::fill(betat,DUMMY_VAR__);
+241: 
+242: 
+243:             current_statement_begin__ = 96;
+244:             stan::math::assign(log_like, 0);
+245:             current_statement_begin__ = 98;
+246:             for (int i = 1; i <= nc; ++i) {
+247: 
+248:                 current_statement_begin__ = 99;
+249:                 stan::math::assign(t, get_base1(tt,get_base1(tids,i,"tids",1),"tt",1));
+250:                 current_statement_begin__ = 100;
+251:                 stan::math::assign(betat, (((get_base1(theta,1,"theta",1) + (get_base1(theta,3,"theta",1) * logical_gt(t,get_base1(x_r,2,"x_r",1)))) * get_base1(theta,2,"theta",1)) / get_base1(x_r,1,"x_r",1)));
+252:                 current_statement_begin__ = 101;
+253:                 stan::math::assign(Ne_inv, (get_base1(theta,4,"theta",1) / get_base1(SI,get_base1(tids,i,"tids",1),2,"SI",1)));
+254:                 current_statement_begin__ = 102;
+255:                 stan::math::assign(log_like, ((log_like + (log(Ne_inv) * get_base1(y,i,"y",1))) - (((2 * get_base1(w,i,"w",1)) * get_base1(C,i,"C",1)) * Ne_inv)));
+256:             }
+257:             current_statement_begin__ = 105;
+258:             return stan::math::promote_scalar<fun_return_scalar_t__>(log_like);
+259:         }
+260:     } catch (const std::exception& e) {
+261:         stan::lang::rethrow_located(e,current_statement_begin__);
+262:         // Next line prevents compiler griping about no return
+263:         throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***");
+264:     }
+265: }
+266: 
+267: 
+268: struct coal_log_stan_functor__ {
+269:     template <typename T0__, typename T1__, typename T2__, typename T3__, typename T5__, typename T6__, typename T8__>
+270:         typename boost::math::tools::promote_args<T0__, T1__, T2__, T3__, typename boost::math::tools::promote_args<T5__, T6__, T8__>::type>::type
+271:     operator()(const Eigen::Matrix<T0__, Eigen::Dynamic,1>& w,
+272:                   const Eigen::Matrix<T1__, Eigen::Dynamic,1>& C,
+273:                   const Eigen::Matrix<T2__, Eigen::Dynamic,1>& y,
+274:                   const Eigen::Matrix<T3__, Eigen::Dynamic,1>& tt,
+275:                   const std::vector<int>& tids,
+276:                   const Eigen::Matrix<T5__, Eigen::Dynamic,Eigen::Dynamic>& SI,
+277:                   const std::vector<T6__>& theta,
+278:                   const int& nc,
+279:                   const std::vector<T8__>& x_r, std::ostream* pstream__) const {
+280:         return coal_log_stan(w, C, y, tt, tids, SI, theta, nc, x_r, pstream__);
+281:     }
+282: };
+283: 
+284: class modelb030a27ccfb_LNA_Stan_change_point : public prob_grad {
+285: private:
+286:     int ngrid;
+287:     vector<double> x_r;
+288:     vector<double> tt;
+289:     int nc;
+290:     vector<int> tids;
+291:     vector_d w;
+292:     vector_d C;
+293:     vector_d y;
+294:     vector<double> x_k;
+295:     vector<int> x_i;
+296: public:
+297:     modelb030a27ccfb_LNA_Stan_change_point(stan::io::var_context& context__,
+298:         std::ostream* pstream__ = 0)
+299:         : prob_grad(0) {
+300:         typedef boost::ecuyer1988 rng_t;
+301:         rng_t base_rng(0);  // 0 seed default
+302:         ctor_body(context__, base_rng, pstream__);
+303:     }
+304: 
+305:     template <class RNG>
+306:     modelb030a27ccfb_LNA_Stan_change_point(stan::io::var_context& context__,
+307:         RNG& base_rng__,
+308:         std::ostream* pstream__ = 0)
+309:         : prob_grad(0) {
+310:         ctor_body(context__, base_rng__, pstream__);
+311:     }
+312: 
+313:     template <class RNG>
+314:     void ctor_body(stan::io::var_context& context__,
+315:                    RNG& base_rng__,
+316:                    std::ostream* pstream__) {
+317:         current_statement_begin__ = -1;
+318: 
+319:         static const char* function__ = "modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point";
+320:         (void) function__; // dummy call to supress warning
+321:         size_t pos__;
+322:         (void) pos__; // dummy call to supress warning
+323:         std::vector<int> vals_i__;
+324:         std::vector<double> vals_r__;
+325:         double DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
+326:         (void) DUMMY_VAR__;  // suppress unused var warning
+327: 
+328:         // initialize member variables
+329:         context__.validate_dims("data initialization", "ngrid", "int", context__.to_vec());
+330:         ngrid = int(0);
+331:         vals_i__ = context__.vals_i("ngrid");
+332:         pos__ = 0;
+333:         ngrid = vals_i__[pos__++];
+334:         context__.validate_dims("data initialization", "x_r", "double", context__.to_vec(2));
+335:         validate_non_negative_index("x_r", "2", 2);
+336:         x_r = std::vector<double>(2,double(0));
+337:         vals_r__ = context__.vals_r("x_r");
+338:         pos__ = 0;
+339:         size_t x_r_limit_0__ = 2;
+340:         for (size_t i_0__ = 0; i_0__ < x_r_limit_0__; ++i_0__) {
+341:             x_r[i_0__] = vals_r__[pos__++];
+342:         }
+343:         context__.validate_dims("data initialization", "tt", "double", context__.to_vec((ngrid + 1)));
+344:         validate_non_negative_index("tt", "(ngrid + 1)", (ngrid + 1));
+345:         tt = std::vector<double>((ngrid + 1),double(0));
+346:         vals_r__ = context__.vals_r("tt");
+347:         pos__ = 0;
+348:         size_t tt_limit_0__ = (ngrid + 1);
+349:         for (size_t i_0__ = 0; i_0__ < tt_limit_0__; ++i_0__) {
+350:             tt[i_0__] = vals_r__[pos__++];
+351:         }
+352:         context__.validate_dims("data initialization", "nc", "int", context__.to_vec());
+353:         nc = int(0);
+354:         vals_i__ = context__.vals_i("nc");
+355:         pos__ = 0;
+356:         nc = vals_i__[pos__++];
+357:         context__.validate_dims("data initialization", "tids", "int", context__.to_vec(nc));
+358:         validate_non_negative_index("tids", "nc", nc);
+359:         tids = std::vector<int>(nc,int(0));
+360:         vals_i__ = context__.vals_i("tids");
+361:         pos__ = 0;
+362:         size_t tids_limit_0__ = nc;
+363:         for (size_t i_0__ = 0; i_0__ < tids_limit_0__; ++i_0__) {
+364:             tids[i_0__] = vals_i__[pos__++];
+365:         }
+366:         validate_non_negative_index("w", "nc", nc);
+367:         w = vector_d(static_cast<Eigen::VectorXd::Index>(nc));
+368:         context__.validate_dims("data initialization", "w", "vector_d", context__.to_vec(nc));
+369:         vals_r__ = context__.vals_r("w");
+370:         pos__ = 0;
+371:         size_t w_i_vec_lim__ = nc;
+372:         for (size_t i_vec__ = 0; i_vec__ < w_i_vec_lim__; ++i_vec__) {
+373:             w[i_vec__] = vals_r__[pos__++];
+374:         }
+375:         validate_non_negative_index("C", "nc", nc);
+376:         C = vector_d(static_cast<Eigen::VectorXd::Index>(nc));
+377:         context__.validate_dims("data initialization", "C", "vector_d", context__.to_vec(nc));
+378:         vals_r__ = context__.vals_r("C");
+379:         pos__ = 0;
+380:         size_t C_i_vec_lim__ = nc;
+381:         for (size_t i_vec__ = 0; i_vec__ < C_i_vec_lim__; ++i_vec__) {
+382:             C[i_vec__] = vals_r__[pos__++];
+383:         }
+384:         validate_non_negative_index("y", "nc", nc);
+385:         y = vector_d(static_cast<Eigen::VectorXd::Index>(nc));
+386:         context__.validate_dims("data initialization", "y", "vector_d", context__.to_vec(nc));
+387:         vals_r__ = context__.vals_r("y");
+388:         pos__ = 0;
+389:         size_t y_i_vec_lim__ = nc;
+390:         for (size_t i_vec__ = 0; i_vec__ < y_i_vec_lim__; ++i_vec__) {
+391:             y[i_vec__] = vals_r__[pos__++];
+392:         }
+393: 
+394:         // validate, data variables
+395:         check_greater_or_equal(function__,"ngrid",ngrid,1);
+396:         // initialize data variables
+397:         validate_non_negative_index("x_k", "0", 0);
+398:         x_k = std::vector<double>(0,double(0));
+399:         stan::math::fill(x_k,DUMMY_VAR__);
+400:         validate_non_negative_index("x_i", "0", 0);
+401:         x_i = std::vector<int>(0,int(0));
+402:         stan::math::fill(x_i, std::numeric_limits<int>::min());
+403: 
+404:         try {
+405:         } catch (const std::exception& e) {
+406:             stan::lang::rethrow_located(e,current_statement_begin__);
+407:             // Next line prevents compiler griping about no return
+408:             throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***");
+409:         }
+410: 
+411:         // validate transformed data
+412: 
+413:         // set parameter ranges
+414:         num_params_r__ = 0U;
+415:         param_ranges_i__.clear();
+416:         ++num_params_r__;
+417:         ++num_params_r__;
+418:         ++num_params_r__;
+419:         ++num_params_r__;
+420:         ++num_params_r__;
+421:         num_params_r__ += ngrid * 2;
+422:     }
+423: 
+424:     ~modelb030a27ccfb_LNA_Stan_change_point() { }
+425: 
+426: 
+427:     void transform_inits(const stan::io::var_context& context__,
+428:                          std::vector<int>& params_i__,
+429:                          std::vector<double>& params_r__,
+430:                          std::ostream* pstream__) const {
+431:         stan::io::writer<double> writer__(params_r__,params_i__);
+432:         size_t pos__;
+433:         (void) pos__; // dummy call to supress warning
+434:         std::vector<double> vals_r__;
+435:         std::vector<int> vals_i__;
+436: 
+437:         if (!(context__.contains_r("R0")))
+438:             throw std::runtime_error("variable R0 missing");
+439:         vals_r__ = context__.vals_r("R0");
+440:         pos__ = 0U;
+441:         context__.validate_dims("initialization", "R0", "double", context__.to_vec());
+442:         // generate_declaration R0
+443:         double R0(0);
+444:         R0 = vals_r__[pos__++];
+445:         try {
+446:             writer__.scalar_lub_unconstrain(0,10,R0);
+447:         } catch (const std::exception& e) { 
+448:             throw std::runtime_error(std::string("Error transforming variable R0: ") + e.what());
+449:         }
+450: 
+451:         if (!(context__.contains_r("gamma")))
+452:             throw std::runtime_error("variable gamma missing");
+453:         vals_r__ = context__.vals_r("gamma");
+454:         pos__ = 0U;
+455:         context__.validate_dims("initialization", "gamma", "double", context__.to_vec());
+456:         // generate_declaration gamma
+457:         double gamma(0);
+458:         gamma = vals_r__[pos__++];
+459:         try {
+460:             writer__.scalar_lb_unconstrain(0,gamma);
+461:         } catch (const std::exception& e) { 
+462:             throw std::runtime_error(std::string("Error transforming variable gamma: ") + e.what());
+463:         }
+464: 
+465:         if (!(context__.contains_r("ch")))
+466:             throw std::runtime_error("variable ch missing");
+467:         vals_r__ = context__.vals_r("ch");
+468:         pos__ = 0U;
+469:         context__.validate_dims("initialization", "ch", "double", context__.to_vec());
+470:         // generate_declaration ch
+471:         double ch(0);
+472:         ch = vals_r__[pos__++];
+473:         try {
+474:             writer__.scalar_lb_unconstrain(0,ch);
+475:         } catch (const std::exception& e) { 
+476:             throw std::runtime_error(std::string("Error transforming variable ch: ") + e.what());
+477:         }
+478: 
+479:         if (!(context__.contains_r("Alpha")))
+480:             throw std::runtime_error("variable Alpha missing");
+481:         vals_r__ = context__.vals_r("Alpha");
+482:         pos__ = 0U;
+483:         context__.validate_dims("initialization", "Alpha", "double", context__.to_vec());
+484:         // generate_declaration Alpha
+485:         double Alpha(0);
+486:         Alpha = vals_r__[pos__++];
+487:         try {
+488:             writer__.scalar_lb_unconstrain(0,Alpha);
+489:         } catch (const std::exception& e) { 
+490:             throw std::runtime_error(std::string("Error transforming variable Alpha: ") + e.what());
+491:         }
+492: 
+493:         if (!(context__.contains_r("lambda")))
+494:             throw std::runtime_error("variable lambda missing");
+495:         vals_r__ = context__.vals_r("lambda");
+496:         pos__ = 0U;
+497:         context__.validate_dims("initialization", "lambda", "double", context__.to_vec());
+498:         // generate_declaration lambda
+499:         double lambda(0);
+500:         lambda = vals_r__[pos__++];
+501:         try {
+502:             writer__.scalar_lb_unconstrain(1,lambda);
+503:         } catch (const std::exception& e) { 
+504:             throw std::runtime_error(std::string("Error transforming variable lambda: ") + e.what());
+505:         }
+506: 
+507:         if (!(context__.contains_r("SI")))
+508:             throw std::runtime_error("variable SI missing");
+509:         vals_r__ = context__.vals_r("SI");
+510:         pos__ = 0U;
+511:         context__.validate_dims("initialization", "SI", "matrix_d", context__.to_vec(ngrid,2));
+512:         // generate_declaration SI
+513:         matrix_d SI(static_cast<Eigen::VectorXd::Index>(ngrid),static_cast<Eigen::VectorXd::Index>(2));
+514:         for (int j2__ = 0U; j2__ < 2; ++j2__)
+515:             for (int j1__ = 0U; j1__ < ngrid; ++j1__)
+516:                 SI(j1__,j2__) = vals_r__[pos__++];
+517:         try {
+518:             writer__.matrix_lb_unconstrain(1,SI);
+519:         } catch (const std::exception& e) { 
+520:             throw std::runtime_error(std::string("Error transforming variable SI: ") + e.what());
+521:         }
+522: 
+523:         params_r__ = writer__.data_r();
+524:         params_i__ = writer__.data_i();
+525:     }
+526: 
+527:     void transform_inits(const stan::io::var_context& context,
+528:                          Eigen::Matrix<double,Eigen::Dynamic,1>& params_r,
+529:                          std::ostream* pstream__) const {
+530:       std::vector<double> params_r_vec;
+531:       std::vector<int> params_i_vec;
+532:       transform_inits(context, params_i_vec, params_r_vec, pstream__);
+533:       params_r.resize(params_r_vec.size());
+534:       for (int i = 0; i < params_r.size(); ++i)
+535:         params_r(i) = params_r_vec[i];
+536:     }
+537: 
+538: 
+539:     template <bool propto__, bool jacobian__, typename T__>
+540:     T__ log_prob(vector<T__>& params_r__,
+541:                  vector<int>& params_i__,
+542:                  std::ostream* pstream__ = 0) const {
+543: 
+544:         T__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
+545:         (void) DUMMY_VAR__;  // suppress unused var warning
+546: 
+547:         T__ lp__(0.0);
+548:         stan::math::accumulator<T__> lp_accum__;
+549: 
+550:         // model parameters
+551:         stan::io::reader<T__> in__(params_r__,params_i__);
+552: 
+553:         T__ R0;
+554:         (void) R0;  // dummy to suppress unused var warning
+555:         if (jacobian__)
+556:             R0 = in__.scalar_lub_constrain(0,10,lp__);
+557:         else
+558:             R0 = in__.scalar_lub_constrain(0,10);
+559: 
+560:         T__ gamma;
+561:         (void) gamma;  // dummy to suppress unused var warning
+562:         if (jacobian__)
+563:             gamma = in__.scalar_lb_constrain(0,lp__);
+564:         else
+565:             gamma = in__.scalar_lb_constrain(0);
+566: 
+567:         T__ ch;
+568:         (void) ch;  // dummy to suppress unused var warning
+569:         if (jacobian__)
+570:             ch = in__.scalar_lb_constrain(0,lp__);
+571:         else
+572:             ch = in__.scalar_lb_constrain(0);
+573: 
+574:         T__ Alpha;
+575:         (void) Alpha;  // dummy to suppress unused var warning
+576:         if (jacobian__)
+577:             Alpha = in__.scalar_lb_constrain(0,lp__);
+578:         else
+579:             Alpha = in__.scalar_lb_constrain(0);
+580: 
+581:         T__ lambda;
+582:         (void) lambda;  // dummy to suppress unused var warning
+583:         if (jacobian__)
+584:             lambda = in__.scalar_lb_constrain(1,lp__);
+585:         else
+586:             lambda = in__.scalar_lb_constrain(1);
+587: 
+588:         Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic>  SI;
+589:         (void) SI;  // dummy to suppress unused var warning
+590:         if (jacobian__)
+591:             SI = in__.matrix_lb_constrain(1,ngrid,2,lp__);
+592:         else
+593:             SI = in__.matrix_lb_constrain(1,ngrid,2);
+594: 
+595: 
+596:         // transformed parameters
+597:         vector<T__> Init_State(2);
+598:         stan::math::initialize(Init_State, DUMMY_VAR__);
+599:         stan::math::fill(Init_State,DUMMY_VAR__);
+600:         vector<T__> theta(4);
+601:         stan::math::initialize(theta, DUMMY_VAR__);
+602:         stan::math::fill(theta,DUMMY_VAR__);
+603: 
+604: 
+605:         try {
+606:             current_statement_begin__ = 172;
+607:             stan::math::assign(theta, static_cast<std::vector<T__> >(stan::math::array_builder<T__ >().add(R0).add(gamma).add(ch).add(lambda).array()));
+608:             current_statement_begin__ = 173;
+609:             stan::math::assign(get_base1_lhs(Init_State,1,"Init_State",1), ((get_base1(x_r,1,"x_r",1) * Alpha) / (1 + Alpha)));
+610:             current_statement_begin__ = 174;
+611:             stan::math::assign(get_base1_lhs(Init_State,2,"Init_State",1), (get_base1(x_r,1,"x_r",1) - get_base1(Init_State,1,"Init_State",1)));
+612:         } catch (const std::exception& e) {
+613:             stan::lang::rethrow_located(e,current_statement_begin__);
+614:             // Next line prevents compiler griping about no return
+615:             throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***");
+616:         }
+617: 
+618:         // validate transformed parameters
+619:         for (int i0__ = 0; i0__ < 2; ++i0__) {
+620:             if (stan::math::is_uninitialized(Init_State[i0__])) {
+621:                 std::stringstream msg__;
+622:                 msg__ << "Undefined transformed parameter: Init_State" << '[' << i0__ << ']';
+623:                 throw std::runtime_error(msg__.str());
+624:             }
+625:         }
+626:         for (int i0__ = 0; i0__ < 4; ++i0__) {
+627:             if (stan::math::is_uninitialized(theta[i0__])) {
+628:                 std::stringstream msg__;
+629:                 msg__ << "Undefined transformed parameter: theta" << '[' << i0__ << ']';
+630:                 throw std::runtime_error(msg__.str());
+631:             }
+632:         }
+633: 
+634:         const char* function__ = "validate transformed params";
+635:         (void) function__;  // dummy to suppress unused var warning
+636: 
+637:         // model body
+638:         try {
+639:             {
+640:                 vector<Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> > FT(ngrid, (Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> (static_cast<Eigen::VectorXd::Index>(3),static_cast<Eigen::VectorXd::Index>(2))));
+641:                 stan::math::initialize(FT, DUMMY_VAR__);
+642:                 stan::math::fill(FT,DUMMY_VAR__);
+643: 
+644: 
+645:                 current_statement_begin__ = 180;
+646:                 lp_accum__.add(uniform_log<propto__>(R0, 1, 10));
+647:                 current_statement_begin__ = 183;
+648:                 lp_accum__.add(lognormal_log<propto__>(gamma, 3, 0.5));
+649:                 current_statement_begin__ = 184;
+650:                 lp_accum__.add(lognormal_log<propto__>(Alpha, 8, 2));
+651:                 current_statement_begin__ = 185;
+652:                 lp_accum__.add(lognormal_log<propto__>(lambda, 10, 3));
+653:                 current_statement_begin__ = 186;
+654:                 lp_accum__.add(double_exponential_log<propto__>(ch, 0, 1));
+655:                 current_statement_begin__ = 188;
+656:                 for (int i = 1; i <= ngrid; ++i) {
+657: 
+658:                     current_statement_begin__ = 189;
+659:                     if (as_bool(logical_eq(i,1))) {
+660: 
+661:                         current_statement_begin__ = 190;
+662:                         stan::math::assign(get_base1_lhs(FT,i,"FT",1), LNA_rs_onestep(to_row_vector(Init_State),get_base1(tt,i,"tt",1),get_base1(tt,(i + 1),"tt",1),theta,x_k,x_i, pstream__));
+663:                         current_statement_begin__ = 192;
+664:                         lp_accum__.add(multi_normal_log<propto__>(get_base1(SI,i,"SI",1), to_vector(static_cast<std::vector<int> >(stan::math::array_builder<int >().add(1).add(1).array())), to_matrix(static_cast<std::vector<std::vector<int> > >(stan::math::array_builder<std::vector<int> >().add(static_cast<std::vector<int> >(stan::math::array_builder<int >().add(1).add(0).array())).add(static_cast<std::vector<int> >(stan::math::array_builder<int >().add(0).add(1).array())).array()))));
+665:                     } else {
+666: 
+667:                         current_statement_begin__ = 200;
+668:                         lp_accum__.add(multi_normal_log<propto__>(get_base1(SI,i,"SI",1), to_vector(static_cast<std::vector<int> >(stan::math::array_builder<int >().add(1).add(1).array())), to_matrix(static_cast<std::vector<std::vector<int> > >(stan::math::array_builder<std::vector<int> >().add(static_cast<std::vector<int> >(stan::math::array_builder<int >().add(1).add(0).array())).add(static_cast<std::vector<int> >(stan::math::array_builder<int >().add(0).add(1).array())).array()))));
+669:                     }
+670:                 }
+671:                 current_statement_begin__ = 203;
+672:                 lp_accum__.add(coal_log_stan(w,C,y,to_vector(tt),tids,append_row(to_row_vector(Init_State),SI),theta,nc,x_r, pstream__));
+673:             }
+674:         } catch (const std::exception& e) {
+675:             stan::lang::rethrow_located(e,current_statement_begin__);
+676:             // Next line prevents compiler griping about no return
+677:             throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***");
+678:         }
+679: 
+680:         lp_accum__.add(lp__);
+681:         return lp_accum__.sum();
+682: 
+683:     } // log_prob()
+684: 
+685:     template <bool propto, bool jacobian, typename T_>
+686:     T_ log_prob(Eigen::Matrix<T_,Eigen::Dynamic,1>& params_r,
+687:                std::ostream* pstream = 0) const {
+688:       std::vector<T_> vec_params_r;
+689:       vec_params_r.reserve(params_r.size());
+690:       for (int i = 0; i < params_r.size(); ++i)
+691:         vec_params_r.push_back(params_r(i));
+692:       std::vector<int> vec_params_i;
+693:       return log_prob<propto,jacobian,T_>(vec_params_r, vec_params_i, pstream);
+694:     }
+695: 
+696: 
+697:     void get_param_names(std::vector<std::string>& names__) const {
+698:         names__.resize(0);
+699:         names__.push_back("R0");
+700:         names__.push_back("gamma");
+701:         names__.push_back("ch");
+702:         names__.push_back("Alpha");
+703:         names__.push_back("lambda");
+704:         names__.push_back("SI");
+705:         names__.push_back("Init_State");
+706:         names__.push_back("theta");
+707:     }
+708: 
+709: 
+710:     void get_dims(std::vector<std::vector<size_t> >& dimss__) const {
+711:         dimss__.resize(0);
+712:         std::vector<size_t> dims__;
+713:         dims__.resize(0);
+714:         dimss__.push_back(dims__);
+715:         dims__.resize(0);
+716:         dimss__.push_back(dims__);
+717:         dims__.resize(0);
+718:         dimss__.push_back(dims__);
+719:         dims__.resize(0);
+720:         dimss__.push_back(dims__);
+721:         dims__.resize(0);
+722:         dimss__.push_back(dims__);
+723:         dims__.resize(0);
+724:         dims__.push_back(ngrid);
+725:         dims__.push_back(2);
+726:         dimss__.push_back(dims__);
+727:         dims__.resize(0);
+728:         dims__.push_back(2);
+729:         dimss__.push_back(dims__);
+730:         dims__.resize(0);
+731:         dims__.push_back(4);
+732:         dimss__.push_back(dims__);
+733:     }
+734: 
+735:     template <typename RNG>
+736:     void write_array(RNG& base_rng__,
+737:                      std::vector<double>& params_r__,
+738:                      std::vector<int>& params_i__,
+739:                      std::vector<double>& vars__,
+740:                      bool include_tparams__ = true,
+741:                      bool include_gqs__ = true,
+742:                      std::ostream* pstream__ = 0) const {
+743:         vars__.resize(0);
+744:         stan::io::reader<double> in__(params_r__,params_i__);
+745:         static const char* function__ = "modelb030a27ccfb_LNA_Stan_change_point_namespace::write_array";
+746:         (void) function__; // dummy call to supress warning
+747:         // read-transform, write parameters
+748:         double R0 = in__.scalar_lub_constrain(0,10);
+749:         double gamma = in__.scalar_lb_constrain(0);
+750:         double ch = in__.scalar_lb_constrain(0);
+751:         double Alpha = in__.scalar_lb_constrain(0);
+752:         double lambda = in__.scalar_lb_constrain(1);
+753:         matrix_d SI = in__.matrix_lb_constrain(1,ngrid,2);
+754:         vars__.push_back(R0);
+755:         vars__.push_back(gamma);
+756:         vars__.push_back(ch);
+757:         vars__.push_back(Alpha);
+758:         vars__.push_back(lambda);
+759:         for (int k_1__ = 0; k_1__ < 2; ++k_1__) {
+760:             for (int k_0__ = 0; k_0__ < ngrid; ++k_0__) {
+761:                 vars__.push_back(SI(k_0__, k_1__));
+762:             }
+763:         }
+764: 
+765:         if (!include_tparams__) return;
+766:         // declare and define transformed parameters
+767:         double lp__ = 0.0;
+768:         (void) lp__; // dummy call to supress warning
+769:         stan::math::accumulator<double> lp_accum__;
+770: 
+771:         double DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
+772:         (void) DUMMY_VAR__;  // suppress unused var warning
+773: 
+774:         vector<double> Init_State(2, 0.0);
+775:         stan::math::initialize(Init_State, std::numeric_limits<double>::quiet_NaN());
+776:         stan::math::fill(Init_State,DUMMY_VAR__);
+777:         vector<double> theta(4, 0.0);
+778:         stan::math::initialize(theta, std::numeric_limits<double>::quiet_NaN());
+779:         stan::math::fill(theta,DUMMY_VAR__);
+780: 
+781: 
+782:         try {
+783:             current_statement_begin__ = 172;
+784:             stan::math::assign(theta, static_cast<std::vector<double> >(stan::math::array_builder<double >().add(R0).add(gamma).add(ch).add(lambda).array()));
+785:             current_statement_begin__ = 173;
+786:             stan::math::assign(get_base1_lhs(Init_State,1,"Init_State",1), ((get_base1(x_r,1,"x_r",1) * Alpha) / (1 + Alpha)));
+787:             current_statement_begin__ = 174;
+788:             stan::math::assign(get_base1_lhs(Init_State,2,"Init_State",1), (get_base1(x_r,1,"x_r",1) - get_base1(Init_State,1,"Init_State",1)));
+789:         } catch (const std::exception& e) {
+790:             stan::lang::rethrow_located(e,current_statement_begin__);
+791:             // Next line prevents compiler griping about no return
+792:             throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***");
+793:         }
+794: 
+795:         // validate transformed parameters
+796: 
+797:         // write transformed parameters
+798:         for (int k_0__ = 0; k_0__ < 2; ++k_0__) {
+799:             vars__.push_back(Init_State[k_0__]);
+800:         }
+801:         for (int k_0__ = 0; k_0__ < 4; ++k_0__) {
+802:             vars__.push_back(theta[k_0__]);
+803:         }
+804: 
+805:         if (!include_gqs__) return;
+806:         // declare and define generated quantities
+807: 
+808: 
+809:         try {
+810:         } catch (const std::exception& e) {
+811:             stan::lang::rethrow_located(e,current_statement_begin__);
+812:             // Next line prevents compiler griping about no return
+813:             throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***");
+814:         }
+815: 
+816:         // validate generated quantities
+817: 
+818:         // write generated quantities
+819:     }
+820: 
+821:     template <typename RNG>
+822:     void write_array(RNG& base_rng,
+823:                      Eigen::Matrix<double,Eigen::Dynamic,1>& params_r,
+824:                      Eigen::Matrix<double,Eigen::Dynamic,1>& vars,
+825:                      bool include_tparams = true,
+826:                      bool include_gqs = true,
+827:                      std::ostream* pstream = 0) const {
+828:       std::vector<double> params_r_vec(params_r.size());
+829:       for (int i = 0; i < params_r.size(); ++i)
+830:         params_r_vec[i] = params_r(i);
+831:       std::vector<double> vars_vec;
+832:       std::vector<int> params_i_vec;
+833:       write_array(base_rng,params_r_vec,params_i_vec,vars_vec,include_tparams,include_gqs,pstream);
+834:       vars.resize(vars_vec.size());
+835:       for (int i = 0; i < vars.size(); ++i)
+836:         vars(i) = vars_vec[i];
+837:     }
+838: 
+839:     static std::string model_name() {
+840:         return "modelb030a27ccfb_LNA_Stan_change_point";
+841:     }
+842: 
+843: 
+844:     void constrained_param_names(std::vector<std::string>& param_names__,
+845:                                  bool include_tparams__ = true,
+846:                                  bool include_gqs__ = true) const {
+847:         std::stringstream param_name_stream__;
+848:         param_name_stream__.str(std::string());
+849:         param_name_stream__ << "R0";
+850:         param_names__.push_back(param_name_stream__.str());
+851:         param_name_stream__.str(std::string());
+852:         param_name_stream__ << "gamma";
+853:         param_names__.push_back(param_name_stream__.str());
+854:         param_name_stream__.str(std::string());
+855:         param_name_stream__ << "ch";
+856:         param_names__.push_back(param_name_stream__.str());
+857:         param_name_stream__.str(std::string());
+858:         param_name_stream__ << "Alpha";
+859:         param_names__.push_back(param_name_stream__.str());
+860:         param_name_stream__.str(std::string());
+861:         param_name_stream__ << "lambda";
+862:         param_names__.push_back(param_name_stream__.str());
+863:         for (int k_1__ = 1; k_1__ <= 2; ++k_1__) {
+864:             for (int k_0__ = 1; k_0__ <= ngrid; ++k_0__) {
+865:                 param_name_stream__.str(std::string());
+866:                 param_name_stream__ << "SI" << '.' << k_0__ << '.' << k_1__;
+867:                 param_names__.push_back(param_name_stream__.str());
+868:             }
+869:         }
+870: 
+871:         if (!include_gqs__ && !include_tparams__) return;
+872:         for (int k_0__ = 1; k_0__ <= 2; ++k_0__) {
+873:             param_name_stream__.str(std::string());
+874:             param_name_stream__ << "Init_State" << '.' << k_0__;
+875:             param_names__.push_back(param_name_stream__.str());
+876:         }
+877:         for (int k_0__ = 1; k_0__ <= 4; ++k_0__) {
+878:             param_name_stream__.str(std::string());
+879:             param_name_stream__ << "theta" << '.' << k_0__;
+880:             param_names__.push_back(param_name_stream__.str());
+881:         }
+882: 
+883:         if (!include_gqs__) return;
+884:     }
+885: 
+886: 
+887:     void unconstrained_param_names(std::vector<std::string>& param_names__,
+888:                                    bool include_tparams__ = true,
+889:                                    bool include_gqs__ = true) const {
+890:         std::stringstream param_name_stream__;
+891:         param_name_stream__.str(std::string());
+892:         param_name_stream__ << "R0";
+893:         param_names__.push_back(param_name_stream__.str());
+894:         param_name_stream__.str(std::string());
+895:         param_name_stream__ << "gamma";
+896:         param_names__.push_back(param_name_stream__.str());
+897:         param_name_stream__.str(std::string());
+898:         param_name_stream__ << "ch";
+899:         param_names__.push_back(param_name_stream__.str());
+900:         param_name_stream__.str(std::string());
+901:         param_name_stream__ << "Alpha";
+902:         param_names__.push_back(param_name_stream__.str());
+903:         param_name_stream__.str(std::string());
+904:         param_name_stream__ << "lambda";
+905:         param_names__.push_back(param_name_stream__.str());
+906:         for (int k_1__ = 1; k_1__ <= 2; ++k_1__) {
+907:             for (int k_0__ = 1; k_0__ <= ngrid; ++k_0__) {
+908:                 param_name_stream__.str(std::string());
+909:                 param_name_stream__ << "SI" << '.' << k_0__ << '.' << k_1__;
+910:                 param_names__.push_back(param_name_stream__.str());
+911:             }
+912:         }
+913: 
+914:         if (!include_gqs__ && !include_tparams__) return;
+915:         for (int k_0__ = 1; k_0__ <= 2; ++k_0__) {
+916:             param_name_stream__.str(std::string());
+917:             param_name_stream__ << "Init_State" << '.' << k_0__;
+918:             param_names__.push_back(param_name_stream__.str());
+919:         }
+920:         for (int k_0__ = 1; k_0__ <= 4; ++k_0__) {
+921:             param_name_stream__.str(std::string());
+922:             param_name_stream__ << "theta" << '.' << k_0__;
+923:             param_names__.push_back(param_name_stream__.str());
+924:         }
+925: 
+926:         if (!include_gqs__) return;
+927:     }
+928: 
+929: }; // model
+930: 
+931: } // namespace
+932: 
+933: typedef modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point stan_model;
+934: 
+935: #include <rstan/rstaninc.hpp>
+936: /**
+937:  * Define Rcpp Module to expose stan_fit's functions to R.
+938:  */
+939: RCPP_MODULE(stan_fit4modelb030a27ccfb_LNA_Stan_change_point_mod){
+940:   Rcpp::class_<rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point,
+941:                boost::random::ecuyer1988> >("stan_fit4modelb030a27ccfb_LNA_Stan_change_point")
+942:     // .constructor<Rcpp::List>()
+943:     .constructor<SEXP, SEXP>()
+944:     // .constructor<SEXP, SEXP>()
+945:     .method("call_sampler",
+946:             &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::call_sampler)
+947:     .method("param_names",
+948:             &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::param_names)
+949:     .method("param_names_oi",
+950:             &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::param_names_oi)
+951:     .method("param_fnames_oi",
+952:             &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::param_fnames_oi)
+953:     .method("param_dims",
+954:             &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::param_dims)
+955:     .method("param_dims_oi",
+956:             &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::param_dims_oi)
+957:     .method("update_param_oi",
+958:             &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::update_param_oi)
+959:     .method("param_oi_tidx",
+960:             &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::param_oi_tidx)
+961:     .method("grad_log_prob",
+962:             &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::grad_log_prob)
+963:     .method("log_prob",
+964:             &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::log_prob)
+965:     .method("unconstrain_pars",
+966:             &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::unconstrain_pars)
+967:     .method("constrain_pars",
+968:             &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::constrain_pars)
+969:     .method("num_pars_unconstrained",
+970:             &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::num_pars_unconstrained)
+971:     .method("unconstrained_param_names",
+972:             &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::unconstrained_param_names)
+973:     .method("constrained_param_names",
+974:             &rstan::stan_fit<modelb030a27ccfb_LNA_Stan_change_point_namespace::modelb030a27ccfb_LNA_Stan_change_point, boost::random::ecuyer1988>::constrained_param_names)
+975:     ;
+976: }
+977: 
+978: // declarations
+979: extern "C" {
+980: SEXP fileb0303b0277f2( ) ;
+981: }
+982: 
+983: // definition
+984: 
+985: SEXP fileb0303b0277f2(  ){
+986:  return Rcpp::wrap("LNA_Stan_change_point");
+987: }
+988: 
+989: 
