@@ -29,12 +29,13 @@ functions{
     matrix[2,2] A;
     matrix[2,2] S;
     matrix[2,2] F;
+    vector [2] m;
     vector[2] h;
     int i;
 
     A = to_matrix({{-1,1},{0,-1}});
     S = to_matrix({{X[3],X[4]},{X[4],X[5]}});
-
+    m = to_vector({X[6],X[7]});
     i = 1;
     N = x_r[1];
     Rt = theta[1];
@@ -63,6 +64,10 @@ functions{
     dX[3] = S[1,1];
     dX[4] = S[1,2];
     dX[5] = S[2,2];
+
+    m = F * m;
+    dX[6] = m[1];
+    dX[7] = m[2];
 
     return dX;
 	  }
@@ -178,7 +183,7 @@ transformed parameters{
 */
   real Init_State[2];
   real theta[4];
- theta = {R0,gamma,ch,lambda};
+ theta = {R0,gamma,lambda,ch};
  Init_State[1] = x_r[1] * Alpha / (1 + Alpha);
  Init_State[2] = x_r[1] / (1 + Alpha) ;
 

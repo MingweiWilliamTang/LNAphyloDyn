@@ -24,7 +24,6 @@ functions{
     int i;
     real Rt;
     real betat;
-    real N;
     real dX[2];
    # matrix[2,2] A;
     //matrix[2,2] S;
@@ -34,14 +33,13 @@ functions{
     //A = to_matrix({{-1,1},{0,-1}});
     //S = to_matrix({{X[3],X[4]},{X[4],X[5]}});
     i = 1;
-    N = x_r[1];
     Rt = theta[1];
     while(x_r[i+1]<= t){
       Rt = Rt * theta[i+3];
       if(i == x_i[1]) break;
       i = i + 1;
     }
-    betat = Rt * theta[2] / N;
+    betat = Rt * theta[2] / x_r[1];
 //    h[1] = betat * X[1] * X[2];
 //	  h[2] = gamma * X[2];
 /*
@@ -238,9 +236,9 @@ model{
    R0 ~ uniform(r0,r1);
  // gamma ~ lognormal(-3,0.4);
   //Alpha ~ lognormal(1,10);
-  gamma ~ normal(g0,g1);
+  gamma ~ lognormal(g0,g1);
   Alpha ~ lognormal(a0,a1);
-  lambda ~ lognormal(l0,l1);
+  lambda ~ normal(l0,l1);
   ch ~ lognormal(0,chpr);
 
   increment_log_prob(coal_log_stan(w, C, y, to_vector(tt), tids, SIs, theta, nc));

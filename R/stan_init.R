@@ -100,7 +100,7 @@ para_init_stan_changepoint2 = function(input,N,chains=1){
     R0 = runif(1,1,10)
     gamma = exp(rnorm(1,2.5,1))
     Alpha = rnorm(1,8,2)
-    ch = rnorm(input$nch,0,2)
+    ch = rlnorm(input$nch,0,0.5)
     #trajlist = SI_traj_initialize_stan2(input, R0, gamma, 0, 0, Alpha,N)
     res[[i]] = list(R0=R0,gamma=gamma,Alpha=Alpha,lambda = 5000,ch = ch)
   }

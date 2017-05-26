@@ -425,7 +425,6 @@ arma::mat ESlice_SIR_BD(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec 
       // newTraj.col(0) = f_cur.col(0);
       newTraj.cols(1,p) = f_prime + OdeTraj.cols(1,p);
       if(volz){
-        Rcout <<"vvvvv"<<endl;
         loglike = volz_loglik_nh(init, LogTraj(newTraj), betaN, t_correct, gridsize);
       }else{
         loglike = coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize);

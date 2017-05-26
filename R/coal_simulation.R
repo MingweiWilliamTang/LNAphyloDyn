@@ -8,7 +8,7 @@
 #'
 #' @return A list of sampling time, number sampled, interval of time points and coalsecent time inverse to the time scale
 
-volz_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, betaN, ...)
+volz_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, betaN,lower = 1, ...)
 {
   coal_times = NULL
   lineages = NULL
@@ -29,13 +29,14 @@ volz_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, betaN, ...)
     if (active_lineages == 1)
     {
       curr = curr + 1
+      #print(curr)
       active_lineages = active_lineages + n_sampled[curr]
       time = samp_times[curr]
     }
 
-    time = time + rexp(1, 0.5*active_lineages*(active_lineages-1))
+    time = time + rexp(1, 0.5*active_lineages*(active_lineages-1)/lower)
 
-    i = which.min(ts>=0) - 1
+    #i = which.min(ts>=0) - 1
     while(time>ts[i]){
       i = i-1
       if(i==0) {
@@ -45,14 +46,16 @@ volz_thin_sir <- function(eff_pop,t_correct,samp_times, n_sampled, betaN, ...)
         break
       }
     }
+   # print(ts[i])
     thed = traj[i]
     if (curr < length(samp_times) && time >= samp_times[curr + 1])
     {
       curr = curr + 1
+      #print(curr)
       active_lineages = active_lineages + n_sampled[curr]
       time = samp_times[curr]
     }
-    else if (runif(1) <= 1/(thed) )
+    else if (runif(1) <= lower/(thed) )
     {
       time = min(c(time,t_correct))
       coal_times = c(coal_times, time)
@@ -202,8 +205,8 @@ coal_lik_init = function(samp_times, n_sampled, coal_times, grid, t_correct)
 {
   ns = length(samp_times)
   nc = length(coal_times)
-  samp_times = samp_times[ns:1]
-  coal_times = coal_times[nc:1]
+  #samp_times = samp_times[ns:1]
+  #coal_times = coal_times[nc:1]
 
   #n0 = which.min(grid < t_correct)
   Tcoal = max(coal_times)
@@ -228,7 +231,7 @@ coal_lik_init = function(samp_times, n_sampled, coal_times, grid, t_correct)
 
   for (i in 1:ns)
     l[t >= samp_times[i]] = l[t >= samp_times[i]] + n_sampled[i]
-
+  print(l)
   for (i in 1:nc)
     l[t >= coal_times[i]] = l[t >= coal_times[i]] - 1
 
