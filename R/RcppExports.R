@@ -21,6 +21,46 @@ expM <- function(A) {
     .Call('LNAPhyloDyn_expM', PACKAGE = 'LNAPhyloDyn', A)
 }
 
+betaf <- function(t, param, x_r, x_i) {
+    .Call('LNAPhyloDyn_betaf', PACKAGE = 'LNAPhyloDyn', t, param, x_r, x_i)
+}
+
+ODE_general_one <- function(states, param, t, x_r, x_i) {
+    .Call('LNAPhyloDyn_ODE_general_one', PACKAGE = 'LNAPhyloDyn', states, param, t, x_r, x_i)
+}
+
+general_F <- function(states, param, t, x_r, x_i) {
+    .Call('LNAPhyloDyn_general_F', PACKAGE = 'LNAPhyloDyn', states, param, t, x_r, x_i)
+}
+
+General_ODE_rk45 <- function(initial, t, param, x_r, x_i) {
+    .Call('LNAPhyloDyn_General_ODE_rk45', PACKAGE = 'LNAPhyloDyn', initial, t, param, x_r, x_i)
+}
+
+General_IntSigmaF <- function(Traj_par, param, x_r, x_i) {
+    .Call('LNAPhyloDyn_General_IntSigmaF', PACKAGE = 'LNAPhyloDyn', Traj_par, param, x_r, x_i)
+}
+
+General_KOM_Filter <- function(OdeTraj, param, gridsize, x_r, x_i) {
+    .Call('LNAPhyloDyn_General_KOM_Filter', PACKAGE = 'LNAPhyloDyn', OdeTraj, param, gridsize, x_r, x_i)
+}
+
+log_like_traj_general <- function(SdeTraj, OdeTraj, Filter, gridsize, t_correct) {
+    .Call('LNAPhyloDyn_log_like_traj_general', PACKAGE = 'LNAPhyloDyn', SdeTraj, OdeTraj, Filter, gridsize, t_correct)
+}
+
+Traj_sim_general <- function(OdeTraj, Filter, t_correct) {
+    .Call('LNAPhyloDyn_Traj_sim_general', PACKAGE = 'LNAPhyloDyn', OdeTraj, Filter, t_correct)
+}
+
+Traj_sim_ezG <- function(initial, times, param, gridsize, x_r, x_i, t_correct) {
+    .Call('LNAPhyloDyn_Traj_sim_ezG', PACKAGE = 'LNAPhyloDyn', initial, times, param, gridsize, x_r, x_i, t_correct)
+}
+
+ESlice_general <- function(f_cur, OdeTraj, FTs, state, init, betaN, t_correct, lambda = 10, reps = 1L, gridsize = 100L, volz = FALSE) {
+    .Call('LNAPhyloDyn_ESlice_general', PACKAGE = 'LNAPhyloDyn', f_cur, OdeTraj, FTs, state, init, betaN, t_correct, lambda, reps, gridsize, volz)
+}
+
 SIR_BD_period_ODE_one <- function(states, N, param, t, period) {
     .Call('LNAPhyloDyn_SIR_BD_period_ODE_one', PACKAGE = 'LNAPhyloDyn', states, N, param, t, period)
 }
