@@ -231,7 +231,6 @@ coal_lik_init = function(samp_times, n_sampled, coal_times, grid, t_correct)
 
   for (i in 1:ns)
     l[t >= samp_times[i]] = l[t >= samp_times[i]] + n_sampled[i]
-  print(l)
   for (i in 1:nc)
     l[t >= coal_times[i]] = l[t >= coal_times[i]] - 1
 
@@ -264,6 +263,7 @@ coal_lik_init = function(samp_times, n_sampled, coal_times, grid, t_correct)
   rep_idx = cumsum(gridrep)
   rep_idx = cbind(rep_idx-gridrep+1,rep_idx)
   grid_idx = c(0,cumsum(gridrep))
+  print(ng)
   if(gridrep[ng] == 0){
     grid_idx = grid_idx[1:(length(grid_idx)-1)]
   }

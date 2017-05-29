@@ -2,6 +2,23 @@
 #' @importFrom Rcpp sourceCpp
 #'
 #'
+
+
+SIR_exact=list()
+SIR_exact$Pre=matrix(c(1,0,1,1,0,0),ncol=3)
+SIR_exact$Post = matrix(c(0,0,2,0,0,1),ncol=3)
+SIR_exact$h = function(x,t,th=c(theta1=0.00002,theta2=0.1)){
+  with(as.list(c(x,th)),{
+    return(c(theta1*X*Y, theta2*Y))
+  })
+}
+
+
+SIR_FRM = StepFRM(SIR_exact)
+
+
+
+
 simuSIR = function(theta1,theta2,S,I,time){
   R = 0
   SIR = list()
@@ -17,6 +34,8 @@ simuSIR = function(theta1,theta2,S,I,time){
   plot(time,simu_Traj[,2],type="l")
   return(cbind(time,simu_Traj))
 }
+
+
 
 
 #' Plot the posterior

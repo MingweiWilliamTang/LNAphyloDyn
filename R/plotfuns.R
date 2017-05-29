@@ -51,16 +51,16 @@ random_effpoptraj_line = function(MCMC_res,idxs,volz = FALSE){
 
 
 
-medianCur = function(MCMC_obj,ids,scale=1,col="red",row=3,med = T,volz = F,lid=7){
+medianCur = function(MCMC_obj,ids,scale=1,col="red",row=3,med = T,volz = F,lwd=lwd,lid=7){
   if(volz == F){
     scale = MCMC_obj$par[ids,lid]
   }
   if(med){
   lines(MCMC_obj$Trajectory[,1,1],apply(MCMC_obj$Trajectory[,row,ids]/scale,1,median),lty=2,
-          col=col,lwd=2)
+          col=col,lwd=lwd)
   }else{
   lines(MCMC_obj$Trajectory[,1,1],apply(MCMC_obj$Trajectory[,row,ids]/scale,1,mean),lty=2,
-        col=col,lwd=2)
+        col=col,lwd=lwd)
   }
 }
 

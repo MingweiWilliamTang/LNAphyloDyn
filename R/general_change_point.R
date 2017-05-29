@@ -240,7 +240,7 @@ updategamma_general = function(MCMC_obj, MCMC_setting, i){
   if(is.na(a)){
     AR = 0
     if(is.na(coalLog_new)){
-      print("NA appears in likelihood R0 gamma")
+      print("NA appears in  gamma")
       # print(LatentTraj_new)
     }else{
       print("NA appears in S1 S2")
@@ -284,7 +284,7 @@ updateLambdaGeneral = function(MCMC_obj,MCMC_setting, i){
 }
 
 
-update_xChangePoint_general = function(MCMC_obj, MCMC_setting, i){
+update_ChangePoint_general = function(MCMC_obj, MCMC_setting, i){
   chpxid =  (MCMC_setting$x_i[2]+3):(sum(MCMC_setting$x_i)+2)
   for( i in chpxid){
     newpara = MCMC_obj$par[c(3,4,5,chpxid)]
