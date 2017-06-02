@@ -56,7 +56,7 @@ List SIRS_IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2,doub
   A << -1 << 1 << 0 <<arma::endr<<0<<-1<<1 <<arma::endr
     << 1 <<0 << -1<<arma::endr;
   arma::mat H,F0,Xinv;
-  F0.zeros(3,3);
+  F0 = arma::diagmat(ones(3));
   double t;
   for(int i = 0; i < k; i++){
     t = Traj_par(i,0);
@@ -66,11 +66,11 @@ List SIRS_IntSigma(arma::mat Traj_par,double dt,double theta1,double theta2,doub
     h(2) = theta3 * Traj_par(i,3);
     H = diagmat(h);
     F = SIRS_Fm_LNA_period(Traj_par(i,1),Traj_par(i,2), Traj_par(i,3), theta1, theta2, theta3,alpha,t,period);
-    F0 = F0 + F*dt;
+    F0 = F0 + (F * F0) * dt;
     Sigma = Sigma + (Sigma * F.t() + F * Sigma +  A.t() * H * A ) * dt;
   }
   List Res;
-  Res["expF"] = arma::expmat(F0);
+  Res["expF"] = F0;
   Res["Simga"] = Sigma;
   if(Sigma.has_nan()){
     Rcout<<Traj_par<<endl;
@@ -105,7 +105,7 @@ double log_like_trajSIRS(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
     if(SdeTraj(i+1,0) <= t_correct){
       arma::mat INexp = ((Xd1 - A * Xd0).t() * SigInv * (Xd1 - A * Xd0));
       // Rcout <<  ((Xd1 - A * Xd0).t() * SigInv * (Xd1 - A * Xd0)) <<endl;
-      loglik += -log(DegenerateDet3(Scube.slice(i))) - 0.5 * INexp(0,0);
+      loglik += -log(DegenerateDet3(Scube.slice(i))) * 0.5 - 0.5 * INexp(0,0);
     }
     /*
      arma::mat A = Acube.slice(i);
@@ -226,7 +226,7 @@ List Traj_sim_SIRS(arma::vec initial, arma::mat OdeTraj, List Filter,double t_co
       arma::mat l1 = (-0.5) * noise.t() * PseudoInverse(Sig) * noise;
       //     arma::mat l1  = (-0.5) * noise.t() * inv2(Sig + eye(3,3)*0.00001) * noise;
       //    loglike += -1.5 * log(det(Sig+eye(3,3)*0.00001)) + l1(0,0);
-      loglike += -log(DegenerateDet3(Sig)) + l1(0,0);
+      loglike += -log(DegenerateDet3(Sig))*0.5 + l1(0,0);
     }
     //    Rcout<<"test3"<<endl;
     LNA_traj(i+1,0) = OdeTraj((i+1), 0);
@@ -295,7 +295,7 @@ List Traj_sim_SIRS_ez(arma::vec initial, arma::vec times, arma::vec param,
       arma::mat l1 = (-0.5) * noise.t() * PseudoInverse(Sig) * noise;
       //     arma::mat l1  = (-0.5) * noise.t() * inv2(Sig + eye(3,3)*0.00001) * noise;
       //    loglike += -1.5 * log(det(Sig+eye(3,3)*0.00001)) + l1(0,0);
-      loglike += -log(DegenerateDet3(Sig)) + l1(0,0);
+      loglike += -log(DegenerateDet3(Sig)) * 0.5 + l1(0,0);
     }
     //    Rcout<<"test3"<<endl;
     LNA_traj(i+1,0) = OdeTraj((i+1), 0);
@@ -349,7 +349,6 @@ arma::mat ESlice_SIRS(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec st
      }
    }else{
      logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
-     Rcout << "kingman" <<endl;
    }
     //   }else{
     //     logy = coal_loglik(init,f_cur,t_correct,lambda,gridsize) + log(u);

@@ -65,9 +65,9 @@ medianCur = function(MCMC_obj,ids,scale=1,col="red",row=3,med = T,volz = F,lwd =
 }
 
 
-effpopfun = function(Traj,beta=0,lambda=1, volz = FALSE,N=1){
+effpopfun = function(Traj,beta=0,lambda=1, volz = FALSE){
   if(volz){
-    return(1/(2 * Traj[,2] * beta * N / Traj[,3]))
+    return(1/(2 * Traj[,2] * beta / Traj[,3]))
   }else{
     return(Traj[,3] / lambda)
   }
@@ -111,6 +111,50 @@ CI_Curve = function(MCMC_obj,ids,scale = 1, col = "black", fill_col = "grey", ro
   }
 }
 
+
+CI_Curve_eff = function(MCMC_obj,ids,scale = 1, col = "black", fill_col = "grey", row = 3,method = "qtile",alpha=0.05,fill = T,likelihood ="volz"){
+  if(likelihood == "volz"){
+    Mx = 1/(2 * MCMC_obj$Trajectory[,2,ids]/MCMC_obj$Trajectory[,3,ids])
+  }else{
+    Mx = MCMC_obj$Trajectory[,row,ids]
+  }
+  midcur = apply(Mx/scale,1,mean)
+  if(method == "NormApp"){
+    midSd = apply(Mx/scale,1,sd)
+    qt = qnorm(1-alpha/2)
+    upper = midcur + qt * midSd
+    lower = midcur - qt * midSd
+    #lines(MCMC_obj$Trajectory[,1,1],upper,lty=2,
+    #      col=col,lwd=2)
+
+    #lines(MCMC_obj$Trajectory[,1,1],lower,lty=2,
+    #      col=col,lwd=2)
+  }else if(method == "qtile"){
+    qt1 = 1 - alpha/2
+    qt2 = alpha/2
+    upper = apply(Mx/scale,1,function(x){
+      return(quantile(x,qt1))
+    }
+    )
+    lower = apply(Mx/scale,1,function(x){
+      return(quantile(x,qt2))
+    })
+    # lines(MCMC_obj$Trajectory[,1,1],midcur + qt * midSd,lty=2,
+    #      col=col,lwd=2)
+
+    #lines(MCMC_obj$Trajectory[,1,1],midcur - qt * midSd,lty=2,
+    #     col=col,lwd=2)
+  }
+  if(fill == T){
+    polygon(x = c(MCMC_obj$Trajectory[,1,1],rev(MCMC_obj$Trajectory[,1,1])),
+            y = c(upper,rev(lower)),col = fill_col,border = NA)
+  }
+  lines(MCMC_obj$Trajectory[,1,1],midcur,col = col,lwd=2,lty=2)
+}
+
+
+
+
 vlineCI = function(data,cred = T){
   if(cred){
     m = median(data)
@@ -129,13 +173,15 @@ vlineCI = function(data,cred = T){
 }
 
 
-randomR0_traj = function(times,MCMC_obj,col_id,idx){
+randomR0_traj = function(times,MCMC_obj,col_id,idx,ylim=c(0,5),main = ""){
   R0 = MCMC_obj$par[idx,3]
-  R0_traj = matrix(ncol= length(col_id)+1, nrow = length(idx))
+  R0_traj = matrix(ncol= length(col_id)+2, nrow = length(idx))
   R0_traj[,1] = R0
   for(i in 1:length(col_id)){
     R0_traj[,i+1] = R0_traj[,i] * MCMC_obj$par[idx,col_id[i]]
   }
+  i = length(col_id)
+  R0_traj[,length(col_id)+2] = R0_traj[,i] * MCMC_obj$par[idx,col_id[i]]
   CIup = apply(R0_traj,2,function(x){
     return(quantile(x,0.975))
     })
@@ -143,7 +189,7 @@ randomR0_traj = function(times,MCMC_obj,col_id,idx){
       return(quantile(x,0.025))
     })
   m = apply(R0_traj,2,median)
-  plot(times,m,type="l",col = "red",lwd = 2)
+  plot(times,m,type="l",ylab = "R0",col = "red",lwd = 2,ylim=ylim,main=main)
   polygon(x = c(times,rev(times)),
           y = c(CIup,rev(CIlow)),col = "grey",border = NA)
   lines(times,m,type="l",col = "red",lwd = 2)

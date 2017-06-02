@@ -8,7 +8,7 @@ updateAlphas_SIRS = function(MCMC_obj,MCMC_setting,i){
   alpha2_new = alpha2 * exp(runif(1,-MCMC_setting$pa, MCMC_setting$pa))
 
   state_new = c(X = MCMC_setting$N * alpha1_new / (alpha1_new + alpha2_new + 1),
-   Y = MCMC_setting$N * alpha2_new / (alpha1_new + alpha2_new + 1),Z = N / (alpha1_new + alpha2_new + 1))
+   Y = MCMC_setting$N * alpha2_new / (alpha1_new + alpha2_new + 1),Z = MCMC_setting$N / (alpha1_new + alpha2_new + 1))
 
   #state_new = c(X = MCMC_setting$N * alpha1_new/(alpha1_new + 1),
    #             Y = MCMC_setting$N/(alpha1_new + 1))
@@ -32,13 +32,12 @@ updateAlphas_SIRS = function(MCMC_obj,MCMC_setting,i){
   }else{
     coalLog_new = coal_loglik(MCMC_setting$Init,LogTraj(LatentTraj_new),MCMC_setting$t_correct,
                               MCMC_obj$par[8],MCMC_setting$gridsize)
-    print("aaaa")
   }
   if (is.nan(logMultiNorm_new)) {
     logMultiNorm_new = -Inf
     # countInf = countInf + 1
   }
-  a = dnorm(log(alpha1_new),MCMC_setting$b1,MCMC_setting$a1,log = T) + coalLog_new + #dgamma(log(alpha2_new),MCMC_setting$b2,MCMC_setting$a2,log = T) +
+  a = dlnorm(alpha1_new,MCMC_setting$b1,MCMC_setting$a1,log = T) + dlnorm(alpha2_new,MCMC_setting$b2,MCMC_setting$a2,log = T) + coalLog_new + #dgamma(log(alpha2_new),MCMC_setting$b2,MCMC_setting$a2,log = T) +
     logMultiNorm_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog -
     ( MCMC_obj$LogAlpha1)
 
@@ -53,10 +52,11 @@ updateAlphas_SIRS = function(MCMC_obj,MCMC_setting,i){
     state = state_new
     MCMC_obj$par[1] = state_new[1]
     MCMC_obj$par[2] = state_new[2]
+    MCMC_obj$par[3] = state_new[3]
     MCMC_obj$Ode_Traj_coarse = Ode_Traj_coarse_new
     MCMC_obj$logMultiNorm = logMultiNorm_new
     MCMC_obj$FT = FT_new
-    MCMC_obj$LogAlpha1 = dnorm(log(alpha1_new),MCMC_setting$b1,MCMC_setting$a1,log = T)
+    MCMC_obj$LogAlpha1 = dlnorm(alpha1_new,MCMC_setting$b1,MCMC_setting$a1,log = T) +  dlnorm(alpha2_new,MCMC_setting$b2,MCMC_setting$a2,log = T)
     #    MCMC_obj$LogAlpha2 = dgamma(log(alpha2_new),MCMC_setting$b2,MCMC_setting$a2,log = T)
     MCMC_obj$coalLog = coalLog_new
     MCMC_obj$LatentTraj = LatentTraj_new
@@ -71,7 +71,7 @@ updateS1_SIRS = function(MCMC_obj, MCMC_setting, i){
   s1 = MCMC_obj$par[4] / MCMC_obj$par[5] * MCMC_setting$N
   #s1_new = pmin(pmax(s1 + runif(1,-0.5,0.5), 3),6)
   s1_new = s1 + runif(1,-MCMC_setting$ps1, MCMC_setting$ps1)
-  if(s1_new <1 || s1_new > 20){
+  if(s1_new <1 || s1_new > 10){
     # theta1_new = s1_new * MCMC_obj$par[4] / MCMC_setting$N
     # MCMC_obj$par[3] = theta1_new
     return(list(MCMC_obj = MCMC_obj, AR = 0))
@@ -98,7 +98,6 @@ updateS1_SIRS = function(MCMC_obj, MCMC_setting, i){
   }else{
     coalLog_new = coal_loglik(MCMC_setting$Init,LogTraj(LatentTraj_new),MCMC_setting$t_correct,
                               MCMC_obj$par[8],MCMC_setting$gridsize)
-    print("aaaa")
   }
 
   # coalLog_new = coal_loglik(MCMC_setting$Init,LogTraj(LatentTraj_new),MCMC_setting$t_correct,MCMC_obj$par[8],MCMC_setting$gridsize)
@@ -172,7 +171,7 @@ updateS2_SIRS = function(MCMC_obj, MCMC_setting, i){
   if (is.nan(logMultiNorm_new)) {
     a = -1
   }else{
-    a = min(c(exp(dnorm(log(s2_new),MCMC_setting$c1,MCMC_setting$c2,log = T) + logMultiNorm_new + coalLog_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog -
+    a = min(c(exp(dlnorm(s2_new,MCMC_setting$c1,MCMC_setting$c2,log = T) + logMultiNorm_new + coalLog_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog -
                     MCMC_obj$LogS2 ),1))
   }
   # print(theta2_new)
@@ -186,7 +185,7 @@ updateS2_SIRS = function(MCMC_obj, MCMC_setting, i){
     MCMC_obj$par[5] = theta2_new
     MCMC_obj$Ode_Traj_coarse = Ode_Traj_coarse_new
     MCMC_obj$logMultiNorm = logMultiNorm_new
-    MCMC_obj$LogS2 = dnorm(log(s2_new),MCMC_setting$c1,MCMC_setting$c2,log = T)
+    MCMC_obj$LogS2 = dlnorm(s2_new,MCMC_setting$c1,MCMC_setting$c2,log = T)
     MCMC_obj$FT = FT_new
     MCMC_obj$coalLog = coalLog_new
     MCMC_obj$LatentTraj = LatentTraj_new
@@ -235,8 +234,8 @@ updateReSus_SIRS = function(MCMC_obj, MCMC_setting, i){
     a = -1
     #print("NA")
   }else{
-    a = min(c(exp((logMultiNorm_new - MCMC_obj$logMultiNorm + coalLog_new - MCMC_obj$coalLog + dnorm(log(theta3_new),MCMC_setting$e1,MCMC_setting$e2,T) -
-                     dnorm(log(MCMC_obj$par[6]),MCMC_setting$e1,MCMC_setting$e2,T))
+    a = min(c(exp((logMultiNorm_new - MCMC_obj$logMultiNorm + coalLog_new - MCMC_obj$coalLog + dlnorm(theta3_new,MCMC_setting$e1,MCMC_setting$e2,T) -
+                     dlnorm(MCMC_obj$par[6],MCMC_setting$e1,MCMC_setting$e2,T))
     ),1))
   }
   AR = 0
@@ -336,7 +335,7 @@ update_Scale_SIRS = function(MCMC_obj, MCMC_setting, i){
 updateLambda_SIRS = function(MCMC_obj,MCMC_setting, i){
   lambda_new = MCMC_obj$par[8] * exp(runif(1,-0.3,0.3))
   coalLog_new = coal_loglik(MCMC_setting$Init,LogTraj(MCMC_obj$LatentTraj),MCMC_setting$t_correct,lambda_new,MCMC_setting$gridsize)
-  a = min(c(exp(coalLog_new - MCMC_obj$coalLog + dgamma(log(lambda_new),MCMC_setting$d1,MCMC_setting$d2,log = T) -
+  a = min(c(exp(coalLog_new - MCMC_obj$coalLog + dnorm(lambda_new,MCMC_setting$d1,MCMC_setting$d2,log = T) -
                   MCMC_obj$LogLambda), 1))
   AR = 0
 
@@ -346,7 +345,7 @@ updateLambda_SIRS = function(MCMC_obj,MCMC_setting, i){
   if(runif(1,0,1) < a){
     # rec[i,5] = 1
     AR = 1
-    MCMC_obj$LogLambda = dgamma(log(lambda_new),MCMC_setting$d1,MCMC_setting$d2,log = T)
+    MCMC_obj$LogLambda = dnorm(lambda_new,MCMC_setting$d1,MCMC_setting$d2,log = T)
     MCMC_obj$coalLog = coalLog_new
     MCMC_obj$par[8] = lambda_new
   }
@@ -397,7 +396,7 @@ MCMC_initialize_SIRS = function(MCMC_setting){ #, prior_par = c(10,20,-2.3,200,4
     # print(MCMC_setting$control)
     if(is.null(MCMC_setting$control$alpha)){
       alpha1 = exp(rnorm(1,MCMC_setting$b1,MCMC_setting$a1))
-      alpha1 = exp(rnorm(1,MCMC_setting$b2,MCMC_setting$a2))
+      alpha2 = exp(rnorm(1,MCMC_setting$b2,MCMC_setting$a2))
       }else{
       alpha1 = MCMC_setting$control$alpha[1]
       alpha2 = MCMC_setting$control$alpha[2]
@@ -463,7 +462,7 @@ MCMC_initialize_SIRS = function(MCMC_setting){ #, prior_par = c(10,20,-2.3,200,4
     }
 
     if(is.null(MCMC_setting$control$lambda)){
-      lambda = exp(rgamma(1,MCMC_setting$d1,MCMC_setting$d2))
+      lambda = rnorm(1,MCMC_setting$d1,MCMC_setting$d2)
     }else{
       lambda = MCMC_setting$control$lambda
     }
@@ -486,11 +485,11 @@ MCMC_initialize_SIRS = function(MCMC_setting){ #, prior_par = c(10,20,-2.3,200,4
     }
     plot(LatentTraj[,1],LatentTraj[,3],type="l")
   }
-  LogAlpha1 = dnorm(log(alpha1),MCMC_setting$b1,MCMC_setting$a1,log = T)
-  LogMu = dnorm(log(theta3), MCMC_setting$e1, MCMC_setting$e2, log = T)
+  LogAlpha1 = dlnorm(alpha1,MCMC_setting$b1,MCMC_setting$a1,log = T)
+  LogMu = dlnorm(theta3, MCMC_setting$e1, MCMC_setting$e2, log = T)
   #LogAlpha2 = dgamma(log(alpha2),MCMC_setting$b1,MCMC_setting$a2,log = T)
-  LogS2 = dnorm(log(s2),MCMC_setting$c1,MCMC_setting$c2,log = T)
-  LogLambda = dgamma(log(lambda),MCMC_setting$d1,MCMC_setting$d2,log = T)
+  LogS2 = dlnorm(s2,MCMC_setting$c1,MCMC_setting$c2,log = T)
+  LogLambda = dnorm(lambda,MCMC_setting$d1,MCMC_setting$d2,log = T)
 
   #print(log_like_trajSIR_BD(LatentTraj,Ode_Traj_coarse,FT,MCMC_setting$gridsize,90))
   #print()
@@ -560,9 +559,14 @@ SIRS_LNA_MCMC_standard = function(coal_obs,times,t_correct,N,gridsize=1000, nite
       plot(MCMC_obj$LatentTraj[,1],MCMC_obj$LatentTraj[,3],type="l")
     }
     ARvec = numeric(d)
-    #step1 = updateAlphas(MCMC_obj,MCMC_setting,i)
+
     #  print(c(MCMC_obj$coalLog,MCMC_obj$logMultiNorm))
     #MCMC_obj = step1$MCMC_obj
+    if(updateVec[1] == 1){
+      step1 = updateAlphas_SIRS(MCMC_obj,MCMC_setting,i)
+      ARvec[1] = step1$AR
+      MCMC_obj = step1$MCMC_obj
+    }
     if(updateVec[2] == 1){
       step2 = updateS1_SIRS(MCMC_obj,MCMC_setting,i)
       ARvec[4] = step2$AR
@@ -585,6 +589,9 @@ SIRS_LNA_MCMC_standard = function(coal_obs,times,t_correct,N,gridsize=1000, nite
     }
     if(updateVec[6] == 1){
     MCMC_obj = updateTraj(MCMC_obj,MCMC_setting,i)$MCMC_obj
+    }
+    if(updateVec[7] == 1){
+      MCMC_obj = updateLambda_SIRS(MCMC_obj,MCMC_setting,i)$MCMC_obj
     }
     # step4 = updateLambda_SIRS(MCMC_obj,MCMC_setting,i)
   # ARvec[8] = step4$AR
