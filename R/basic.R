@@ -1,23 +1,31 @@
-#' @useDynLib LNAPhyloDyn
-#' @importFrom Rcpp sourceCpp
-#'
-#'
+loadModule("mod_Foo", TRUE)
+#SIR_exact=list()
+#SIR_exact$Pre=matrix(c(1,0,1,1,0,0),ncol=3)
+#SIR_exact$Post = matrix(c(0,0,2,0,0,1),ncol=3)
+#SIR_exact$h = function(x,t,th=c(theta1=0.00002,theta2=0.1)){
+#  with(as.list(c(x,th)),{
+#    return(c(theta1*X*Y, theta2*Y))
+#  })
+#}
+#SIR_FRM = StepFRM(SIR_exact)
 
-
-SIR_exact=list()
-SIR_exact$Pre=matrix(c(1,0,1,1,0,0),ncol=3)
-SIR_exact$Post = matrix(c(0,0,2,0,0,1),ncol=3)
-SIR_exact$h = function(x,t,th=c(theta1=0.00002,theta2=0.1)){
-  with(as.list(c(x,th)),{
-    return(c(theta1*X*Y, theta2*Y))
-  })
+simuSIRS = function(theta1,theta2,theta3,S,I,R,times){
+  SIRS_exact = list()
+  SIRS_exact$Pre = matrix(c(1,1,0,0,1,0,0,0,1),ncol=3,byrow = T)
+  SIRS_exact$Post = matrix(c(0,2,0,0,0,1,1,0,0),ncol=3,byrow = T)
+  SIRS_exact$h = function(x,t,th=c(theta1=theta1,theta2=theta2,theta3 = theta3)){
+    with(as.list(c(x,th)),{
+      return(c(theta1*X*Y, theta2*Y,theta3 * Z))
+    })
+  }
+  SIRS_FRM = StepFRM(SIRS_exact)
+  simu_Traj = simTs(c(X = S, Y = I, Z = R), min(times), max(times), times[2] - times[1], SIRS_FRM)
+  plot(times,simu_Traj[,2],type="l")
+  return(cbind(times,simu_Traj))
 }
 
-
-SIR_FRM = StepFRM(SIR_exact)
-
-
-
+#SIRS_F = simTs(c(X = 9500,Y = 500,Z = 1500),0,200,0.1,SIRS_FRM)
+#plot(seq(0,200,by=0.1),SIRS_F[,2])
 
 simuSIR = function(theta1,theta2,S,I,time){
   R = 0

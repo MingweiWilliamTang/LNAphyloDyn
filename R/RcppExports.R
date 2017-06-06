@@ -21,6 +21,9 @@ expM <- function(A) {
     .Call('LNAPhyloDyn_expM', PACKAGE = 'LNAPhyloDyn', A)
 }
 
+#' @export Foo
+NULL
+
 betaf <- function(t, param, x_r, x_i) {
     .Call('LNAPhyloDyn_betaf', PACKAGE = 'LNAPhyloDyn', t, param, x_r, x_i)
 }

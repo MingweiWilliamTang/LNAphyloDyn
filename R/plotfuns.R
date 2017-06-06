@@ -200,3 +200,16 @@ coal_like_fast = function(traj, lambda = 1, coal_obj,t_correct,col=3){
   init = coal_lik_init(coal_obj$samp_times,coal_obj$n_sampled,coal_obj$coal_times,grid = traj[,1])
   return(coal_loglik(init,LogTraj(traj),t_correct = t_correct, lambda))
 }
+
+histwithCI = function(data,cred = T){
+  hist(data);
+  vlineCI(data,cred)
+}
+
+effpopPlot = function(NP_res,LNA_res,t_correct,idx,row=id,lid=5,ylab="",xlab="",ylim=c(0,10)){
+  plot(t_correct - NP_res$x,NP_res$effpopmean,type="l",ylim = ylim,xlab = xlab,ylab=ylab)
+  polygon(c(t_correct - NP_res$x, rev(t_correct - NP_res$x)), c(NP_res$effpop975,rev(NP_res$effpop025)),
+          col=rgb(0,0,1,0.3),border = F)
+  CI_Curve(LNA_res,idx,scale = LNA_res$par[idx,5],fill_col = rgb(1,0,0,0.3))
+  medianCur(LNA_res,idx,col="red",lid = 5)
+}
