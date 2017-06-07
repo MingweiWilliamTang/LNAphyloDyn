@@ -289,7 +289,7 @@ update_ChangePoint_general = function(MCMC_obj, MCMC_setting, i){
   chpxid =  (MCMC_setting$x_i[2]+3):(sum(MCMC_setting$x_i)+2)
   for( i in chpxid){
     newpara = MCMC_obj$par[c(3,4,5,chpxid)]
-    newpara[i-2] = MCMC_obj$par[i] * exp(runif(1,-0.2,0.2))
+    newpara[i-2] = MCMC_obj$par[i] * exp(runif(1,-0.1,0.1))
 
     Ode_Traj_thin_new <- General_ODE_rk45(MCMC_obj$par[1:2],MCMC_setting$times,newpara,MCMC_setting$x_r,MCMC_setting$x_i)
     Ode_Traj_coarse_new = Ode_Traj_thin_new[MCMC_setting$gridset,]
@@ -492,11 +492,7 @@ MCMC_initialize_general = function(MCMC_setting){ #, prior_par = c(10,20,-2.3,20
   #print()
   #plot(Ode_Traj_coarse[,3])
   plot(LatentTraj[,1],LatentTraj[,3],type="l")
-  if(MCMC_setting$likelihood == "volz"){
-    paras =  c(S,I,theta1,theta2,theta3,theta4)
-  }else{
-    paras =  c(S,I,param)
-  }
+  paras =  c(S,I,param)
   MCMC_obj = list(par = paras,LatentTraj = LatentTraj, logMultiNorm = logMultiNorm,
                   Ode_Traj_coarse = Ode_Traj_coarse, FT = FT, coalLog = coalLog,
                   LogAlpha1 = LogAlpha1, LogS2 = LogS2,LogLambda = LogLambda)
