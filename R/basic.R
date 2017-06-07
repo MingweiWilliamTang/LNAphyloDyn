@@ -53,16 +53,16 @@ simuSIR = function(theta1,theta2,S,I,time){
 #' @param color The
 #'
 #'
-random_trajectory = function(timegrid,trMatrix,color="grey",ylab="infected population",lwd=0.5,ylim = NULL){
+random_trajectory = function(timegrid,trMatrix,color="grey",ylab="infected population",main="",lwd=0.5,ylim = NULL){
   k = dim(trMatrix)[2]
   if(is.null(ylim)){
   plot(timegrid,trMatrix[,1],lwd=lwd,col=color,ylab=ylab,
        ylim=c(min(trMatrix[,1],na.rm = T)-500,max(trMatrix[,1],na.rm = T)+500),
-       main="infectious population vs time",type="l")
+       main=main,type="l")
   }else{
     plot(timegrid,trMatrix[,1],lwd=lwd,col=color,ylab=ylab,
          ylim = ylim,
-         main="infectious population vs time",type="l")
+         main=main,type="l")
   }
   for(i in 2:k){
     lines(timegrid,trMatrix[,i],lwd=lwd,col=color)
