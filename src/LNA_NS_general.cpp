@@ -6,7 +6,6 @@
 //[[Rcpp::export()]]
 double betaf(double t, arma::vec param, arma::vec x_r, arma::ivec x_i){
   /**
-   * param beta, gamma, mu, A, ch
    * x_r = (N,cht1, cht2, ...)
    * theta = (R0,gamma, lambda, ch1,ch2,...)
    * x_i = (nch,nparam)
@@ -21,6 +20,32 @@ double betaf(double t, arma::vec param, arma::vec x_r, arma::ivec x_i){
   }
   return R0 * param[1] / x_r[0];
 }
+
+//[[Rcpp::export()]]
+arma::vec betafs(arma::vec ts, arma::vec param, arma::vec x_r, arma::ivec x_i){
+  /**
+   * x_r = (N,cht1, cht2, ...)
+   * theta = (R0,gamma, lambda, ch1,ch2,...)
+   * x_i = (nch,nparam)
+   */
+  double R0 = param[0];
+  int i = 0;
+  int nch = x_i[0];
+  int m = ts.n_elem;
+  arma::vec betas(m);
+  for(int j = 0; j < m; j++){
+    if(i < nch){
+      while(x_r[i + 1] <= ts[j]){
+        R0 *= param[x_i[1] + i];
+        i ++;
+        if(i == nch) break;
+      }
+    }
+    betas(j) = R0 * param[1] / x_r[0];
+  }
+  return betas;
+}
+
 
 
 //[[Rcpp::export()]]
@@ -146,7 +171,7 @@ double log_like_traj_general(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
   int p = 2;
   double loglik = 0;
   //  int id1,id0;
-  arma:vec Xd1, Xd0;
+  arma::vec Xd1, Xd0;
 
   Xd1 = (SdeTraj.submat(0,1,0,p)-OdeTraj.submat(0,1,0,p)).t();
   // Xd0 = Xd1 = (SdeTraj.submat(0,1,0,3) - OdeTraj.submat(0,1,0,3)).t();

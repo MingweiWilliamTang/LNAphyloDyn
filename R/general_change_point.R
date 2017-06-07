@@ -29,7 +29,8 @@ updateAlphas_General = function(MCMC_obj,MCMC_setting,i){
   #logMultiNorm_new = log_like_trajSIR_BD(LatentTraj_new,Ode_Traj_coarse_new,FT_new,MCMC_setting$gridsize,MCMC_setting$t_correct)
 
   if(MCMC_setting$likelihood == "volz"){
-    coalLog_new = volz_loglik_nh(MCMC_setting$Init, LogTraj(LatentTraj_new),betaDyn(MCMC_obj$par[3],MCMC_obj$par[6],Ode_Traj_coarse_new[,1],period = MCMC_setting$period) * MCMC_setting$N,
+    coalLog_new = volz_loglik_nh(MCMC_setting$Init, LogTraj(LatentTraj_new),
+                                 betafs(Ode_Traj_coarse_new[,1],MCMC_obj$par[3:(MCMC_setting$x_i[1]+MCMC_setting$x_i[2]+2)], MCMC_setting$x_r,MCMC_setting$x_i),
                                  MCMC_setting$t_correct,
                                  MCMC_setting$gridsize)
   }else{
@@ -94,7 +95,7 @@ updateR0gamma_general = function(MCMC_obj, MCMC_setting, i){
   logMultiNorm_new = log_like_traj_general(LatentTraj_new, Ode_Traj_coarse_new,FT_new,MCMC_setting$gridsize,MCMC_setting$t_correct)
   if(MCMC_setting$likelihood == "volz"){
     coalLog_new = volz_loglik_nh(MCMC_setting$Init, LogTraj(LatentTraj_new),
-                                 betaDyn(MCMC_obj$par[3],MCMC_obj$par[6],Ode_Traj_coarse_new[,1],MCMC_setting$period) * MCMC_setting$N,
+                                 betafs(Ode_Traj_coarse_new[,1],param_new, MCMC_setting$x_r,MCMC_setting$x_i),
                                  MCMC_setting$t_correct,
                                  MCMC_setting$gridsize)
   }else{
@@ -159,7 +160,7 @@ updateR0_general = function(MCMC_obj, MCMC_setting, i){
   logMultiNorm_new = log_like_traj_general(LatentTraj_new, Ode_Traj_coarse_new,FT_new,MCMC_setting$gridsize,MCMC_setting$t_correct)
   if(MCMC_setting$likelihood == "volz"){
     coalLog_new = volz_loglik_nh(MCMC_setting$Init, LogTraj(LatentTraj_new),
-                                 betaDyn(MCMC_obj$par[3],MCMC_obj$par[6],Ode_Traj_coarse_new[,1],MCMC_setting$period) * MCMC_setting$N,
+                                 betafs(Ode_Traj_coarse_new[,1],param_new, MCMC_setting$x_r,MCMC_setting$x_i),
                                  MCMC_setting$t_correct,
                                  MCMC_setting$gridsize)
   }else{
@@ -220,7 +221,7 @@ updategamma_general = function(MCMC_obj, MCMC_setting, i){
   logMultiNorm_new = log_like_traj_general(LatentTraj_new, Ode_Traj_coarse_new,FT_new,MCMC_setting$gridsize,MCMC_setting$t_correct)
   if(MCMC_setting$likelihood == "volz"){
     coalLog_new = volz_loglik_nh(MCMC_setting$Init, LogTraj(LatentTraj_new),
-                                 betaDyn(MCMC_obj$par[3],MCMC_obj$par[6],Ode_Traj_coarse_new[,1],MCMC_setting$period) * MCMC_setting$N,
+                                 betafs(Ode_Traj_coarse_new[,1],param_new, MCMC_setting$x_r,MCMC_setting$x_i),
                                  MCMC_setting$t_correct,
                                  MCMC_setting$gridsize)
   }else{
@@ -302,7 +303,7 @@ update_ChangePoint_general = function(MCMC_obj, MCMC_setting, i){
 
     if(MCMC_setting$likelihood == "volz"){
       coalLog_new = volz_loglik_nh(MCMC_setting$Init, LogTraj(LatentTraj_new),
-                                   betaDyn(MCMC_obj$par[3],MCMC_obj$par[6],Ode_Traj_coarse_new[,1],MCMC_setting$period) * MCMC_setting$N,
+                                   betafs(Ode_Traj_coarse_new[,1],newpara, MCMC_setting$x_r,MCMC_setting$x_i),
                                    MCMC_setting$t_correct,
                                    MCMC_setting$gridsize)
     }else{
@@ -343,7 +344,7 @@ updateTraj_general = function(MCMC_obj,MCMC_setting,i){
   #print(MCMC_obj$par[3])
   #print(betaDyn(MCMC_obj$par[3],MCMC_obj$par[6],MCMC_obj$LatentTraj[,1]))
   MCMC_obj$LatentTraj = ESlice_general(MCMC_obj$LatentTraj,MCMC_obj$Ode_Traj_coarse,
-                                      MCMC_obj$FT,MCMC_obj$par[1:2], MCMC_setting$Init,betaN = 1,
+                                      MCMC_obj$FT,MCMC_obj$par[1:2], MCMC_setting$Init,betaN = betafs(MCMC_obj$LatentTraj[,1],MCMC_obj$par[3:(MCMC_setting$x_i[1]+MCMC_setting$x_i[2]+2)], MCMC_setting$x_r,MCMC_setting$x_i),
                                       MCMC_setting$t_correct,lambda = MCMC_obj$par[5],
                                       reps = MCMC_setting$reps,MCMC_setting$gridsize,
                                       volz = (MCMC_setting$likelihood == "volz"))
@@ -353,7 +354,7 @@ updateTraj_general = function(MCMC_obj,MCMC_setting,i){
 
   if(MCMC_setting$likelihood == "volz"){
     MCMC_obj$coalLog = volz_loglik_nh(MCMC_setting$Init, LogTraj(MCMC_obj$LatentTraj),
-                                      betaDyn(MCMC_obj$par[3],MCMC_obj$par[6],MCMC_obj$LatentTraj[,1],MCMC_setting$period) * MCMC_setting$N,
+                                      betafs(MCMC_obj$LatentTraj[,1],MCMC_obj$par[3:(MCMC_setting$x_i[1]+MCMC_setting$x_i[2]+2)], MCMC_setting$x_r,MCMC_setting$x_i),
                                       MCMC_setting$t_correct,
                                       MCMC_setting$gridsize)
   }else{
@@ -463,7 +464,7 @@ MCMC_initialize_general = function(MCMC_setting){ #, prior_par = c(10,20,-2.3,20
 
 
     if(MCMC_setting$likelihood == "volz"){
-      coalLog = volz_loglik_nh(MCMC_setting$Init, LogTraj(LatentTraj),betaDyn(theta1,theta4,LatentTraj[,1],MCMC_setting$period) * MCMC_setting$N,
+      coalLog = volz_loglik_nh(MCMC_setting$Init, LogTraj(LatentTraj), betafs(LatentTraj[,1],param, MCMC_setting$x_r,MCMC_setting$x_i),
                                MCMC_setting$t_correct,
                                MCMC_setting$gridsize)
 
