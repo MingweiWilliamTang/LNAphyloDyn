@@ -98,7 +98,7 @@ double log_like_traj(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
   int p = SdeTraj.n_cols - 1;
   double loglik = 0;
 //  int id1,id0;
-  arma:vec Xd1, Xd0;
+  arma::vec Xd1, Xd0;
 
    Xd0 = Xd1 = (SdeTraj.submat(0,1,0,p)-OdeTraj.submat(0,1,0,p)).t();
 // Xd0 = Xd1 = (SdeTraj.submat(0,1,0,3) - OdeTraj.submat(0,1,0,3)).t();

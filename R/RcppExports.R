@@ -28,6 +28,10 @@ betaf <- function(t, param, x_r, x_i) {
     .Call('LNAPhyloDyn_betaf', PACKAGE = 'LNAPhyloDyn', t, param, x_r, x_i)
 }
 
+betafs <- function(ts, param, x_r, x_i) {
+    .Call('LNAPhyloDyn_betafs', PACKAGE = 'LNAPhyloDyn', ts, param, x_r, x_i)
+}
+
 ODE_general_one <- function(states, param, t, x_r, x_i) {
     .Call('LNAPhyloDyn_ODE_general_one', PACKAGE = 'LNAPhyloDyn', states, param, t, x_r, x_i)
 }

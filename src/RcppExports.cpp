@@ -77,6 +77,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// betafs
+arma::vec betafs(arma::vec ts, arma::vec param, arma::vec x_r, arma::ivec x_i);
+RcppExport SEXP LNAPhyloDyn_betafs(SEXP tsSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type ts(tsSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type param(paramSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type x_r(x_rSEXP);
+    Rcpp::traits::input_parameter< arma::ivec >::type x_i(x_iSEXP);
+    rcpp_result_gen = Rcpp::wrap(betafs(ts, param, x_r, x_i));
+    return rcpp_result_gen;
+END_RCPP
+}
 // ODE_general_one
 arma::vec ODE_general_one(arma::vec states, arma::vec param, double t, arma::vec x_r, arma::ivec x_i);
 RcppExport SEXP LNAPhyloDyn_ODE_general_one(SEXP statesSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {

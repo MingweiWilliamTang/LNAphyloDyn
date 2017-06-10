@@ -220,7 +220,7 @@ double log_like_trajSIR_BD(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
   int p = 2;
   double loglik = 0;
   //  int id1,id0;
-  arma:vec Xd1, Xd0;
+  arma::vec Xd1, Xd0;
 
   Xd0 = Xd1 = (SdeTraj.submat(0,1,0,p)-OdeTraj.submat(0,1,0,p)).t();
   // Xd0 = Xd1 = (SdeTraj.submat(0,1,0,3) - OdeTraj.submat(0,1,0,3)).t();
