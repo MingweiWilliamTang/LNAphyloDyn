@@ -159,15 +159,32 @@ arma::vec ODE_SIRS_one(arma::vec states,arma::vec param, double t, arma::vec x_r
 }
 
 
+//[[Rcpp::export()]]
+arma::mat SIRS_F(arma::vec states,arma::vec thetas,std::string transX){
+  arma::mat M;
+  //XPtr<parat> param_trans = transformPtr();
+  //double th1 = exp(param[0] + param[3] * sin(2 * pi * t / 40.0));
+  //arma::vec thetas = (*param_trans)(t,param,x_r,x_i);
+  if(transX == "standard"){
+    M << - thetas[0] * states[2] << 0 << - thetas[0] * states[0] << arma::endr
+      << thetas[0] * states[2] << -thetas[1] << thetas[0] * states[0] << arma::endr
+      << 0 << thetas[1] << - thetas[2] << endr;
+  }else if(transX == "log"){
+    M << thetas[0] * exp(states(2)-states(0))/2 << 0 << -thetas[0]*exp(states(2))-thetas[0]/2*exp(states(2)-states(0)) <<arma::endr
+      << thetas[0] * exp(state[0] + state[2] -)
+      <<thetas[0]*exp(states(0))-thetas[0]*exp(states(0)-states(1))/2 << thetas[0]*exp(states(0)-states(1))/2+thetas[1]/2*exp(-states(1))<<arma::endr;
+  }
+  return M;
+}
+
+
+
 
 
 
 //[[Rcpp::export()]]
 arma::mat SIR_F(arma::vec states,arma::vec thetas,std::string transX){
   arma::mat M;
-  arma::mat A;
-  arma::vec h;
-  A << -1 << 1  <<arma::endr<<0<< -1 << arma::endr;
   //XPtr<parat> param_trans = transformPtr();
   //double th1 = exp(param[0] + param[3] * sin(2 * pi * t / 40.0));
   //arma::vec thetas = (*param_trans)(t,param,x_r,x_i);
@@ -610,7 +627,7 @@ List Traj_sim_ezG2(arma::vec initial, arma::vec times, arma::vec param,
 //[[Rcpp::export()]]
 arma::mat ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
                          List init, arma::vec betaN, double t_correct, double lambda=10,
-                         int reps=1, int gridsize = 100, bool volz = false){
+                         int reps=1, int gridsize = 100, bool volz = false, std::string transX = "standard"){
   // OdeTraj is the one with low resolution
   int p = f_cur.n_cols - 1;
   arma::mat newTraj(f_cur.n_rows, f_cur.n_cols);
@@ -628,9 +645,9 @@ arma::mat ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::ve
     //  if(funname == "standard"){
     // logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
     if(volz){
-      logy = volz_loglik_nh(init, LogTraj(f_cur), betaN, t_correct, gridsize) + log(u);
+      logy = volz_loglik_nh2(init, f_cur, betaN, t_correct, gridsize,transX) + log(u);
     }else{
-      logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
+      logy = coal_loglik(init,f_cur,t_correct,lambda,gridsize, transX) + log(u);
     }
     //   }else{
     //     logy = coal_loglik(init,f_cur,t_correct,lambda,gridsize) + log(u);
@@ -687,22 +704,22 @@ void test(arma::vec &param){
 
 
 //[[Rcpp::export()]]
-double volz_loglik_nh2(List init, arma::mat f1, arma::vec betaN, double t_correct, int gridsize = 1
-                         ){
-
+double volz_loglik_nh2(List init, arma::mat f1, arma::vec betaN, double t_correct, arma::ivec index,
+                         std::string transX){
+  int p = f1.n_cols - 1;
   int n0 = as<int>(init[9]) - 1;
   int L = 0;
   while(f1(L,0) < t_correct){
     L ++;
   }
-  if(f1.submat(0,1,n0,2).min() < 0){
+  if(f1.submat(0,1,n0,p).min() < 0){
     return -10000000;
   }
   // Rcout<<f1 <<endl;
-  arma::mat f2(n0,2);
+  arma::mat f2(n0,p);
   arma::vec betanh(n0);
   for(int i = 1; i<= n0; i++){
-    f2.submat((n0-i),0,(n0-i),1) = f1.submat(L-i+1,1,L-i+1,2);
+    f2.submat((n0-i),0,(n0-i),p - 1) = f1.submat(L-i+1,1,L-i+1,p);
     betanh(n0-i) = betaN(L-i+1);
   }
   // Rcout<<f2.n_rows<<"\t"<<as<int>(init[9])<<endl;
@@ -720,8 +737,13 @@ double volz_loglik_nh2(List init, arma::mat f1, arma::vec betaN, double t_correc
   int start = 0;
   for(int i = 0; i < f2.n_rows; i++){
     for(int j = 0; j < gridrep(i);j++){
-      f(start) = f2(f2.n_rows-i-1,1);
-      s(start) = f2(f2.n_rows-i-1,0);
+      if(transX == "standard"){
+        f(start) = log(f2(f2.n_rows-i-1,index(1)));
+        s(start) = log(f2(f2.n_rows-i-1,index(0)));
+      }else if(transX == "log"){
+        f(start) = f2(f2.n_rows-i-1,index(1));
+        s(start) = f2(f2.n_rows-i-1,index(0));
+      }
       betas(start) = betanh(f2.n_rows-i-1);
       start ++;
     }
@@ -897,9 +919,10 @@ bool UpdateUniform(MCMC_obj & mcmc_obj,int ParamIndex, const arma::vec &PriorPro
         mcmc_obj.Coal_log = x[1];
         mcmc_obj.Traj_log = x[0];
         mcmc_obj.Trajectory = LatentTraj_new;
+        return true;
       }
     }
-    return true;
+    return false;
   }
 
 
@@ -943,7 +966,7 @@ bool Updatelnorm(MCMC_obj & mcmc_obj,int ParamIndex, const arma::vec &PriorProp,
     id(0) = 0;
     id(1) = 1;
     x[1] = volz_loglik_nh(data_setting.Init, LatentTraj_new,
-                          betaTs(mcmc_obj.Param, id, data_setting.Times, data_setting.X_r, data_setting.X_i),
+                          betaTs(param_new, id, data_setting.Times, data_setting.X_r, data_setting.X_i),
                           data_setting.T_correct, data_setting.Gridsize);
   }else if(likelihood == "Kingman"){
     x[1] = coal_loglik(data_setting.Init, LatentTraj_new, data_setting.T_correct, mcmc_obj.Lambda,
@@ -964,9 +987,62 @@ bool Updatelnorm(MCMC_obj & mcmc_obj,int ParamIndex, const arma::vec &PriorProp,
       mcmc_obj.Traj_log = x[0];
       mcmc_obj.Trajectory = LatentTraj_new;
       mcmc_obj.Param_log[ParamIndex] = R::dlnorm(mu_new,PriorProp(0),PriorProp(1),1);
+      return true;
     }
   }
-  return true;
+  return false;
 }
 
+
+bool UpdateLambda(MCMC_obj & mcmc_obj,const arma::vec &PriorProp,
+                  Data_setting &data_setting){
+  double Lambda_new = mcmc_obj.Lambda * exp(R::runif(-PriorProp(2),-PriorProp(2));
+  Rcpp::NumericVector x(1);
+  x(0) = coal_loglik(data_setting.Init,mcmc_obj.Trajectory, Lambda_new, 1, data_setting.TransX);
+  if(NumericVector::is_na(x(0))){
+    return false;
+  }else{
+    double a = x(0) - mcmc_obj.Coal_log;
+    if(log(R::runif(0,1)) < a){
+      mcmc_obj.Coal_log = x(0);
+      mcmc_obj.Lambda = lambda_new;
+      return true;
+    }
+  }
+  //x(0) = coal_loglik(data_setting.Init);
+  return false;
+}
+
+void UpdataEslice(MCMC_obj & mcmc_obj, Data_setting & data_setting){
+
+}
+
+List LNA_MCMC_run(List init,arma::vec times, double t_correct, arma::vec x_r, arma::ivec x_i,
+                  double gridsize, List DT_obj, int niter, List PriorProp, std::string likelihood,
+                  control = list(), updateVec = c(1,1,1,1,1)){
+
+  Data_setting data_setting(init,times, t_correct,
+                 x_r,x_i,gridset, gridsize, model, transP,transX);
+
+  MCMC_obj mcmc_obj(initial, param, lambda,
+               ode_traj_coarse, trajectory, ft,coal_log, traj_log, param_log);
+
+  int n = gridset.n_elem;
+  int p = Initial.n_elem;
+
+  arma::vec AR;
+  AR = zeros(5);
+  arma::mat ParaMx(niter,5);
+  arma::cube Trajs(n,p,niter);
+
+  for(int i = 0; i < niter < i ++){
+    AR(0) = (AR(0) * i + UpdateUniform(mcmc_obj, 0, PriorProp1, data_setting,likelihood)) / (i + 1.0);
+    AR(1) = (AR(1) * i + Updatelnorm(mcmc_obj, 1, PriorProp2, data_setting, likelihood)) / (i + 1.0);
+    AR(3) = (AR(3) * i + UpdateLambda(mcmc_obj,PriorProp3, data_setting)) / (i + 1.0);
+
+    ParaMx.row(i) = mcmc_obj.Param;
+    if(like)
+  }
+
+}
 

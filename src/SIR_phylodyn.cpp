@@ -433,7 +433,7 @@ double coal_loglik2(List init, arma::mat f1, double t_correct, double lambda, in
 
 
 //[[Rcpp::export()]]
-double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int gridsize = 1){
+double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int gridsize = 1,std::string transX = "standard"){
 
   int n0 = 0;
   while(f1(n0,0) < t_correct){
