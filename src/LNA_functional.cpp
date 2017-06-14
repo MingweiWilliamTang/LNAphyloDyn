@@ -88,7 +88,7 @@ arma::vec ODE_SIR_one(arma::vec states, arma::vec param, double t, arma::vec x_r
     dx = - thetas[0] * states[0] * states[1];
     dy = thetas[0] * states[0] * states[1] - thetas[1] * states[1];
   }else if(transX == "log"){
-    dx = -thetas[0] * exp(states[1]) - thetas[0]*exp(states[1]-states[0])/2;
+    dx = -thetas[0] * exp(states[1]) - thetas[0] * exp(states[1]-states[0])/2;
     dy = thetas[0] * exp(states[0]) - thetas[1] - thetas[0] * exp(states[0]-states[1])/2 - thetas[1] *exp(-states[1])/2;
   }else{
     dx = 0;
@@ -170,9 +170,9 @@ arma::mat SIRS_F(arma::vec states,arma::vec thetas,std::string transX){
       << thetas[0] * states[2] << -thetas[1] << thetas[0] * states[0] << arma::endr
       << 0 << thetas[1] << - thetas[2] << endr;
   }else if(transX == "log"){
-    M << thetas[0] * exp(states(2)-states(0))/2 << 0 << -thetas[0]*exp(states(2))-thetas[0]/2*exp(states(2)-states(0)) <<arma::endr
-      << thetas[0] * exp(state[0] + state[2] -)
-      <<thetas[0]*exp(states(0))-thetas[0]*exp(states(0)-states(1))/2 << thetas[0]*exp(states(0)-states(1))/2+thetas[1]/2*exp(-states(1))<<arma::endr;
+    M << thetas[0] * exp(states(2)-states(0))/2 << 0 << -thetas[0]*exp(states(2))-thetas[0]/2*exp(states(2)-states(0)) <<arma::endr;
+     // << thetas[0] * exp(states[0] + states[2] -)
+    //  <<thetas[0]*exp(states(0))-thetas[0]*exp(states(0)-states(1))/2 << thetas[0]*exp(states(0)-states(1))/2+thetas[1]/2*exp(-states(1))<<arma::endr;
   }
   return M;
 }
@@ -208,11 +208,16 @@ arma::mat SEIR_F(arma::vec states,arma::vec thetas,std::string transX){
   //double th1 = exp(param[0] + param[3] * sin(2 * pi * t / 40.0));
   //arma::vec thetas = (*param_trans)(t,param,x_r,x_i);
   if(transX == "standard"){
-    M << - thetas[0] * states[1] << - thetas[0] * states[0] << arma::endr
-      << thetas[0] * states[1] << thetas[0] * states[0] - thetas[1] << arma::endr;
+    M << - thetas[0] * states[2] << 0 << - thetas[0] * states[0] << arma::endr
+      << thetas[0] * states[2] << - thetas[1] << thetas[0] * states[0] << arma::endr
+      << 0 << thetas[1] << -thetas[2] << arma::endr;
   }else if(transX == "log"){
-    M << thetas[0] * exp(states(1)-states(0))/2 << -thetas[0]*exp(states(1))-thetas[0]/2*exp(states(1)-states(0)) <<arma::endr
-      <<thetas[0]*exp(states(0))-thetas[0]*exp(states(0)-states(1))/2 << thetas[0]*exp(states(0)-states(1))/2+thetas[1]/2*exp(-states(1))<<arma::endr;
+    M << thetas[0] * exp(states(2)-states(0))/2 << 0 << -thetas[0]*exp(states(2))-thetas[0]/2*exp(states(2)-states(0)) <<arma::endr
+      << thetas[0] * exp(states(0) + states(2) - states(1)) - thetas[0] * exp(states(0) + states(2) - 2*states(1)) / 2
+      << -thetas[0] * exp(states(0) + states(2) - states(1)) + thetas[1] * exp(-states[1])/2 + thetas[0] * exp(states(0) + states(2) - 2*states(1))
+      <<  thetas[0] * exp(states(0) + states(2) - states(1)) - thetas[0] * exp(-states(0) + states(2) - 2* states(1)) << arma::endr
+      << 0 << thetas[1]*exp(states(1)-states(2)) - thetas[1] * exp(states[1] - 2*states[2])/2
+      <<  -thetas[1]*exp(states(1)-states(2)) + thetas[2] * exp(-states[2])/2 + thetas[1] * exp(states[1] - 2 * states[2])  << arma::endr;
   }
   return M;
 }
@@ -623,89 +628,57 @@ List Traj_sim_ezG2(arma::vec initial, arma::vec times, arma::vec param,
 }
 
 
-
+// Kingman's coalescent model
 //[[Rcpp::export()]]
-arma::mat ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
-                         List init, arma::vec betaN, double t_correct, double lambda=10,
-                         int reps=1, int gridsize = 100, bool volz = false, std::string transX = "standard"){
-  // OdeTraj is the one with low resolution
-  int p = f_cur.n_cols - 1;
-  arma::mat newTraj(f_cur.n_rows, f_cur.n_cols);
-  double logy;
-  for(int count = 0; count < reps; count ++){
-    // centered the old trajectory without time grid
-    arma::mat f_cur_centered = f_cur.cols(1,p) - OdeTraj.cols(1,p);
+double coal_loglik3(List init, arma::mat f1, double t_correct, double lambda, int Index, std::string transX = "standard"){
 
-    List v = Traj_sim_general2(OdeTraj,FTs,t_correct);
-    arma::mat v_traj = as<mat>(v[0]).cols(1,p) -  OdeTraj.cols(1,p);
-    if(v_traj.has_nan()){
-      Rcout<<"dddd"<<endl;
-    }
-    double u = R::runif(0,1);
-    //  if(funname == "standard"){
-    // logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
-    if(volz){
-      logy = volz_loglik_nh2(init, f_cur, betaN, t_correct, gridsize,transX) + log(u);
-    }else{
-      logy = coal_loglik(init,f_cur,t_correct,lambda,gridsize, transX) + log(u);
-    }
-    //   }else{
-    //     logy = coal_loglik(init,f_cur,t_correct,lambda,gridsize) + log(u);
-    //    }
-    double theta = R::runif(0,2 * pi);
-
-    double theta_min = theta - 2*pi;
-    double theta_max = theta;
-
-    arma::mat f_prime = f_cur_centered * cos(theta) + v_traj * sin(theta);
-    newTraj.col(0) = f_cur.col(0);
-    newTraj.cols(1,p) = f_prime + OdeTraj.cols(1,p);
-    int i = 0;
-    double loglike;
-    if(volz){
-      loglike = volz_loglik_nh(init, LogTraj(newTraj),betaN,t_correct, gridsize);
-    }else{
-      loglike = coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize);
-    }
-    while(newTraj.cols(1,p).min() <0 || loglike <= logy){
-      // shrink the bracket
-      i += 1;
-      if(i>20){
-        newTraj = f_cur;
-        Rcout<<"theta = "<<theta<<endl;
-        break;
-      }
-      if(theta < 0){
-        theta_min = theta;
-      }else{
-        theta_max = theta;
-      }
-      theta = R::runif(theta_min,theta_max);
-      f_prime = f_cur_centered * cos(theta) + v_traj * sin(theta);
-      // newTraj.col(0) = f_cur.col(0);
-      newTraj.cols(1,p) = f_prime + OdeTraj.cols(1,p);
-      if(volz){
-        loglike = volz_loglik_nh(init, LogTraj(newTraj), betaN, t_correct, gridsize);
-      }else{
-        loglike = coal_loglik(init,LogTraj(newTraj),t_correct,lambda,gridsize);
-      }
-    }
-
-    f_cur = newTraj;
-
+  int n0 = 0;
+  while(f1(n0,0) < t_correct){
+    n0 ++;
   }
-  return newTraj;
+  //Rcout<<f1(n0,0)<<endl;
+  //  Rcout<<n0<<endl;
+  arma::vec f2(n0 + 1);
+  if(transX == "standard"){
+    for(int i = n0; i>0; i--){
+      f2(n0-i) = log(f1(i,Index + 1));
+    }
+  }else if(transX == "log"){
+    for(int i = n0; i>0; i--){
+      f2(n0 - i) = f1(i, Index + 1);
+    }
+  }
+  // Rcout<<f2.n_rows<<"\t"<<as<int>(init[9])<<endl;
+  if(as<int>(init[9]) != f2.n_rows){
+    Rcout<<"Incorrect length for f"<<endl;
+  }
+
+  arma::vec gridrep;
+  gridrep = as<vec>(init[6]);
+  int k = sum(as<arma::vec>(init[6]));
+
+  arma::vec f(k);
+
+  int start = 0;
+  for(int i = 0; i< f2.n_rows; i++){
+    for(int j = 0; j<gridrep(i);j++){
+      f(start ++) = f2(i);
+    }
+  }
+  arma::vec ll = -lambda * (as<vec>(init[2]) % as<vec>(init[3]) % arma::exp(-f)) +\
+    as<vec>(init[4]) % (log(lambda) -f);
+  return sum(ll);
 }
 
-//[[Rcpp::export()]]
-void test(arma::vec &param){
-  param[0] = 1;
-}
+
+
+
 
 
 //[[Rcpp::export()]]
 double volz_loglik_nh2(List init, arma::mat f1, arma::vec betaN, double t_correct, arma::ivec index,
-                         std::string transX){
+                       std::string transX){
+
   int p = f1.n_cols - 1;
   int n0 = as<int>(init[9]) - 1;
   int L = 0;
@@ -758,6 +731,97 @@ double volz_loglik_nh2(List init, arma::mat f1, arma::vec betaN, double t_correc
 
 
 
+//[[Rcpp::export()]]
+arma::mat ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
+                         List init, arma::vec betaN, double t_correct, double lambda=10,
+                         int reps=1, int gridsize = 100, bool volz = false, std::string model = "SIR",
+                         std::string transX = "standard"){
+  // OdeTraj is the one with low resolution
+
+  arma::ivec Index(2);
+  if(model == "SIR"){
+    Index(0) = 0; Index(1) = 1;
+  }else if(model == "SEIR"){
+    Index(0) = 0; Index(1) = 2;
+  }
+
+  int p = f_cur.n_cols - 1;
+  arma::mat newTraj(f_cur.n_rows, f_cur.n_cols);
+  double logy;
+  for(int count = 0; count < reps; count ++){
+    // centered the old trajectory without time grid
+    arma::mat f_cur_centered = f_cur.cols(1,p) - OdeTraj.cols(1,p);
+
+    List v = Traj_sim_general2(OdeTraj,FTs,t_correct);
+    arma::mat v_traj = as<mat>(v[0]).cols(1,p) -  OdeTraj.cols(1,p);
+    if(v_traj.has_nan()){
+      Rcout<<"dddd"<<endl;
+    }
+    double u = R::runif(0,1);
+    //  if(funname == "standard"){
+    // logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
+    if(volz){
+      logy = volz_loglik_nh2(init, f_cur, betaN, t_correct,Index,transX) + log(u);
+    }else{
+      logy = coal_loglik3(init,f_cur,t_correct,lambda,Index(1), transX) + log(u);
+    }
+    //   }else{
+    //     logy = coal_loglik(init,f_cur,t_correct,lambda,gridsize) + log(u);
+    //    }
+    double theta = R::runif(0,2 * pi);
+
+    double theta_min = theta - 2*pi;
+    double theta_max = theta;
+
+    arma::mat f_prime = f_cur_centered * cos(theta) + v_traj * sin(theta);
+    newTraj.col(0) = f_cur.col(0);
+    newTraj.cols(1,p) = f_prime + OdeTraj.cols(1,p);
+    int i = 0;
+    double loglike;
+    if(volz){
+      loglike = volz_loglik_nh2(init, newTraj,betaN,t_correct,Index ,transX);
+    }else{
+      loglike = coal_loglik3(init,LogTraj(newTraj),t_correct,lambda,Index(1), transX);
+    }
+    while(newTraj.cols(1,p).min() <0 || loglike <= logy){
+      // shrink the bracket
+      i += 1;
+      if(i>20){
+        newTraj = f_cur;
+        Rcout<<"theta = "<<theta<<endl;
+        break;
+      }
+      if(theta < 0){
+        theta_min = theta;
+      }else{
+        theta_max = theta;
+      }
+      theta = R::runif(theta_min,theta_max);
+      f_prime = f_cur_centered * cos(theta) + v_traj * sin(theta);
+      // newTraj.col(0) = f_cur.col(0);
+      newTraj.cols(1,p) = f_prime + OdeTraj.cols(1,p);
+      if(volz){
+        loglike = volz_loglik_nh2(init, newTraj, betaN, t_correct, Index ,transX);
+      }else{
+        loglike = coal_loglik3(init,LogTraj(newTraj),t_correct,lambda,Index(1), transX);
+      }
+    }
+
+    f_cur = newTraj;
+
+  }
+  return newTraj;
+}
+
+//[[Rcpp::export()]]
+void test(arma::vec &param){
+  param[0] = 1;
+}
+
+
+
+
+/*
 
 class MCMC_obj{
   //private:
@@ -786,7 +850,6 @@ class MCMC_obj{
     this->Coal_log = coal_log;
     this->Traj_log = -traj_log;
     this->Param_log = param_log;
-
   }
 
   arma::vec get_param(){
@@ -815,7 +878,7 @@ public:
   std::string Model;
   std::string TransP;
   std::string TransX;
-
+  arma::ivec Index;
   Data_setting(List init, arma::vec times, double t_correct,
                arma::vec x_r, arma::ivec x_i,double gridset, double gridsize,
                std::string model = "SIR", std::string transP = "changepoint",
@@ -831,6 +894,12 @@ public:
     this->Model = model;
     this->TransP = transP;
     this->TransX = transX;
+    Index.zeros(2);
+    if(model == "SIR"){
+      Index(0) = 0; Index(1) = 1;
+    }else if(model == "SEIR"){
+      Index(0) = 0; Index(1) = 2;
+    }
   }
 };
 
@@ -844,6 +913,8 @@ void InitializeMCMC(arma::vec initial, arma::vec param, double lambda,
                ode_traj_coarse, trajectory, ft,
                coal_log, traj_log, param_log);
 }
+
+
 
 //[[Rcpp::export()]]
 void InitializeData(List init, arma::vec times, double t_correct,
@@ -899,9 +970,9 @@ bool UpdateUniform(MCMC_obj & mcmc_obj,int ParamIndex, const arma::vec &PriorPro
     arma::ivec id(2);
     id(0) = 0;
     id(1) = 1;
-    x[1] = volz_loglik_nh(data_setting.Init, LatentTraj_new,
+    x[1] = volz_loglik_nh2(data_setting.Init, LatentTraj_new,
                           betaTs(mcmc_obj.Param, id, data_setting.Times, data_setting.X_r, data_setting.X_i),
-                          data_setting.T_correct, data_setting.Gridsize);
+                          data_setting.T_correct, data_setting.Index,data_setting.TransX);
   }else if(likelihood == "Kingman"){
     x[1]= coal_loglik(data_setting.Init, LatentTraj_new, data_setting.T_correct, mcmc_obj.Lambda,
                                 data_setting.Gridsize);
@@ -965,9 +1036,9 @@ bool Updatelnorm(MCMC_obj & mcmc_obj,int ParamIndex, const arma::vec &PriorProp,
     arma::ivec id(2);
     id(0) = 0;
     id(1) = 1;
-    x[1] = volz_loglik_nh(data_setting.Init, LatentTraj_new,
+    x[1] = volz_loglik_nh2(data_setting.Init, LatentTraj_new,
                           betaTs(param_new, id, data_setting.Times, data_setting.X_r, data_setting.X_i),
-                          data_setting.T_correct, data_setting.Gridsize);
+                          data_setting.T_correct, data_setting.Index ,data_setting.TransX);
   }else if(likelihood == "Kingman"){
     x[1] = coal_loglik(data_setting.Init, LatentTraj_new, data_setting.T_correct, mcmc_obj.Lambda,
                                data_setting.Gridsize);
@@ -1013,9 +1084,21 @@ bool UpdateLambda(MCMC_obj & mcmc_obj,const arma::vec &PriorProp,
   return false;
 }
 
-void UpdataEslice(MCMC_obj & mcmc_obj, Data_setting & data_setting){
+void UpdataEslice(MCMC_obj & mcmc_obj, Data_setting & data_setting,std::string likelihood){
+  bool v = (likelihood == "volz");
+  mcmc_obj.Trajectory = ESlice_general2(mcmc_obj.Trajectory, mcmc_obj.Ode_Traj_Coarse, mcmc_obj.FT,
+                                        mcmc_obj.Initial, betaTs(mcmc_obj.Param, data_setting.Index, data_setting.Times, data_setting.X_r, data_setting.X_i),
+                                        data_setting.T_correct, mcmc_obj.Lambda,
+                                        1, data_setting.Gridsize, v, data_setting.Model, data_setting.TransX);
 
-}
+  mcmc_obj.Traj_log = log_like_traj_general2(mcmc_obj.Trajectory, mcmc_obj.Ode_Traj_Coarse,
+                                             mcmc_obj.FT,data_setting.Gridsize,data_setting.T_correct);
+
+  mcmc_obj.Coal_log = volz_loglik_nh2(data_setting.Init, mcmc_obj.Trajectory,
+                                      betaTs(mcmc_obj.Param, id, data_setting.Times, data_setting.X_r, data_setting.X_i),
+                                      data_setting.T_correct, data_setting.Index,data_setting.TransX);
+  }
+
 
 List LNA_MCMC_run(List init,arma::vec times, double t_correct, arma::vec x_r, arma::ivec x_i,
                   double gridsize, List DT_obj, int niter, List PriorProp, std::string likelihood,
@@ -1039,10 +1122,14 @@ List LNA_MCMC_run(List init,arma::vec times, double t_correct, arma::vec x_r, ar
     AR(0) = (AR(0) * i + UpdateUniform(mcmc_obj, 0, PriorProp1, data_setting,likelihood)) / (i + 1.0);
     AR(1) = (AR(1) * i + Updatelnorm(mcmc_obj, 1, PriorProp2, data_setting, likelihood)) / (i + 1.0);
     AR(3) = (AR(3) * i + UpdateLambda(mcmc_obj,PriorProp3, data_setting)) / (i + 1.0);
-
+    UpdataEslice(mcmc_obj, data_setting, "volz");
     ParaMx.row(i) = mcmc_obj.Param;
-    if(like)
+    Trajs.slice(i) = mcmc_obj.Traj_log;
   }
-
+  List returnList;
+  returnList["par"] = ParaMx;
+  returnList["AR"] = AR;
+  returnList["Trajectory"] =
 }
 
+*/
