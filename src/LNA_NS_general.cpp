@@ -2,6 +2,23 @@
 #include "SIR_phylodyn.h"
 #define pi 3.14159265358979323846264338327950288
 
+//[[Rcpp::export()]]
+double betaf(double t, arma::vec param, arma::vec x_r, arma::ivec x_i){
+/**
+* x_r = (N,cht1, cht2, ...)
+* theta = (R0,gamma, lambda, ch1,ch2,...)
+* x_i = (nch,nparam)
+*/
+  double R0 = param[0];
+  int i = 0;
+  int nch = x_i[0];
+  while(x_r[i + 1] <= t){
+    R0 *= param[x_i[1] + i];
+    if(i == nch - 1) break;
+      i ++;
+    }
+    return R0 * param[1] / x_r[0];
+}
 
 
 //[[Rcpp::export()]]

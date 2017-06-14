@@ -22,7 +22,7 @@ List Traj_sim_ez(arma::vec initial, arma::vec times,double theta1, double theta2
 
 double coal_loglik2(List init, arma::mat f1, double t_correct, double lambda, int gridsize);
 
-double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int gridsize);
+double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int gridsize,std::string transX = "standard");
 
 arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
                  List init, double t_correct, double lambda=10, int reps=1,

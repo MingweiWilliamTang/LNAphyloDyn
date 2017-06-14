@@ -45,6 +45,23 @@ simuSIR = function(theta1,theta2,S,I,time){
 
 
 
+simuSEIR = function(theta1,theta2,theta3,S,E,I,time){
+  R = 0
+  SIR = list()
+  SIR$Pre=matrix(c(1,0,1,0,1,0,0,0,1),byrow = T,ncol=3)
+  SIR$Post = matrix(c(0,1,1,0,0,1,0,0,0),byrow = T,ncol=3)
+  SIR$h = function(x,t,th=c(theta1= theta1, theta2 = theta2, theta3 = theta3)){
+    with(as.list(c(x,th)),{
+      return(c(theta1*X*Z, theta2*Y,theta3 * Z))
+    })
+  }
+  SIR_F = StepFRM(SIR)
+  simu_Traj = simTs(c(X = S, Y = E, Z = I), min(time), max(time), time[2] - time[1], SIR_F)
+  #plot(time,simu_Traj[,2],type="l")
+  return(cbind(time,simu_Traj))
+}
+
+
 
 #' Plot the posterior
 #'

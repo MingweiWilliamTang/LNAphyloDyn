@@ -1,17 +1,11 @@
 #include "basic_util.h"
 #include "SIR_phylodyn.h"
-#include<R.h>
 #define pi 3.14159265358979323846264338327950288
-
-using namespace Rcpp;
-using namespace arma;
 
 typedef arma::vec (*parat)(double, arma::vec, arma::vec, arma::ivec);
 typedef arma::vec (*ODE_fun)(arma::vec, arma::vec, double, arma::vec, arma::ivec, std::string, std::string);
 typedef arma::mat (*F_fun)(arma::vec, arma::vec, std::string);
 typedef arma::vec (*h_fun)(arma::vec, arma::vec, std::string);
-//typedef List (*SigmaInt)(arma::mat,arma::vec,arma::vec, arma::ivec, std::string, std::string, std::string);
-
 
 //[[Rcpp::export()]]
 arma::vec betaTs(arma::vec param, arma::ivec index, arma::vec times, arma::vec x_r, arma::ivec x_i){
@@ -116,7 +110,7 @@ arma::vec ODE_SEIR_one(arma::vec states, arma::vec param, double t, arma::vec x_
 
     dx = - thetas[0] * states[0] * states[2];
     dy = thetas[0] * states[0] * states[2] - thetas[1] * states[1];
-    dz = - thetas[2] * states[2];
+    dz = thetas[1] * states[1] - thetas[2] * states[2];
 
   }else if(transX == "log"){
 
@@ -201,9 +195,9 @@ arma::mat SIR_F(arma::vec states,arma::vec thetas,std::string transX){
 //[[Rcpp::export()]]
 arma::mat SEIR_F(arma::vec states,arma::vec thetas,std::string transX){
   arma::mat M;
-  arma::mat A;
+ // arma::mat A;
   arma::vec h;
-  A << -1 << 1<<arma::endr<<0<< -1 << arma::endr;
+  //A << -1 << 1<<arma::endr<<0<< -1 << arma::endr;
   //XPtr<parat> param_trans = transformPtr();
   //double th1 = exp(param[0] + param[3] * sin(2 * pi * t / 40.0));
   //arma::vec thetas = (*param_trans)(t,param,x_r,x_i);
@@ -305,7 +299,7 @@ arma::mat F_SIR_log(arma::vec states, arma::vec transParam){
 XPtr<F_fun> F_funPtr(std::string model = "SIR"){
   if(model == "SIR" ){
     return XPtr<F_fun>(new F_fun(&SIR_F));
-  }else if(model == "SEIS"){
+  }else if(model == "SEIR"){
     return XPtr<F_fun>(new F_fun(&SEIR_F));
   }else{
     return XPtr<F_fun>(R_NilValue); // runtime error as NULL no XPtr
@@ -446,7 +440,7 @@ List KF_param(arma::mat OdeTraj, arma::vec param,int gridsize,arma::vec x_r, arm
   //double dt = (OdeTraj(1,0) - OdeTraj(0,0));
   int k = (n-1) / gridsize;
   //int p = OdeTraj.n_cols - 1;
-  int p = OdeTraj.n_rows - 1;
+  int p = OdeTraj.n_cols - 1;
   arma::cube Acube(p,p,k);
   arma::cube Scube(p,p,k);
   arma::mat Traj_part;
@@ -516,6 +510,7 @@ List Traj_sim_general2(arma::mat OdeTraj, List Filter,double t_correct){
   int k = OdeTraj.n_rows - 1;
   // int p = OdeTraj.n_cols - 1;
   int p = OdeTraj.n_cols - 1;
+
   arma::vec X0(p),eta0(p),X1(p),eta1(p);
   for(int i = 0; i < p; p ++){
     X1(i) = OdeTraj(0,i+1);
@@ -526,7 +521,7 @@ List Traj_sim_general2(arma::mat OdeTraj, List Filter,double t_correct){
   LNA_traj(0,0) = 0;
 
   LNA_traj.submat(0,1,0,p) = X1.t();
-  //Rcout<<"test1"<<endl;
+
 
   for(int i = 0; i< k; i++){
 
@@ -569,7 +564,7 @@ List Traj_sim_ezG2(arma::vec initial, arma::vec times, arma::vec param,
                   std::string transP = "changepoint",std::string model = "SIR",
                   std::string transX = "standard"){
   //int p = initial.n_elem;
-  int p = initial.n_cols;
+  int p = initial.n_elem;
   int k = times.n_rows / gridsize;
   arma::mat OdeTraj_thin = ODE_rk45(initial,times, param, x_r, x_i,
                                 transP, model, transX);
@@ -585,13 +580,13 @@ List Traj_sim_ezG2(arma::vec initial, arma::vec times, arma::vec param,
   arma::cube Scube = as<arma::cube>(Filter[1]);
   k = OdeTraj.n_rows-1;
   //Rcout << Acube.slice(9) <<endl;
-  arma::vec X0,X1 = initial.subvec(0,1),eta0(p),eta1 = initial.subvec(0,1);
+  arma::vec X0,X1 = initial.subvec(0,p-1),eta0(p),eta1 = initial.subvec(0,p-1);
 
   double loglike = 0;
   arma::mat LNA_traj(k+1,p+1);
   LNA_traj(0,0) = 0;
 
-  LNA_traj.submat(0,1,0,p) = initial.subvec(0,1).t();
+  LNA_traj.submat(0,1,0,p) = initial.subvec(0,p-1).t();
   //  Rcout<<"test1"<<endl;
   for(int i = 0; i< k; i++){
 
@@ -812,13 +807,6 @@ arma::mat ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::ve
   }
   return newTraj;
 }
-
-//[[Rcpp::export()]]
-void test(arma::vec &param){
-  param[0] = 1;
-}
-
-
 
 
 /*

@@ -24,6 +24,82 @@ expM <- function(A) {
 #' @export Foo
 NULL
 
+betaTs <- function(param, index, times, x_r, x_i) {
+    .Call('LNAPhyloDyn_betaTs', PACKAGE = 'LNAPhyloDyn', param, index, times, x_r, x_i)
+}
+
+param_transform <- function(t, param, x_r, x_i) {
+    .Call('LNAPhyloDyn_param_transform', PACKAGE = 'LNAPhyloDyn', t, param, x_r, x_i)
+}
+
+ODE_SIR_one <- function(states, param, t, x_r, x_i, transP = "changepoint", transX = "standard") {
+    .Call('LNAPhyloDyn_ODE_SIR_one', PACKAGE = 'LNAPhyloDyn', states, param, t, x_r, x_i, transP, transX)
+}
+
+ODE_SEIR_one <- function(states, param, t, x_r, x_i, transP = "changepoint", transX = "standard") {
+    .Call('LNAPhyloDyn_ODE_SEIR_one', PACKAGE = 'LNAPhyloDyn', states, param, t, x_r, x_i, transP, transX)
+}
+
+ODE_SIRS_one <- function(states, param, t, x_r, x_i, transP = "changepoint", transX = "standard") {
+    .Call('LNAPhyloDyn_ODE_SIRS_one', PACKAGE = 'LNAPhyloDyn', states, param, t, x_r, x_i, transP, transX)
+}
+
+SIRS_F <- function(states, thetas, transX) {
+    .Call('LNAPhyloDyn_SIRS_F', PACKAGE = 'LNAPhyloDyn', states, thetas, transX)
+}
+
+SIR_F <- function(states, thetas, transX) {
+    .Call('LNAPhyloDyn_SIR_F', PACKAGE = 'LNAPhyloDyn', states, thetas, transX)
+}
+
+SEIR_F <- function(states, thetas, transX) {
+    .Call('LNAPhyloDyn_SEIR_F', PACKAGE = 'LNAPhyloDyn', states, thetas, transX)
+}
+
+SIR_h <- function(states, thetas, transX = "standard") {
+    .Call('LNAPhyloDyn_SIR_h', PACKAGE = 'LNAPhyloDyn', states, thetas, transX)
+}
+
+SEIR_h <- function(states, thetas, transX = "standard") {
+    .Call('LNAPhyloDyn_SEIR_h', PACKAGE = 'LNAPhyloDyn', states, thetas, transX)
+}
+
+ODE_rk45 <- function(initial, t, param, x_r, x_i, transP = "changepoint", model = "SIR", transX = "standard") {
+    .Call('LNAPhyloDyn_ODE_rk45', PACKAGE = 'LNAPhyloDyn', initial, t, param, x_r, x_i, transP, model, transX)
+}
+
+SigmaF <- function(Traj_par, param, x_r, x_i, transP = "changepoint", model = "SIR", transX = "standard") {
+    .Call('LNAPhyloDyn_SigmaF', PACKAGE = 'LNAPhyloDyn', Traj_par, param, x_r, x_i, transP, model, transX)
+}
+
+KF_param <- function(OdeTraj, param, gridsize, x_r, x_i, transP = "changepoint", model = "SIR", transX = "standard") {
+    .Call('LNAPhyloDyn_KF_param', PACKAGE = 'LNAPhyloDyn', OdeTraj, param, gridsize, x_r, x_i, transP, model, transX)
+}
+
+log_like_traj_general2 <- function(SdeTraj, OdeTraj, Filter, gridsize, t_correct) {
+    .Call('LNAPhyloDyn_log_like_traj_general2', PACKAGE = 'LNAPhyloDyn', SdeTraj, OdeTraj, Filter, gridsize, t_correct)
+}
+
+Traj_sim_general2 <- function(OdeTraj, Filter, t_correct) {
+    .Call('LNAPhyloDyn_Traj_sim_general2', PACKAGE = 'LNAPhyloDyn', OdeTraj, Filter, t_correct)
+}
+
+Traj_sim_ezG2 <- function(initial, times, param, gridsize, x_r, x_i, t_correct, transP = "changepoint", model = "SIR", transX = "standard") {
+    .Call('LNAPhyloDyn_Traj_sim_ezG2', PACKAGE = 'LNAPhyloDyn', initial, times, param, gridsize, x_r, x_i, t_correct, transP, model, transX)
+}
+
+coal_loglik3 <- function(init, f1, t_correct, lambda, Index, transX = "standard") {
+    .Call('LNAPhyloDyn_coal_loglik3', PACKAGE = 'LNAPhyloDyn', init, f1, t_correct, lambda, Index, transX)
+}
+
+volz_loglik_nh2 <- function(init, f1, betaN, t_correct, index, transX) {
+    .Call('LNAPhyloDyn_volz_loglik_nh2', PACKAGE = 'LNAPhyloDyn', init, f1, betaN, t_correct, index, transX)
+}
+
+ESlice_general2 <- function(f_cur, OdeTraj, FTs, state, init, betaN, t_correct, lambda = 10, reps = 1L, gridsize = 100L, volz = FALSE, model = "SIR", transX = "standard") {
+    .Call('LNAPhyloDyn_ESlice_general2', PACKAGE = 'LNAPhyloDyn', f_cur, OdeTraj, FTs, state, init, betaN, t_correct, lambda, reps, gridsize, volz, model, transX)
+}
+
 betaf <- function(t, param, x_r, x_i) {
     .Call('LNAPhyloDyn_betaf', PACKAGE = 'LNAPhyloDyn', t, param, x_r, x_i)
 }
@@ -184,8 +260,8 @@ coal_loglik2 <- function(init, f1, t_correct, lambda, gridsize = 1L) {
     .Call('LNAPhyloDyn_coal_loglik2', PACKAGE = 'LNAPhyloDyn', init, f1, t_correct, lambda, gridsize)
 }
 
-coal_loglik <- function(init, f1, t_correct, lambda, gridsize = 1L) {
-    .Call('LNAPhyloDyn_coal_loglik', PACKAGE = 'LNAPhyloDyn', init, f1, t_correct, lambda, gridsize)
+coal_loglik <- function(init, f1, t_correct, lambda, gridsize = 1L, transX = "standard") {
+    .Call('LNAPhyloDyn_coal_loglik', PACKAGE = 'LNAPhyloDyn', init, f1, t_correct, lambda, gridsize, transX)
 }
 
 volz_loglik <- function(init, f1, t_correct, betaN, gridsize = 1L) {

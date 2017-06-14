@@ -27,7 +27,12 @@ arma::mat mvrnormArma(int n, arma::mat sigma) {
   int ncols = sigma.n_cols;
  arma::mat Y = randn(ncols,1);
 // arma::mat res = arma::chol(sigma+0.00000000001 * arma::diagmat(ones(3))) * Y;
-arma::mat res = chols(sigma) * Y;
+arma::mat res;
+if(n == 2){
+  res = chols(sigma) * Y;
+}else{
+  res = arma::chol(sigma + 0.000000001 * arma::diagmat(ones(3)) ) * Y;
+}
   if(res.has_nan()){
     Rcout<<"666"<<sigma<<endl;
   }
@@ -38,7 +43,7 @@ arma::mat res = chols(sigma) * Y;
 arma::mat mvrnormArma2(int n, arma::mat sigma) {
   int ncols = sigma.n_cols;
   arma::mat Y = randn(ncols,1);
-  arma::mat res = arma::chol(sigma + 0.0000001 * arma::diagmat(ones(3)) ) * Y;
+  arma::mat res = arma::chol(sigma + 0.000000001 * arma::diagmat(ones(3)) ) * Y;
 //arma::mat res = chols(sigma) * Y;
   if(res.has_nan()){
     Rcout<<"666"<<sigma<<endl;
