@@ -58,7 +58,7 @@ simuSEIR = function(theta1,theta2,theta3,S,E,I,time){
   SIR_F = StepFRM(SIR)
   simu_Traj = simTs(c(X = S, Y = E, Z = I), min(time), max(time), time[2] - time[1], SIR_F)
   #plot(time,simu_Traj[,2],type="l")
-  return(cbind(time,simu_Traj))
+  return(matrix(cbind(time,simu_Traj),ncol = 4))
 }
 
 

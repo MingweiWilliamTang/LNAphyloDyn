@@ -173,8 +173,8 @@ vlineCI = function(data,cred = T){
 }
 
 
-randomR0_traj = function(times,MCMC_obj,col_id,idx,ylim=c(0,5),main = ""){
-  R0 = MCMC_obj$par[idx,3]
+randomR0_traj = function(times,MCMC_obj,R0_id,col_id,idx,ylim=c(0,2),main = ""){
+  R0 = MCMC_obj$par[idx,R0_id]
   R0_traj = matrix(ncol= length(col_id)+2, nrow = length(idx))
   R0_traj[,1] = R0
   for(i in 1:length(col_id)){
