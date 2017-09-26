@@ -7,9 +7,34 @@ typedef arma::vec (*ODE_fun)(arma::vec, arma::vec, double, arma::vec, arma::ivec
 typedef arma::mat (*F_fun)(arma::vec, arma::vec, std::string);
 typedef arma::vec (*h_fun)(arma::vec, arma::vec, std::string);
 
+/*
+ *
+ * Generate a vector of beta corresponds to each time grid
+ *
+ * param: parameters for the model
+ * index: index vector of length two:
+ * first element is the index for infection rate,
+ * 2nd element is the index for recovery rate
+ *
+ * time grid
+ * x_r: parameters for change points
+ * x_i: index for change points
+ */
+
+
+
 //[[Rcpp::export()]]
-arma::vec betaTs(arma::vec param, arma::ivec index, arma::vec times, arma::vec x_r, arma::ivec x_i){
-  double R0 = param[index(0)];
+arma::vec betaTs(arma::vec param, arma::vec times, arma::vec x_r, arma::ivec x_i){
+  /*
+   * x_r = (N,cht1, cht2, ...)
+   * x_i = (nch,nparam, index0, index1)
+   *
+   * return a vector of infection rate beta for different time
+   *
+   * example:
+   * betaTs(c(1.2,40,33,0.6), seq(0,1.5,0.0001), c(1000000,0.5),c(1,3,0,2))
+   */
+  double R0 = param[x_i(2)];
   int i = 0;
   int nch = x_i[0];
   int m = times.n_elem;
@@ -23,7 +48,7 @@ arma::vec betaTs(arma::vec param, arma::ivec index, arma::vec times, arma::vec x
         if(i == nch) break;
       }
     }
-    betas(j) = R0 * param[index(1)] / x_r[0];
+    betas(j) = R0 * param[x_i(3)] / x_r[0];
   }
   return betas;
 }
@@ -34,11 +59,15 @@ arma::vec betaTs(arma::vec param, arma::ivec index, arma::vec times, arma::vec x
 arma::vec param_transform(double t, arma::vec param, arma::vec x_r, arma::ivec x_i){
   /**
   * x_r = (N,cht1, cht2, ...)
-  * theta = (R0,gamma, lambda, ch1,ch2,...)
-  * x_i = (nch,nparam)
+  *
+  * x_i = (nch,nparam, index0, index1)
+  * theta = (beta,gamma,..., ch1,ch2,...) at time t
+  *
+  * example:
+  * param_transform(0.7,c(1.2,40,33,0.6),c(1000000,0.5),c(1,3,0,2))
   */
   arma::vec param2 = param;
-  double R0 = param[0];
+  double R0 = param[x_i(2)];
   int i = 0;
   int nch = x_i[0];
   if(nch > 0){
@@ -48,7 +77,7 @@ arma::vec param_transform(double t, arma::vec param, arma::vec x_r, arma::ivec x
       i ++;
     }
   }
-  param2[0] = R0 * param[1] / x_r[0];
+  param2[0] = R0 * param[x_i(3)] / x_r[0];
   return param2;
 }
 
@@ -93,20 +122,51 @@ arma::vec ODE_SIR_one(arma::vec states, arma::vec param, double t, arma::vec x_r
   return res;
 }
 
-/*
- * states = {S,E,I}
- * params = {beta,alpha,gamma}
- *
- */
-//[[Rcpp::export()]]
-arma::vec ODE_SEIR_one(arma::vec states, arma::vec param, double t, arma::vec x_r, arma::ivec x_i,
-                      std::string transP = "changepoint", std::string transX = "standard"){
-  double dx, dy, dz;
-  arma::vec res(3);
+//[[]Rcpp::export()]]
+arma::vec ODE_SEIR2_one(arma::vec states, arma::vec param, double t,
+                        arma::vec x_r, arma::ivec x_i,
+                        std::string transP = "changepoint",
+                        std::string transX = "standard"){
+  /*
+   * Approximate the susceptible population with true population
+   *
+   * state = {E, I}
+   * parameters = {beta, mu, gamma}
+   *
+   * return one step result for SEIR model
+   *
+   */
+  double dy, dz;
+  arma::vec res(2);
   XPtr<parat> param_trans = transformPtr(transP);
-  //double th1 = exp(param[0] + param[3] * sin(2 * pi * t / 40.0));
+  arma::vec thetas = (*param_trans)(t,param,x_r,x_i);
+  double N = x_r[0];
+  dy = thetas[0] * N * states[1] - thetas[1] * states[0];
+  dz = thetas[1] * states[0] - thetas[2] * states[1];
+  res(0) = dy;
+  res(1) = dz;
+  return res;
+}
+
+//[[Rcpp::export()]]
+arma::vec ODE_SEIR_one(arma::vec states, arma::vec param, double t,
+                       arma::vec x_r, arma::ivec x_i,
+                      std::string transP = "changepoint",
+                      std::string transX = "standard"){
+  /*
+   * states = {S,E,I}
+   * params = {beta,mu,gamma}
+   *
+   */
+
+  double dx, dy, dz; // Susceptible, exposed, Infected
+  arma::vec res(3); // stores the result vector
+  // transform parameter
+  XPtr<parat> param_trans = transformPtr(transP);
   arma::vec thetas = (*param_trans)(t,param,x_r,x_i);
   if(transX == "standard"){
+    // theta0: infection rate, theta1: rate from exposed to infected
+    // theta2: recover rate
 
     dx = - thetas[0] * states[0] * states[2];
     dy = thetas[0] * states[0] * states[2] - thetas[1] * states[1];
@@ -153,6 +213,10 @@ arma::vec ODE_SIRS_one(arma::vec states,arma::vec param, double t, arma::vec x_r
 }
 
 
+
+
+
+
 //[[Rcpp::export()]]
 arma::mat SIRS_F(arma::vec states,arma::vec thetas,std::string transX){
   arma::mat M;
@@ -192,11 +256,22 @@ arma::mat SIR_F(arma::vec states,arma::vec thetas,std::string transX){
   return M;
 }
 
+
+//[[Rcpp::export()]]
+arma::mat SEIR2_F(arma::vec states, arma::vec thetas, std::string transX){
+  arma::mat M;
+  double N = 1000000;
+  M << -thetas[1] << thetas[0] * N << arma::endr
+    << thetas[1] << -thetas[2] << arma::endr;
+  return M;
+}
+
+
+
 //[[Rcpp::export()]]
 arma::mat SEIR_F(arma::vec states,arma::vec thetas,std::string transX){
   arma::mat M;
- // arma::mat A;
-  arma::vec h;
+
   //A << -1 << 1<<arma::endr<<0<< -1 << arma::endr;
   //XPtr<parat> param_trans = transformPtr();
   //double th1 = exp(param[0] + param[3] * sin(2 * pi * t / 40.0));
@@ -235,12 +310,24 @@ arma::vec SIR_h(arma::vec states,arma::vec thetas,std::string transX = "standard
 }
 
 //[[Rcpp::export()]]
+arma::vec SEIR2_h(arma::vec states, arma::vec thetas, std::string transX = "standard"){
+  arma::vec h(3);
+  double N = 1000000;
+  h(0) = thetas[0] * N * states(1);
+  h(1) = thetas[1] * states(0);
+  h(2) = thetas[2] * states(1);
+  return h;
+}
+
+
+//[[Rcpp::export()]]
 arma::vec SEIR_h(arma::vec states,arma::vec thetas,std::string transX = "standard"){
   arma::vec h(3);
   if(transX == "standard"){
     //XPtr<parat> param_trans = transformPtr();
     //double th1 = exp(param[0] + param[3] * sin(2 * pi * t / 40.0));
     //arma::vec thetas = (*param_trans)(tstates(0),param,x_r,x_i);
+
     h(0)= thetas[0] * states(0) * states(2);
     h(1) = thetas[1] * states(1);
     h(2) = thetas[2] * states(2);
@@ -301,6 +388,8 @@ XPtr<F_fun> F_funPtr(std::string model = "SIR"){
     return XPtr<F_fun>(new F_fun(&SIR_F));
   }else if(model == "SEIR"){
     return XPtr<F_fun>(new F_fun(&SEIR_F));
+  }else if(model == "SEIR2"){
+    return XPtr<F_fun>(new F_fun(&SEIR2_F));
   }else{
     return XPtr<F_fun>(R_NilValue); // runtime error as NULL no XPtr
   }
@@ -323,11 +412,17 @@ XPtr<h_fun> h_fun_Ptr(std::string model = "SIR"){
     return XPtr<h_fun>(new h_fun(&SIR_h));
   }else if(model == "SEIR"){
     return XPtr<h_fun>(new h_fun(&SEIR_h));
+  }else if(model == "SEIR2"){
+    return XPtr<h_fun>(new h_fun(&SEIR2_h));
   }else{
     return XPtr<h_fun>(R_NilValue); // runtime error as NULL no XPtr
   }
 }
 
+/**
+ * Function pointer for one-step ODE integrator
+ *
+ */
 
 XPtr<ODE_fun> ODE_fun_Ptr(std::string model = "SIR"){
   if(model == "SIR"){
@@ -336,6 +431,8 @@ XPtr<ODE_fun> ODE_fun_Ptr(std::string model = "SIR"){
     return XPtr<ODE_fun>(new ODE_fun(&ODE_SEIR_one));
   }else if(model == "SIRS"){
     return XPtr<ODE_fun>(new ODE_fun(&ODE_SIRS_one));
+  }else if(model == "SEIR2"){
+    return XPtr<ODE_fun>(new ODE_fun(&ODE_SEIR2_one));
   }else{
     return XPtr<ODE_fun>(R_NilValue); // runtime error as NULL no XPtr
   }
@@ -357,6 +454,18 @@ arma::mat ODE_rk45(arma::vec initial, arma::vec t, arma::vec param,
                            std::string transX = "standard"){
   // XPtr<ODEfuncPtr> SIR_ODEfun = putFunPtrInXPtr(funname);
   //double N = initial[0] + initial[1] + initial[2];
+
+  /*
+   * example:
+   *
+    traj0 = ODE_rk45(c(10,10),seq(0,1.5,0.01),c(1.5,40,33,0.6),c(975000,0.6),c(1,3,0,2),model = "SEIR2")
+    traj = ODE_rk45(c(10,10),seq(0,1.5,0.01),c(1.5,40,33,0.6),c(1000000,0.6),c(1,3,0,2),model = "SEIR2")
+    traj2 = ODE_rk45(c(1000000,10,10),seq(0,1.5,0.01),c(1.5,40,33,0.6),c(1000000,0.6),c(1,3,0,2),model = "SEIR")
+    plot(traj[,1],traj[,2],col = "red")
+    lines(traj0[,1],traj0[,2],col = "blue")
+    lines(traj2[,1],traj2[,3], col = "green")
+   *
+   */
   int n = t.n_rows;
   int p = initial.size();
   double dt = t[1] - t[0];
@@ -394,6 +503,8 @@ List SigmaF(arma::mat Traj_par,arma::vec param,
     A << -1 << 1  <<arma::endr<<0<< -1 << arma::endr;
   }else if(model == "SEIR"){
     A << -1 << 1 << 0 << arma::endr << 0 << -1 << 1 << arma::endr << 0 << 0 << -1 << endr;
+  }else if(model == "SEIR2"){
+    A << 1 << 0 << arma::endr << -1 << 1 <<arma::endr << 0 << -1 << arma::endr;
   }
   arma::mat H;
   //F0 << 1 <<0 <<arma::endr << 0 << 1 <<endr;
@@ -458,6 +569,34 @@ List KF_param(arma::mat OdeTraj, arma::vec param,int gridsize,arma::vec x_r, arm
 }
 
 
+//[[Rcpp::export()]]
+List KF_param_chol(arma::mat OdeTraj, arma::vec param,int gridsize,arma::vec x_r, arma::ivec x_i,
+              std::string transP = "changepoint",
+              std::string model = "SIR",std::string transX = "standard"){
+
+  int n = OdeTraj.n_rows;
+  //double dt = (OdeTraj(1,0) - OdeTraj(0,0));
+  int k = (n-1) / gridsize;
+  //int p = OdeTraj.n_cols - 1;
+  int p = OdeTraj.n_cols - 1;
+  arma::cube Acube(p,p,k);
+  arma::cube Lcube(p,p,k);
+  arma::mat Traj_part;
+  for(int i=0;i<k;i++){
+    Traj_part = OdeTraj.submat(i*gridsize,0,(i+1)*gridsize-1,p);
+    List tempres = SigmaF(Traj_part,param,x_r,x_i,transP, model, transX);
+    // Rcout<< tempres<<endl;
+    Acube.slice(i) = as<arma::mat>(tempres[0]);
+    Lcube.slice(i) = arma::chol(as<arma::mat>(tempres[1]) + 0.0000000000001 * arma::diagmat(ones(p))).t();
+  }
+  List Res;
+  Res["A"] = Acube;
+  Res["Sigma"] = Lcube;
+  return Res;
+}
+
+
+
 
 //[[Rcpp::export()]]
 double log_like_traj_general2(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
@@ -466,8 +605,7 @@ double log_like_traj_general2(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
   arma::cube Scube = as<arma::cube>(Filter[1]);
 
   int k = SdeTraj.n_rows - 1;
-  // int p = SdeTraj.n_cols - 1;
-  int p = 2;
+  int p = SdeTraj.n_cols - 1;
   double loglik = 0;
   //  int id1,id0;
   arma::vec Xd1, Xd0;
@@ -504,24 +642,43 @@ double log_like_traj_general2(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
 
 
 //[[Rcpp::export()]]
-List Traj_sim_general2(arma::mat OdeTraj, List Filter,double t_correct){
+double log_like_traj_general_adjust(arma::mat SdeTraj,arma::mat OdeTraj, List Filter_NC,
+                             int gridsize,double t_correct){
+  arma::cube Acube = as<arma::cube>(Filter_NC[0]);
+  arma::cube Lcube = as<arma::cube>(Filter_NC[1]);
+
+  int k = SdeTraj.n_rows - 1;
+  double loglik = 0;
+  //  int id1,id0;
+
+  // Xd0 = Xd1 = (SdeTraj.submat(0,1,0,3) - OdeTraj.submat(0,1,0,3)).t();
+  for(int i = 0; i < k; i++){
+
+    if(SdeTraj(i+1,0) <= t_correct){
+      loglik += -log(arma::det(Lcube.slice(i)));
+    }
+  }
+
+  return loglik;
+}
+
+
+//[[Rcpp::export()]]
+List Traj_sim_general3(arma::mat OdeTraj, List Filter,double t_correct){
   arma::cube Acube = as<arma::cube>(Filter[0]);
   arma::cube Scube = as<arma::cube>(Filter[1]);
   int k = OdeTraj.n_rows - 1;
-  // int p = OdeTraj.n_cols - 1;
-  int p = OdeTraj.n_cols - 1;
 
+  int p = OdeTraj.n_cols - 1;
   arma::vec X0(p),eta0(p),X1(p),eta1(p);
-  for(int i = 0; i < p; p ++){
-    X1(i) = OdeTraj(0,i+1);
-  }
+  X1 = OdeTraj.submat(0,1,0,p).t();
   eta1 = X1;
   double loglike = 0;
   arma::mat LNA_traj(k+1,p+1);
   LNA_traj(0,0) = 0;
 
   LNA_traj.submat(0,1,0,p) = X1.t();
-
+  //Rcout<<"test1"<<endl;
 
   for(int i = 0; i< k; i++){
 
@@ -537,12 +694,12 @@ List Traj_sim_general2(arma::mat OdeTraj, List Filter,double t_correct){
     arma::mat noise = mvrnormArma(p,Sig);
 
     X1 = A * (X0 - eta0) + eta1 + noise;
-    //Rcout<<noise.submat(0,0,1,0)<<endl;
+
     if(OdeTraj(i+1,0) <= t_correct){
       arma::mat l1 = (-0.5) * noise.t() * arma::solve(Sig,noise);
       //     arma::mat l1  = (-0.5) * noise.t() * inv2(Sig + eye(3,3)*0.00001) * noise;
       //    loglike += -1.5 * log(det(Sig+eye(3,3)*0.00001)) + l1(0,0);
-      loglike += -log(arma::det(Sig))/2 + l1(0,0);
+      loglike += -log(arma::det(Sig))/2.0 + l1(0,0);
     }
     //    Rcout<<"test3"<<endl;
     LNA_traj(i+1,0) = OdeTraj((i+1), 0);
@@ -558,11 +715,88 @@ List Traj_sim_general2(arma::mat OdeTraj, List Filter,double t_correct){
 
 
 
+
+//[[Rcpp::export()]]
+List Traj_sim_general_noncentral(arma::mat OdeTraj, List Filter_NC,double t_correct){
+  arma::cube Acube = as<arma::cube>(Filter_NC[0]);
+  arma::cube Lcube = as<arma::cube>(Filter_NC[1]);
+
+  int k = OdeTraj.n_rows - 1;
+  int p = OdeTraj.n_cols - 1;
+  arma::vec X0(p),X1(p);
+  for(int i = 0; i < p; i ++){
+    X0(i) = 0;
+  }
+  double loglike = 0;
+  double logTraj = 0;
+  arma::mat LNA_traj = OdeTraj;
+  arma::mat OriginLatent(k,p);
+  for(int i = 0; i< k; i++){
+    arma::mat epsilons_i = arma::randn(p,1);
+    OriginLatent.row(i) = epsilons_i.t();
+    arma::mat L_i = Lcube.slice((i));
+    //   arma::mat SigInv = inv2(Scube.slice(i).submat(0,0,1,1));
+    arma::mat A = Acube.slice(i);
+    X1 = A * X0 + L_i * epsilons_i;
+    LNA_traj.submat(i+1,1,i+1,p) = X1.t() + LNA_traj.submat(i+1,1,i+1,p);
+    X0 = X1;
+    //Rcout<<noise.submat(0,0,1,0)<<endl;
+    if(OdeTraj(i+1,0) <= t_correct){
+      arma::mat l1 = (-0.5) * epsilons_i.t() * epsilons_i;
+      loglike += -log(arma::det(L_i));
+      logTraj += l1(0,0);
+    }
+  }
+
+  List Res;
+  Res["SimuTraj"] = LNA_traj;
+  Res["OriginTraj"] = OriginLatent;
+  Res["logMultiNorm"] = loglike;
+  Res["logOrigin"] = logTraj;
+  return Res;
+}
+
+
+
+//[[Rcpp::export()]]
+arma::mat TransformTraj(arma::mat OdeTraj,arma::mat OriginLatent, List Filter_NC){
+  int n = OriginLatent.n_rows;
+  int p = OriginLatent.n_cols;
+  arma::vec X0(p),X1(p);
+   for(int i = 0; i < p; i ++){
+    X0(i) = 0;
+  }
+  arma::cube Acube = as<arma::cube>(Filter_NC[0]);
+  arma::cube Lcube = as<arma::cube>(Filter_NC[1]);
+  arma::mat LNA_traj = OdeTraj;
+  for(int i = 0; i< n; i++){
+    arma::mat epsilons_i = OriginLatent.row(i).t();
+    arma::mat L_i = Lcube.slice((i));
+
+    arma::mat A = Acube.slice(i);
+    X1 = A * X0 + L_i * epsilons_i;
+    LNA_traj.submat(i+1,1,i+1,p) = X1.t() + LNA_traj.submat(i+1,1,i+1,p);
+    X0 = X1;
+  }
+  return LNA_traj;
+}
+
+
+
+
+
 //[[Rcpp::export()]]
 List Traj_sim_ezG2(arma::vec initial, arma::vec times, arma::vec param,
                   int gridsize,arma::vec x_r,arma::ivec x_i,double t_correct,
                   std::string transP = "changepoint",std::string model = "SIR",
                   std::string transX = "standard"){
+  /*
+   example:
+   Traj_sim_ezG2(c(1000000,10,10),seq(0,1.5,0.0001),c(1.5,40,33,0.6),500,
+   c(1000000,0.6),c(1,3,0,2),1.1,model = "SEIR")
+
+   */
+
   //int p = initial.n_elem;
   int p = initial.n_elem;
   int k = times.n_rows / gridsize;
@@ -623,6 +857,42 @@ List Traj_sim_ezG2(arma::vec initial, arma::vec times, arma::vec param,
 }
 
 
+
+//[[Rcpp::export()]]
+List Traj_sim_ezG_NC(arma::vec initial, arma::vec times, arma::vec param,
+                  int gridsize,arma::vec x_r,arma::ivec x_i,double t_correct,
+                  std::string transP = "changepoint",std::string model = "SIR",
+                  std::string transX = "standard"){
+  /*
+   example:
+   Traj_sim_ezG2(c(1000000,10,10),seq(0,1.5,0.0001),c(1.5,40,33,0.6),500,
+   c(1000000,0.6),c(1,3,0,2),1.1,model = "SEIR")
+
+   */
+
+  //int p = initial.n_elem;
+  int p = initial.n_elem;
+  int k = times.n_rows / gridsize;
+  arma::mat OdeTraj_thin = ODE_rk45(initial,times, param, x_r, x_i,
+                                transP, model, transX);
+  arma::mat OdeTraj(k+1,p+1);
+  for(int i = 0; i< k + 1; i++){
+    OdeTraj.submat(i,0,i,p) = OdeTraj_thin.submat(i*gridsize,0,i*gridsize,p);
+  }
+
+  List Filter = KF_param_chol(OdeTraj_thin, param, gridsize, x_r, x_i,
+                         transP, model, transX);
+  return Traj_sim_general_noncentral(OdeTraj, Filter, t_correct);
+}
+
+
+
+
+
+
+
+
+
 // Kingman's coalescent model
 //[[Rcpp::export()]]
 double coal_loglik3(List init, arma::mat f1, double t_correct, double lambda, int Index, std::string transX = "standard"){
@@ -672,7 +942,7 @@ double coal_loglik3(List init, arma::mat f1, double t_correct, double lambda, in
 
 //[[Rcpp::export()]]
 double volz_loglik_nh2(List init, arma::mat f1, arma::vec betaN, double t_correct, arma::ivec index,
-                       std::string transX){
+                       std::string transX = "standard"){
 
   int p = f1.n_cols - 1;
   int n0 = as<int>(init[9]) - 1;
@@ -701,6 +971,7 @@ double volz_loglik_nh2(List init, arma::mat f1, arma::vec betaN, double t_correc
 
   arma::vec f(k);
   arma::vec s(k);
+  arma::vec e(k);
   arma::vec betas(k);
   int start = 0;
   for(int i = 0; i < f2.n_rows; i++){
@@ -708,31 +979,104 @@ double volz_loglik_nh2(List init, arma::mat f1, arma::vec betaN, double t_correc
       if(transX == "standard"){
         f(start) = log(f2(f2.n_rows-i-1,index(1)));
         s(start) = log(f2(f2.n_rows-i-1,index(0)));
+        e(start) = log(f2(f2.n_rows-i-1,1));
       }else if(transX == "log"){
         f(start) = f2(f2.n_rows-i-1,index(1));
         s(start) = f2(f2.n_rows-i-1,index(0));
+        e(start) = f2(f2.n_rows-i-1,1);
       }
       betas(start) = betanh(f2.n_rows-i-1);
       start ++;
     }
   }
-  arma::vec ll = -2 * (as<vec>(init[2]) % as<vec>(init[3]) % betas % (arma::exp(-f)) % (arma::exp(s))) +\
-    as<vec>(init[4]) % (log(betas) -f+s);
+  arma::vec ll = -2 * (as<vec>(init[2]) % as<vec>(init[3]) % betas % (arma::exp(- f)) % (arma::exp(s))) +\
+    as<vec>(init[4]) % (log(betas) -f + s);
   //Rcout<< ll <<endl;
   return sum(ll);
 }
 
 
+//[[Rcpp::export()]]
+arma::mat ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
+                         List init, arma::vec betaN, double t_correct, double lambda=10,
+                         double coal_log=0, int gridsize = 100, bool volz = false, std::string model = "SIR",
+                         std::string transX = "standard"){
+  // OdeTraj is the one with low resolution
+  arma::ivec Index(2);
+  if(model == "SIR"){
+    Index(0) = 0; Index(1) = 1;
+  }else if(model == "SEIR"){
+    Index(0) = 0; Index(1) = 2;
+  }
+
+  int p = f_cur.n_cols;
+  arma::mat newTraj(f_cur.n_rows, f_cur.n_cols);
+  double logy;
+
+    // centered the old trajectory without time grid
+    arma::mat v_traj = arma::randn(f_cur.n_rows, f_cur.n_cols);
+    double u = R::runif(0,1);
+    //  if(funname == "standard"){
+    // logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
+    if(coal_log != 0){
+      logy = coal_log + log(u);
+    }else{
+      if(volz){
+        logy = volz_loglik_nh2(init, f_cur, betaN, t_correct,Index,transX) + log(u);
+      }else{
+        logy = coal_loglik3(init,f_cur,t_correct,lambda,Index(1), transX) + log(u);
+      }
+    }
+
+    double theta = R::runif(0,2 * pi);
+
+    double theta_min = theta - 2*pi;
+    double theta_max = theta;
+
+    arma::mat f_prime = f_cur * cos(theta) + v_traj * sin(theta);
+    newTraj = TransformTraj(OdeTraj,f_prime, FTs);
+    int i = 0;
+    double loglike;
+    if(volz){
+      loglike = volz_loglik_nh2(init, newTraj,betaN,t_correct,Index ,transX);
+    }else{
+      loglike = coal_loglik3(init,LogTraj(newTraj),t_correct,lambda,Index(1), transX);
+    }
+    while(newTraj.cols(1,p).min() <0 || loglike <= logy){
+      // shrink the bracket
+      i += 1;
+      if(i>20){
+        newTraj = f_cur;
+        Rcout<<"theta = "<<theta<<endl;
+        break;
+      }
+      if(theta < 0){
+        theta_min = theta;
+      }else{
+        theta_max = theta;
+      }
+      theta = R::runif(theta_min,theta_max);
+      f_prime = f_cur * cos(theta) + v_traj * sin(theta);
+      newTraj = TransformTraj(OdeTraj,f_prime, FTs);
+
+      if(volz){
+        loglike = volz_loglik_nh2(init, newTraj, betaN, t_correct, Index ,transX);
+      }else{
+        loglike = coal_loglik3(init,LogTraj(newTraj),t_correct,lambda,Index(1), transX);
+      }
+  }
+  f_cur = newTraj;
+  return newTraj;
+}
 
 
 
 //[[Rcpp::export()]]
-arma::mat ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
+List ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
                          List init, arma::vec betaN, double t_correct, double lambda=10,
                          int reps=1, int gridsize = 100, bool volz = false, std::string model = "SIR",
                          std::string transX = "standard"){
   // OdeTraj is the one with low resolution
-
   arma::ivec Index(2);
   if(model == "SIR"){
     Index(0) = 0; Index(1) = 1;
@@ -743,14 +1087,13 @@ arma::mat ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::ve
   int p = f_cur.n_cols - 1;
   arma::mat newTraj(f_cur.n_rows, f_cur.n_cols);
   double logy;
-  for(int count = 0; count < reps; count ++){
+
     // centered the old trajectory without time grid
     arma::mat f_cur_centered = f_cur.cols(1,p) - OdeTraj.cols(1,p);
-
-    List v = Traj_sim_general2(OdeTraj,FTs,t_correct);
+    List v = Traj_sim_general3(OdeTraj,FTs,t_correct);
     arma::mat v_traj = as<mat>(v[0]).cols(1,p) -  OdeTraj.cols(1,p);
     if(v_traj.has_nan()){
-      Rcout<<"dddd"<<endl;
+      Rcout<<"NA in proposed trajectory"<<endl;
     }
     double u = R::runif(0,1);
     //  if(funname == "standard"){
@@ -801,22 +1144,26 @@ arma::mat ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::ve
         loglike = coal_loglik3(init,LogTraj(newTraj),t_correct,lambda,Index(1), transX);
       }
     }
-
     f_cur = newTraj;
-
-  }
-  return newTraj;
+  List Res;
+  Res["LatentTraj"] = newTraj;
+  Res["OriginTraj"] = f_prime;
+  return Res;
 }
 
 
-/*
+
+
+
+
+
 
 class MCMC_obj{
   //private:
   public:
 
   arma::vec Initial; // initial state
-  arma::vec Param; //{R0.gamma,}
+  arma::vec Param; //{R0,gamma, .... }
   double Lambda; // scaleing, overdispersion parameter
   arma::mat Ode_Traj_Coarse;
   arma::mat Trajectory;
@@ -917,7 +1264,7 @@ void InitializeData(List init, arma::vec times, double t_correct,
 }
 
 
-
+/*
 
 bool UpdateUniform(MCMC_obj & mcmc_obj,int ParamIndex, const arma::vec &PriorProp,
                    Data_setting data_setting, std::string likelihood){

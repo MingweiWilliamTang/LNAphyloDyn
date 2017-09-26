@@ -213,3 +213,52 @@ effpopPlot = function(NP_res,LNA_res,t_correct,idx,row=id,lid=5,ylab="",xlab="",
   CI_Curve(LNA_res,idx,scale = LNA_res$par[idx,5],fill_col = rgb(1,0,0,0.3))
   medianCur(LNA_res,idx,col="red",lid = 5)
 }
+
+
+
+
+CI_Curve_eff2 = function(MCMC_obj,ids, col = "black", fill_col = "grey", Irow = 3,method = "qtile",alpha=0.05,fill = T,likelihood ="volz",
+                         x_r,x_i){
+  if(likelihood == "volz"){
+    Mx = 1/(2 * MCMC_obj$Trajectory[,2,ids]/MCMC_obj$Trajectory[,Irow,ids])
+    scale = sapply(ids,function(x){
+      return(betaTs(MCMC_obj$par[x,4:(3 + x_i[1] + x_i[2])],
+                   MCMC_obj$Trajectory[,1,1],x_r, x_i))})
+    Mx = Mx/scale
+    }else{
+    Mx = MCMC_obj$Trajectory[,Irow,ids]
+    scale = 1
+  }
+  midcur = apply(Mx,1,mean)
+  if(method == "NormApp"){
+    midSd = apply(Mx,1,sd)
+    qt = qnorm(1-alpha/2)
+    upper = midcur + qt * midSd
+    lower = midcur - qt * midSd
+    #lines(MCMC_obj$Trajectory[,1,1],upper,lty=2,
+    #      col=col,lwd=2)
+
+    #lines(MCMC_obj$Trajectory[,1,1],lower,lty=2,
+    #      col=col,lwd=2)
+  }else if(method == "qtile"){
+    qt1 = 1 - alpha/2
+    qt2 = alpha/2
+    upper = apply(Mx,1,function(x){
+      return(quantile(x,qt1))
+    }
+    )
+    lower = apply(Mx,1,function(x){
+      return(quantile(x,qt2))
+    })
+    # lines(MCMC_obj$Trajectory[,1,1],midcur + qt * midSd,lty=2,
+    #      col=col,lwd=2)
+
+    #lines(MCMC_obj$Trajectory[,1,1],midcur - qt * midSd,lty=2,
+    #     col=col,lwd=2)
+  }
+  if(fill == T){
+    polygon(x = c(MCMC_obj$Trajectory[,1,1],rev(MCMC_obj$Trajectory[,1,1])),
+            y = c(upper,rev(lower)),col = fill_col,border = NA)
+  }
+  lines(MCMC_obj$Trajectory[,1,1],midcur,col = col,lwd=2,lty=2)
+}

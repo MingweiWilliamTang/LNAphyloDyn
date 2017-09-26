@@ -167,8 +167,7 @@ double log_like_traj_general(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
   arma::cube Scube = as<arma::cube>(Filter[1]);
 
   int k = SdeTraj.n_rows - 1;
-  // int p = SdeTraj.n_cols - 1;
-  int p = 2;
+  int p = SdeTraj.n_cols - 1;
   double loglik = 0;
   //  int id1,id0;
   arma::vec Xd1, Xd0;

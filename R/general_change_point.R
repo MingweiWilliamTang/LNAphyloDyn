@@ -19,14 +19,12 @@ updateAlphas_General = function(MCMC_obj,MCMC_setting,i){
 
   FT_new = General_KOM_Filter(Ode_Traj_thin_new,MCMC_obj$par[3:(MCMC_setting$x_i[1]+MCMC_setting$x_i[2]+2)],
                               MCMC_setting$gridsize,MCMC_setting$x_r,MCMC_setting$x_i)
- # FT_new = SIR_BD_KOM_Filter(Ode_Traj_thin_new,MCMC_obj$par[3:6],MCMC_setting$gridsize,MCMC_setting$N,period = MCMC_setting$period)
 
 
   LatentTraj_new =cbind(MCMC_obj$LatentTraj[,1],MCMC_obj$LatentTraj[,2:3] - MCMC_obj$Ode_Traj_coarse[,2:3] +
                           Ode_Traj_coarse_new[,2:3])
   logMultiNorm_new = log_like_traj_general(LatentTraj_new, Ode_Traj_coarse_new,FT_new,MCMC_setting$gridsize,MCMC_setting$t_correct)
 
-  #logMultiNorm_new = log_like_trajSIR_BD(LatentTraj_new,Ode_Traj_coarse_new,FT_new,MCMC_setting$gridsize,MCMC_setting$t_correct)
 
   if(MCMC_setting$likelihood == "volz"){
     coalLog_new = volz_loglik_nh(MCMC_setting$Init, LogTraj(LatentTraj_new),
@@ -39,7 +37,7 @@ updateAlphas_General = function(MCMC_obj,MCMC_setting,i){
   }
   if (is.nan(logMultiNorm_new)) {
     logMultiNorm_new = -Inf
-    # countInf = countInf + 1
+
   }
   a = dlnorm(alpha1_new,MCMC_setting$b1,MCMC_setting$a1,log = T) - 2*log(1+alpha1_new) + coalLog_new + #dgamma(log(alpha2_new),MCMC_setting$b2,MCMC_setting$a2,log = T) +
     logMultiNorm_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog -
@@ -59,7 +57,6 @@ updateAlphas_General = function(MCMC_obj,MCMC_setting,i){
     MCMC_obj$logMultiNorm = logMultiNorm_new
     MCMC_obj$FT = FT_new
     MCMC_obj$LogAlpha1 = dlnorm(alpha1_new,MCMC_setting$b1,MCMC_setting$a1,log = T)
-    #    MCMC_obj$LogAlpha2 = dgamma(log(alpha2_new),MCMC_setting$b2,MCMC_setting$a2,log = T)
     MCMC_obj$coalLog = coalLog_new
     MCMC_obj$LatentTraj = LatentTraj_new
   }
@@ -73,8 +70,6 @@ updateR0gamma_general = function(MCMC_obj, MCMC_setting, i){
   #s1_new = pmin(pmax(s1 + runif(1,-0.5,0.5), 3),6)
   R0_new = MCMC_obj$par[3] + runif(1,-MCMC_setting$ps1, MCMC_setting$ps1)
   if(R0_new <1 || R0_new > 10){
-    # theta1_new = s1_new * MCMC_obj$par[4] / MCMC_setting$N
-    # MCMC_obj$par[3] = theta1_new
     return(list(MCMC_obj = MCMC_obj, AR = 0))
   }
   gamma_new = MCMC_obj$par[4] * exp(runif(1,-MCMC_setting$ps2,MCMC_setting$ps2))
@@ -110,13 +105,11 @@ updateR0gamma_general = function(MCMC_obj, MCMC_setting, i){
     a = dlnorm(gamma_new,MCMC_setting$c1,MCMC_setting$c2,log = T) + log(gamma_new) + logMultiNorm_new + coalLog_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog -
       MCMC_obj$LogS2 - log(MCMC_obj$par[4])
   }
-  # print(theta2_new)
   AR = 0
   if(is.na(a)){
     AR = 0
     if(is.na(coalLog_new)){
       print("NA appears in likelihood R0 gamma")
-      # print(LatentTraj_new)
     }else{
       print("NA appears in S1 S2")
     }
@@ -134,15 +127,12 @@ updateR0gamma_general = function(MCMC_obj, MCMC_setting, i){
   return(list(MCMC_obj = MCMC_obj, AR = AR))
 }
 ############
+
 updateR0_general = function(MCMC_obj, MCMC_setting, i){
-  #s1_new = pmin(pmax(s1 + runif(1,-0.5,0.5), 3),6)
   R0_new = MCMC_obj$par[3] + runif(1,-MCMC_setting$ps1, MCMC_setting$ps1)
   if(R0_new <1 || R0_new > 10){
-    # theta1_new = s1_new * MCMC_obj$par[4] / MCMC_setting$N
-    # MCMC_obj$par[3] = theta1_new
     return(list(MCMC_obj = MCMC_obj, AR = 0))
   }
-  #gamma_new = MCMC_obj$par[4] * exp(runif(1,-MCMC_setting$ps2,MCMC_setting$ps2))
 
 
   param_new = c(R0_new, MCMC_obj$par[4], MCMC_obj$par[5:(MCMC_setting$x_i[1]+MCMC_setting$x_i[2]+2)])
@@ -172,7 +162,8 @@ updateR0_general = function(MCMC_obj, MCMC_setting, i){
   if (is.nan(logMultiNorm_new)) {
     a = -Inf
   }else{
-    a = logMultiNorm_new + coalLog_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog
+    #a = logMultiNorm_new + coalLog_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog
+    a = coalLog_new - MCMC_obj$coalLog
   }
   # print(theta2_new)
   AR = 0
@@ -233,8 +224,8 @@ updategamma_general = function(MCMC_obj, MCMC_setting, i){
   if (is.nan(logMultiNorm_new)) {
     a = -Inf
   }else{
-    a = dlnorm(gamma_new,MCMC_setting$c1,MCMC_setting$c2,log = T) + log(gamma_new) + logMultiNorm_new + coalLog_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog -
-      MCMC_obj$LogS2 - log(MCMC_obj$par[4])
+    a = dlnorm(gamma_new,MCMC_setting$c1,MCMC_setting$c2,log = T) + log(gamma_new) + coalLog_new - MCMC_obj$coalLog -
+       MCMC_obj$LogS2 - log(MCMC_obj$par[4])
   }
   # print(theta2_new)
   AR = 0
@@ -314,8 +305,9 @@ update_ChangePoint_general = function(MCMC_obj, MCMC_setting, i){
     if (is.nan(logMultiNorm_new)) {
       a = -Inf
     }else{
-      a = dlnorm(newpara[i-2],0,MCMC_setting$chpr) + logMultiNorm_new + coalLog_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog + dlnorm(MCMC_obj$par[i],0,MCMC_setting$chpr)
-    }
+      #a = dlnorm(newpara[i-2],0,MCMC_setting$chpr) + logMultiNorm_new + coalLog_new - MCMC_obj$logMultiNorm - MCMC_obj$coalLog - dlnorm(MCMC_obj$par[i],0,MCMC_setting$chpr)
+      a = dlnorm(newpara[i-2],0,MCMC_setting$chpr) + coalLog_new - MCMC_obj$coalLog - dlnorm(MCMC_obj$par[i],0,MCMC_setting$chpr)
+      }
     # print(theta2_new)
     AR = 0
     if(is.na(a)){
@@ -364,7 +356,6 @@ updateTraj_general = function(MCMC_obj,MCMC_setting,i){
 
   return(list(MCMC_obj=MCMC_obj))
 }
-
 
 
 
@@ -450,9 +441,12 @@ MCMC_initialize_general = function(MCMC_setting){ #, prior_par = c(10,20,-2.3,20
 
 
     if(is.null(MCMC_setting$control$traj)){
-      Latent = Traj_sim_general(Ode_Traj_coarse,FT,MCMC_setting$t_correct)
-      LatentTraj = Latent$SimuTraj
-      logMultiNorm = Latent$loglike
+      #Latent = Traj_sim_general(Ode_Traj_coarse,FT,MCMC_setting$t_correct)
+      #LatentTraj = Latent$SimuTraj
+      #logMultiNorm = Latent$loglike
+      LatentTraj = Ode_Traj_coarse
+      logMultiNorm = log_like_traj_general(LatentTraj,Ode_Traj_coarse,
+                                           FT,MCMC_setting$gridsize,MCMC_setting$t_correct)
     }else{
       LatentTraj = MCMC_setting$control$traj
       if( sum(abs(LatentTraj[1,c(2,3)]) - c(S,I)) > 1){
@@ -516,8 +510,8 @@ SIR_general_MCMC = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 10
 
   MCMC_obj = MCMC_initialize_general(MCMC_setting)
   if(MCMC_setting$likelihood == "volz"){
-    params = matrix(nrow = niter, ncol = 6)
-    ARMS = matrix(nrow = niter, ncol = 6)
+    params = matrix(nrow = niter, ncol =  sum(MCMC_setting$x_i) + 2)
+    ARMS = matrix(nrow = niter, ncol =  sum(MCMC_setting$x_i) + 2)
   }else{
     params = matrix(nrow = niter, ncol = sum(MCMC_setting$x_i) + 2)
     ARMS = matrix(nrow = niter, ncol = sum(MCMC_setting$x_i) + 2)
@@ -532,6 +526,7 @@ SIR_general_MCMC = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 10
       print(i)
       print(MCMC_obj$par)
       plot(MCMC_obj$LatentTraj[,1],MCMC_obj$LatentTraj[,3],type="l")
+      lines(MCMC_obj$Ode_Traj_coarse[,1],MCMC_obj$Ode_Traj_coarse[,3],col="red",lty=2)
     }
     ARvec = numeric(dim(ARMS)[2])
     if(updateVec[1] == 1){
