@@ -997,7 +997,7 @@ double volz_loglik_nh2(List init, arma::mat f1, arma::vec betaN, double t_correc
 
 
 //[[Rcpp::export()]]
-arma::mat ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
+List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
                          List init, arma::vec betaN, double t_correct, double lambda=10,
                          double coal_log=0, int gridsize = 100, bool volz = false, std::string model = "SIR",
                          std::string transX = "standard"){
@@ -1046,7 +1046,7 @@ arma::mat ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::
       // shrink the bracket
       i += 1;
       if(i>20){
-        newTraj = f_cur;
+        newTraj = TransformTraj(OdeTraj,f_cur, FTs);
         Rcout<<"theta = "<<theta<<endl;
         break;
       }
@@ -1066,13 +1066,23 @@ arma::mat ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::
       }
   }
   f_cur = newTraj;
-  return newTraj;
+  List Res;
+  double logOrigin = 0;
+  for(int j = 0; j < f_cur.n_rows - 1; j ++){
+    for(int k = 0; k < p; k ++){
+      logOrigin += R::dnorm4(f_prime(j,k),0,1,1);
+    }
+  }
+  Res["LatentTraj"] = newTraj;
+  Res["OriginTraj"] = f_prime;
+  Res["logOrigin"] = logOrigin;
+  return Res;
 }
 
 
 
 //[[Rcpp::export()]]
-List ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
+arma::mat ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
                          List init, arma::vec betaN, double t_correct, double lambda=10,
                          int reps=1, int gridsize = 100, bool volz = false, std::string model = "SIR",
                          std::string transX = "standard"){
@@ -1145,10 +1155,7 @@ List ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec sta
       }
     }
     f_cur = newTraj;
-  List Res;
-  Res["LatentTraj"] = newTraj;
-  Res["OriginTraj"] = f_prime;
-  return Res;
+  return newTraj;
 }
 
 

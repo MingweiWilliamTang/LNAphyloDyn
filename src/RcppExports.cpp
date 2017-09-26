@@ -446,7 +446,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // ESlice_general_NC
-arma::mat ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, arma::vec betaN, double t_correct, double lambda, double coal_log, int gridsize, bool volz, std::string model, std::string transX);
+List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, arma::vec betaN, double t_correct, double lambda, double coal_log, int gridsize, bool volz, std::string model, std::string transX);
 RcppExport SEXP LNAPhyloDyn_ESlice_general_NC(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP coal_logSEXP, SEXP gridsizeSEXP, SEXP volzSEXP, SEXP modelSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -469,7 +469,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // ESlice_general2
-List ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, arma::vec betaN, double t_correct, double lambda, int reps, int gridsize, bool volz, std::string model, std::string transX);
+arma::mat ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, arma::vec betaN, double t_correct, double lambda, int reps, int gridsize, bool volz, std::string model, std::string transX);
 RcppExport SEXP LNAPhyloDyn_ESlice_general2(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP volzSEXP, SEXP modelSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
