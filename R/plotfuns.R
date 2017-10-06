@@ -172,7 +172,6 @@ vlineCI = function(data,cred = T){
   abline(v = m ,col="blue",lwd=2)
 }
 
-
 randomR0_traj = function(times,MCMC_obj,R0_id,col_id,idx,ylim=c(0,2),main = ""){
   R0 = MCMC_obj$par[idx,R0_id]
   R0_traj = matrix(ncol= length(col_id)+2, nrow = length(idx))
@@ -184,15 +183,45 @@ randomR0_traj = function(times,MCMC_obj,R0_id,col_id,idx,ylim=c(0,2),main = ""){
   R0_traj[,length(col_id)+2] = R0_traj[,i] * MCMC_obj$par[idx,col_id[i]]
   CIup = apply(R0_traj,2,function(x){
     return(quantile(x,0.975))
-    })
+  })
   CIlow = apply(R0_traj,2,function(x){
-      return(quantile(x,0.025))
-    })
+    return(quantile(x,0.025))
+  })
   m = apply(R0_traj,2,median)
   plot(times,m,type="l",ylab = "R0",col = "red",lwd = 2,ylim=ylim,main=main)
   polygon(x = c(times,rev(times)),
           y = c(CIup,rev(CIlow)),col = "grey",border = NA)
   lines(times,m,type="l",col = "red",lwd = 2)
+}
+
+
+randomR0_traj_V = function(times,MCMC_obj,R0_id,col_id,idx,ylim=c(0,2),main = ""){
+  R0 = MCMC_obj$par[idx,R0_id]
+  R0_traj = matrix(ncol= length(col_id)+1, nrow = length(idx))
+  R0_traj[,1] = R0
+  for(i in 1:length(col_id)){
+    R0_traj[,i+1] = R0_traj[,i] * MCMC_obj$par[idx,col_id[i]]
+  }
+  i = length(col_id)
+  #R0_traj[,length(col_id)+2] = R0_traj[,i] * MCMC_obj$par[idx,col_id[i]]
+  CIup = apply(R0_traj,2,function(x){
+    return(quantile(x,0.975))
+    })
+  CIlow = apply(R0_traj,2,function(x){
+      return(quantile(x,0.025))
+    })
+  m = apply(R0_traj,2,median)
+  times = times[2:(length(m))]
+  step1 = stepfun(times, m, f = 0)
+  step2 = stepfun(times, CIup, f = 0)
+  step3 = stepfun(times, CIlow, f = 0)
+  plot(step1,ylab = "R0",col = "red",lwd = 2.5,ylim=ylim,
+       main=main,verticals = F,xlim=c(0,1.36),xlab = "time")
+  #polygon(x = c(times,rev(times)),
+   #       y = c(CIup,rev(CIlow)),col = "grey",border = NA)
+  lines(step2, lty=2,lwd = 1,verticals = F, col = "blue")
+  lines(step3, lty=2,lwd = 1,verticals = F, col = "blue")
+  #lines(times,m,type="l",col = "red",lwd = 2)
 }
 
 

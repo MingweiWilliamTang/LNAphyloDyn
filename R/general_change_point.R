@@ -1,4 +1,4 @@
-# SIRLNA_Period
+  # SIRLNA_Period
 updateAlphas_General = function(MCMC_obj,MCMC_setting,i){
   #alpha1 = MCMC_obj$par[1] / (MCMC_setting$N -  MCMC_obj$par[1] -  MCMC_obj$par[2])
   #alpha2 = MCMC_obj$par[2] / (MCMC_setting$N -  MCMC_obj$par[1] -  MCMC_obj$par[2])

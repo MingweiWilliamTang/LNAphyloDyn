@@ -29,7 +29,7 @@ arma::mat mvrnormArma(int n, arma::mat sigma) {
 // arma::mat res = arma::chol(sigma+0.00000000001 * arma::diagmat(ones(3))) * Y;
 arma::mat res;
 if(n == 2){
-  res = chols(sigma) * Y;
+  res = chols(sigma).t() * Y;
 }else{
   res = arma::chol(sigma + 0.0000000000001 * arma::diagmat(ones(n)) ).t() * Y;
 }

@@ -92,6 +92,10 @@ log_like_traj_general2 <- function(SdeTraj, OdeTraj, Filter, gridsize, t_correct
     .Call('LNAPhyloDyn_log_like_traj_general2', PACKAGE = 'LNAPhyloDyn', SdeTraj, OdeTraj, Filter, gridsize, t_correct)
 }
 
+log_like_traj_general_ez <- function(SdeTraj, t_correct, initial, t, param, x_r, x_i, transP = "changepoint", model = "SIR", transX = "standard") {
+    .Call('LNAPhyloDyn_log_like_traj_general_ez', PACKAGE = 'LNAPhyloDyn', SdeTraj, t_correct, initial, t, param, x_r, x_i, transP, model, transX)
+}
+
 log_like_traj_general_adjust <- function(SdeTraj, OdeTraj, Filter_NC, gridsize, t_correct) {
     .Call('LNAPhyloDyn_log_like_traj_general_adjust', PACKAGE = 'LNAPhyloDyn', SdeTraj, OdeTraj, Filter_NC, gridsize, t_correct)
 }

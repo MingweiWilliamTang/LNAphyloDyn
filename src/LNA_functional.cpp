@@ -597,7 +597,6 @@ List KF_param_chol(arma::mat OdeTraj, arma::vec param,int gridsize,arma::vec x_r
 
 
 
-
 //[[Rcpp::export()]]
 double log_like_traj_general2(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
                              int gridsize,double t_correct){
@@ -640,10 +639,31 @@ double log_like_traj_general2(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
   return loglik;
 }
 
+//[[Rcpp::export()]]
+double log_like_traj_general_ez(arma::mat SdeTraj, double t_correct, arma::vec initial, arma::vec t, arma::vec param,
+                                arma::vec x_r, arma::ivec x_i,
+                                std::string transP = "changepoint",std::string model = "SIR",
+                                std::string transX = "standard"){
+
+  arma::mat OdeTraj = ODE_rk45(initial,t,param,
+                               x_r,  x_i, transP , model,transX);
+
+  int gridsize = (int) (SdeTraj(1,0) - SdeTraj(0,0) )/ (t[1]-t[0]);
+  List Filter = KF_param(OdeTraj, param, gridsize, x_r, x_i,
+                         transP, model, transX);
+  arma::mat OdeTraj_Coarse(SdeTraj.n_rows, SdeTraj.n_cols);
+  for(int i = 0; i < SdeTraj.n_rows; i ++){
+    OdeTraj_Coarse.row(i) = OdeTraj_Coarse.row(i * gridsize);
+  }
+
+  return log_like_traj_general2(SdeTraj, OdeTraj_Coarse, Filter, gridsize, t_correct);
+}
+
 
 //[[Rcpp::export()]]
 double log_like_traj_general_adjust(arma::mat SdeTraj,arma::mat OdeTraj, List Filter_NC,
                              int gridsize,double t_correct){
+/*
   arma::cube Acube = as<arma::cube>(Filter_NC[0]);
   arma::cube Lcube = as<arma::cube>(Filter_NC[1]);
 
@@ -660,6 +680,8 @@ double log_like_traj_general_adjust(arma::mat SdeTraj,arma::mat OdeTraj, List Fi
   }
 
   return loglik;
+*/
+return 0;
 }
 
 
@@ -1013,7 +1035,6 @@ List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec s
   arma::mat newTraj(f_cur.n_rows, f_cur.n_cols);
   double logy;
 
-    // centered the old trajectory without time grid
     arma::mat v_traj = arma::randn(f_cur.n_rows, f_cur.n_cols);
     double u = R::runif(0,1);
     //  if(funname == "standard"){
@@ -1022,7 +1043,7 @@ List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec s
       logy = coal_log + log(u);
     }else{
       if(volz){
-        logy = volz_loglik_nh2(init, f_cur, betaN, t_correct,Index,transX) + log(u);
+        logy = volz_loglik_nh2(init, TransformTraj(OdeTraj, f_cur, FTs), betaN, t_correct,Index,transX) + log(u);
       }else{
         logy = coal_loglik3(init,f_cur,t_correct,lambda,Index(1), transX) + log(u);
       }
@@ -1047,6 +1068,8 @@ List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec s
       i += 1;
       if(i>20){
         newTraj = TransformTraj(OdeTraj,f_cur, FTs);
+        loglike = volz_loglik_nh2(init, newTraj,betaN,t_correct,Index ,transX);
+        f_prime = f_cur;
         Rcout<<"theta = "<<theta<<endl;
         break;
       }
@@ -1065,17 +1088,17 @@ List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec s
         loglike = coal_loglik3(init,LogTraj(newTraj),t_correct,lambda,Index(1), transX);
       }
   }
-  f_cur = newTraj;
   List Res;
   double logOrigin = 0;
   for(int j = 0; j < f_cur.n_rows - 1; j ++){
     for(int k = 0; k < p; k ++){
-      logOrigin += R::dnorm4(f_prime(j,k),0,1,1);
+      logOrigin -= 0.5 * f_prime(j,k) * f_prime(j,k);
     }
   }
   Res["LatentTraj"] = newTraj;
   Res["OriginTraj"] = f_prime;
   Res["logOrigin"] = logOrigin;
+  Res["CoalLog"] = loglike;
   return Res;
 }
 

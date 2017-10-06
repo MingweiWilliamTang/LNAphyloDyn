@@ -319,6 +319,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// log_like_traj_general_ez
+double log_like_traj_general_ez(arma::mat SdeTraj, double t_correct, arma::vec initial, arma::vec t, arma::vec param, arma::vec x_r, arma::ivec x_i, std::string transP, std::string model, std::string transX);
+RcppExport SEXP LNAPhyloDyn_log_like_traj_general_ez(SEXP SdeTrajSEXP, SEXP t_correctSEXP, SEXP initialSEXP, SEXP tSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type SdeTraj(SdeTrajSEXP);
+    Rcpp::traits::input_parameter< double >::type t_correct(t_correctSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type initial(initialSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type t(tSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type param(paramSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type x_r(x_rSEXP);
+    Rcpp::traits::input_parameter< arma::ivec >::type x_i(x_iSEXP);
+    Rcpp::traits::input_parameter< std::string >::type transP(transPSEXP);
+    Rcpp::traits::input_parameter< std::string >::type model(modelSEXP);
+    Rcpp::traits::input_parameter< std::string >::type transX(transXSEXP);
+    rcpp_result_gen = Rcpp::wrap(log_like_traj_general_ez(SdeTraj, t_correct, initial, t, param, x_r, x_i, transP, model, transX));
+    return rcpp_result_gen;
+END_RCPP
+}
 // log_like_traj_general_adjust
 double log_like_traj_general_adjust(arma::mat SdeTraj, arma::mat OdeTraj, List Filter_NC, int gridsize, double t_correct);
 RcppExport SEXP LNAPhyloDyn_log_like_traj_general_adjust(SEXP SdeTrajSEXP, SEXP OdeTrajSEXP, SEXP Filter_NCSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP) {
