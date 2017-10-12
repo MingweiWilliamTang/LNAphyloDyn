@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // inv2
 arma::mat inv2(arma::mat a);
-RcppExport SEXP LNAPhyloDyn_inv2(SEXP aSEXP) {
+RcppExport SEXP _LNAPhyloDyn_inv2(SEXP aSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -19,7 +19,7 @@ END_RCPP
 }
 // chols
 arma::mat chols(arma::mat S);
-RcppExport SEXP LNAPhyloDyn_chols(SEXP SSEXP) {
+RcppExport SEXP _LNAPhyloDyn_chols(SEXP SSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -30,7 +30,7 @@ END_RCPP
 }
 // mvrnormArma
 arma::mat mvrnormArma(int n, arma::mat sigma);
-RcppExport SEXP LNAPhyloDyn_mvrnormArma(SEXP nSEXP, SEXP sigmaSEXP) {
+RcppExport SEXP _LNAPhyloDyn_mvrnormArma(SEXP nSEXP, SEXP sigmaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -42,7 +42,7 @@ END_RCPP
 }
 // mvrnormArma2
 arma::mat mvrnormArma2(int n, arma::mat sigma);
-RcppExport SEXP LNAPhyloDyn_mvrnormArma2(SEXP nSEXP, SEXP sigmaSEXP) {
+RcppExport SEXP _LNAPhyloDyn_mvrnormArma2(SEXP nSEXP, SEXP sigmaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -54,7 +54,7 @@ END_RCPP
 }
 // expM
 arma::mat expM(arma::mat A);
-RcppExport SEXP LNAPhyloDyn_expM(SEXP ASEXP) {
+RcppExport SEXP _LNAPhyloDyn_expM(SEXP ASEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -65,7 +65,7 @@ END_RCPP
 }
 // betaTs
 arma::vec betaTs(arma::vec param, arma::vec times, arma::vec x_r, arma::ivec x_i);
-RcppExport SEXP LNAPhyloDyn_betaTs(SEXP paramSEXP, SEXP timesSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
+RcppExport SEXP _LNAPhyloDyn_betaTs(SEXP paramSEXP, SEXP timesSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -79,7 +79,7 @@ END_RCPP
 }
 // param_transform
 arma::vec param_transform(double t, arma::vec param, arma::vec x_r, arma::ivec x_i);
-RcppExport SEXP LNAPhyloDyn_param_transform(SEXP tSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
+RcppExport SEXP _LNAPhyloDyn_param_transform(SEXP tSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -93,7 +93,7 @@ END_RCPP
 }
 // ODE_SIR_one
 arma::vec ODE_SIR_one(arma::vec states, arma::vec param, double t, arma::vec x_r, arma::ivec x_i, std::string transP, std::string transX);
-RcppExport SEXP LNAPhyloDyn_ODE_SIR_one(SEXP statesSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_ODE_SIR_one(SEXP statesSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -110,7 +110,7 @@ END_RCPP
 }
 // ODE_SEIR_one
 arma::vec ODE_SEIR_one(arma::vec states, arma::vec param, double t, arma::vec x_r, arma::ivec x_i, std::string transP, std::string transX);
-RcppExport SEXP LNAPhyloDyn_ODE_SEIR_one(SEXP statesSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_ODE_SEIR_one(SEXP statesSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -127,7 +127,7 @@ END_RCPP
 }
 // ODE_SIRS_one
 arma::vec ODE_SIRS_one(arma::vec states, arma::vec param, double t, arma::vec x_r, arma::ivec x_i, std::string transP, std::string transX);
-RcppExport SEXP LNAPhyloDyn_ODE_SIRS_one(SEXP statesSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_ODE_SIRS_one(SEXP statesSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -144,7 +144,7 @@ END_RCPP
 }
 // SIRS_F
 arma::mat SIRS_F(arma::vec states, arma::vec thetas, std::string transX);
-RcppExport SEXP LNAPhyloDyn_SIRS_F(SEXP statesSEXP, SEXP thetasSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIRS_F(SEXP statesSEXP, SEXP thetasSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -157,7 +157,7 @@ END_RCPP
 }
 // SIR_F
 arma::mat SIR_F(arma::vec states, arma::vec thetas, std::string transX);
-RcppExport SEXP LNAPhyloDyn_SIR_F(SEXP statesSEXP, SEXP thetasSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIR_F(SEXP statesSEXP, SEXP thetasSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -170,7 +170,7 @@ END_RCPP
 }
 // SEIR2_F
 arma::mat SEIR2_F(arma::vec states, arma::vec thetas, std::string transX);
-RcppExport SEXP LNAPhyloDyn_SEIR2_F(SEXP statesSEXP, SEXP thetasSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SEIR2_F(SEXP statesSEXP, SEXP thetasSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -183,7 +183,7 @@ END_RCPP
 }
 // SEIR_F
 arma::mat SEIR_F(arma::vec states, arma::vec thetas, std::string transX);
-RcppExport SEXP LNAPhyloDyn_SEIR_F(SEXP statesSEXP, SEXP thetasSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SEIR_F(SEXP statesSEXP, SEXP thetasSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -196,7 +196,7 @@ END_RCPP
 }
 // SIR_h
 arma::vec SIR_h(arma::vec states, arma::vec thetas, std::string transX);
-RcppExport SEXP LNAPhyloDyn_SIR_h(SEXP statesSEXP, SEXP thetasSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIR_h(SEXP statesSEXP, SEXP thetasSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -209,7 +209,7 @@ END_RCPP
 }
 // SEIR2_h
 arma::vec SEIR2_h(arma::vec states, arma::vec thetas, std::string transX);
-RcppExport SEXP LNAPhyloDyn_SEIR2_h(SEXP statesSEXP, SEXP thetasSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SEIR2_h(SEXP statesSEXP, SEXP thetasSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -222,7 +222,7 @@ END_RCPP
 }
 // SEIR_h
 arma::vec SEIR_h(arma::vec states, arma::vec thetas, std::string transX);
-RcppExport SEXP LNAPhyloDyn_SEIR_h(SEXP statesSEXP, SEXP thetasSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SEIR_h(SEXP statesSEXP, SEXP thetasSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -235,7 +235,7 @@ END_RCPP
 }
 // ODE_rk45
 arma::mat ODE_rk45(arma::vec initial, arma::vec t, arma::vec param, arma::vec x_r, arma::ivec x_i, std::string transP, std::string model, std::string transX);
-RcppExport SEXP LNAPhyloDyn_ODE_rk45(SEXP initialSEXP, SEXP tSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_ODE_rk45(SEXP initialSEXP, SEXP tSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -253,7 +253,7 @@ END_RCPP
 }
 // SigmaF
 List SigmaF(arma::mat Traj_par, arma::vec param, arma::vec x_r, arma::ivec x_i, std::string transP, std::string model, std::string transX);
-RcppExport SEXP LNAPhyloDyn_SigmaF(SEXP Traj_parSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SigmaF(SEXP Traj_parSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -270,7 +270,7 @@ END_RCPP
 }
 // KF_param
 List KF_param(arma::mat OdeTraj, arma::vec param, int gridsize, arma::vec x_r, arma::ivec x_i, std::string transP, std::string model, std::string transX);
-RcppExport SEXP LNAPhyloDyn_KF_param(SEXP OdeTrajSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_KF_param(SEXP OdeTrajSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -288,7 +288,7 @@ END_RCPP
 }
 // KF_param_chol
 List KF_param_chol(arma::mat OdeTraj, arma::vec param, int gridsize, arma::vec x_r, arma::ivec x_i, std::string transP, std::string model, std::string transX);
-RcppExport SEXP LNAPhyloDyn_KF_param_chol(SEXP OdeTrajSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_KF_param_chol(SEXP OdeTrajSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -306,7 +306,7 @@ END_RCPP
 }
 // log_like_traj_general2
 double log_like_traj_general2(arma::mat SdeTraj, arma::mat OdeTraj, List Filter, int gridsize, double t_correct);
-RcppExport SEXP LNAPhyloDyn_log_like_traj_general2(SEXP SdeTrajSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP) {
+RcppExport SEXP _LNAPhyloDyn_log_like_traj_general2(SEXP SdeTrajSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -321,7 +321,7 @@ END_RCPP
 }
 // log_like_traj_general_ez
 double log_like_traj_general_ez(arma::mat SdeTraj, double t_correct, arma::vec initial, arma::vec t, arma::vec param, arma::vec x_r, arma::ivec x_i, std::string transP, std::string model, std::string transX);
-RcppExport SEXP LNAPhyloDyn_log_like_traj_general_ez(SEXP SdeTrajSEXP, SEXP t_correctSEXP, SEXP initialSEXP, SEXP tSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_log_like_traj_general_ez(SEXP SdeTrajSEXP, SEXP t_correctSEXP, SEXP initialSEXP, SEXP tSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -341,7 +341,7 @@ END_RCPP
 }
 // log_like_traj_general_adjust
 double log_like_traj_general_adjust(arma::mat SdeTraj, arma::mat OdeTraj, List Filter_NC, int gridsize, double t_correct);
-RcppExport SEXP LNAPhyloDyn_log_like_traj_general_adjust(SEXP SdeTrajSEXP, SEXP OdeTrajSEXP, SEXP Filter_NCSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP) {
+RcppExport SEXP _LNAPhyloDyn_log_like_traj_general_adjust(SEXP SdeTrajSEXP, SEXP OdeTrajSEXP, SEXP Filter_NCSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -356,7 +356,7 @@ END_RCPP
 }
 // Traj_sim_general3
 List Traj_sim_general3(arma::mat OdeTraj, List Filter, double t_correct);
-RcppExport SEXP LNAPhyloDyn_Traj_sim_general3(SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP t_correctSEXP) {
+RcppExport SEXP _LNAPhyloDyn_Traj_sim_general3(SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP t_correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -369,7 +369,7 @@ END_RCPP
 }
 // Traj_sim_general_noncentral
 List Traj_sim_general_noncentral(arma::mat OdeTraj, List Filter_NC, double t_correct);
-RcppExport SEXP LNAPhyloDyn_Traj_sim_general_noncentral(SEXP OdeTrajSEXP, SEXP Filter_NCSEXP, SEXP t_correctSEXP) {
+RcppExport SEXP _LNAPhyloDyn_Traj_sim_general_noncentral(SEXP OdeTrajSEXP, SEXP Filter_NCSEXP, SEXP t_correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -382,7 +382,7 @@ END_RCPP
 }
 // TransformTraj
 arma::mat TransformTraj(arma::mat OdeTraj, arma::mat OriginLatent, List Filter_NC);
-RcppExport SEXP LNAPhyloDyn_TransformTraj(SEXP OdeTrajSEXP, SEXP OriginLatentSEXP, SEXP Filter_NCSEXP) {
+RcppExport SEXP _LNAPhyloDyn_TransformTraj(SEXP OdeTrajSEXP, SEXP OriginLatentSEXP, SEXP Filter_NCSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -395,7 +395,7 @@ END_RCPP
 }
 // Traj_sim_ezG2
 List Traj_sim_ezG2(arma::vec initial, arma::vec times, arma::vec param, int gridsize, arma::vec x_r, arma::ivec x_i, double t_correct, std::string transP, std::string model, std::string transX);
-RcppExport SEXP LNAPhyloDyn_Traj_sim_ezG2(SEXP initialSEXP, SEXP timesSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP t_correctSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_Traj_sim_ezG2(SEXP initialSEXP, SEXP timesSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP t_correctSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -415,7 +415,7 @@ END_RCPP
 }
 // Traj_sim_ezG_NC
 List Traj_sim_ezG_NC(arma::vec initial, arma::vec times, arma::vec param, int gridsize, arma::vec x_r, arma::ivec x_i, double t_correct, std::string transP, std::string model, std::string transX);
-RcppExport SEXP LNAPhyloDyn_Traj_sim_ezG_NC(SEXP initialSEXP, SEXP timesSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP t_correctSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_Traj_sim_ezG_NC(SEXP initialSEXP, SEXP timesSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP t_correctSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -435,7 +435,7 @@ END_RCPP
 }
 // coal_loglik3
 double coal_loglik3(List init, arma::mat f1, double t_correct, double lambda, int Index, std::string transX);
-RcppExport SEXP LNAPhyloDyn_coal_loglik3(SEXP initSEXP, SEXP f1SEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP IndexSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_coal_loglik3(SEXP initSEXP, SEXP f1SEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP IndexSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -451,7 +451,7 @@ END_RCPP
 }
 // volz_loglik_nh2
 double volz_loglik_nh2(List init, arma::mat f1, arma::vec betaN, double t_correct, arma::ivec index, std::string transX);
-RcppExport SEXP LNAPhyloDyn_volz_loglik_nh2(SEXP initSEXP, SEXP f1SEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP indexSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_volz_loglik_nh2(SEXP initSEXP, SEXP f1SEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP indexSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -467,7 +467,7 @@ END_RCPP
 }
 // ESlice_general_NC
 List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, arma::vec betaN, double t_correct, double lambda, double coal_log, int gridsize, bool volz, std::string model, std::string transX);
-RcppExport SEXP LNAPhyloDyn_ESlice_general_NC(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP coal_logSEXP, SEXP gridsizeSEXP, SEXP volzSEXP, SEXP modelSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_ESlice_general_NC(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP coal_logSEXP, SEXP gridsizeSEXP, SEXP volzSEXP, SEXP modelSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -490,7 +490,7 @@ END_RCPP
 }
 // ESlice_general2
 arma::mat ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, arma::vec betaN, double t_correct, double lambda, int reps, int gridsize, bool volz, std::string model, std::string transX);
-RcppExport SEXP LNAPhyloDyn_ESlice_general2(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP volzSEXP, SEXP modelSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_ESlice_general2(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP volzSEXP, SEXP modelSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -513,7 +513,7 @@ END_RCPP
 }
 // InitializeMCMC
 void InitializeMCMC(arma::vec initial, arma::vec param, double lambda, arma::mat ode_traj_coarse, arma::mat trajectory, List ft, double coal_log, double traj_log, arma::vec param_log);
-RcppExport SEXP LNAPhyloDyn_InitializeMCMC(SEXP initialSEXP, SEXP paramSEXP, SEXP lambdaSEXP, SEXP ode_traj_coarseSEXP, SEXP trajectorySEXP, SEXP ftSEXP, SEXP coal_logSEXP, SEXP traj_logSEXP, SEXP param_logSEXP) {
+RcppExport SEXP _LNAPhyloDyn_InitializeMCMC(SEXP initialSEXP, SEXP paramSEXP, SEXP lambdaSEXP, SEXP ode_traj_coarseSEXP, SEXP trajectorySEXP, SEXP ftSEXP, SEXP coal_logSEXP, SEXP traj_logSEXP, SEXP param_logSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec >::type initial(initialSEXP);
@@ -531,7 +531,7 @@ END_RCPP
 }
 // InitializeData
 void InitializeData(List init, arma::vec times, double t_correct, arma::vec x_r, arma::ivec x_i, double gridset, double gridsize, std::string model, std::string transP, std::string transX);
-RcppExport SEXP LNAPhyloDyn_InitializeData(SEXP initSEXP, SEXP timesSEXP, SEXP t_correctSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP gridsetSEXP, SEXP gridsizeSEXP, SEXP modelSEXP, SEXP transPSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_InitializeData(SEXP initSEXP, SEXP timesSEXP, SEXP t_correctSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP gridsetSEXP, SEXP gridsizeSEXP, SEXP modelSEXP, SEXP transPSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type init(initSEXP);
@@ -550,7 +550,7 @@ END_RCPP
 }
 // betaf
 double betaf(double t, arma::vec param, arma::vec x_r, arma::ivec x_i);
-RcppExport SEXP LNAPhyloDyn_betaf(SEXP tSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
+RcppExport SEXP _LNAPhyloDyn_betaf(SEXP tSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -564,7 +564,7 @@ END_RCPP
 }
 // betafs
 arma::vec betafs(arma::vec ts, arma::vec param, arma::vec x_r, arma::ivec x_i);
-RcppExport SEXP LNAPhyloDyn_betafs(SEXP tsSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
+RcppExport SEXP _LNAPhyloDyn_betafs(SEXP tsSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -578,7 +578,7 @@ END_RCPP
 }
 // ODE_general_one
 arma::vec ODE_general_one(arma::vec states, arma::vec param, double t, arma::vec x_r, arma::ivec x_i);
-RcppExport SEXP LNAPhyloDyn_ODE_general_one(SEXP statesSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
+RcppExport SEXP _LNAPhyloDyn_ODE_general_one(SEXP statesSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -593,7 +593,7 @@ END_RCPP
 }
 // general_F
 arma::mat general_F(arma::vec states, arma::vec param, double t, arma::vec x_r, arma::ivec x_i);
-RcppExport SEXP LNAPhyloDyn_general_F(SEXP statesSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
+RcppExport SEXP _LNAPhyloDyn_general_F(SEXP statesSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -608,7 +608,7 @@ END_RCPP
 }
 // General_ODE_rk45
 arma::mat General_ODE_rk45(arma::vec initial, arma::vec t, arma::vec param, arma::vec x_r, arma::ivec x_i);
-RcppExport SEXP LNAPhyloDyn_General_ODE_rk45(SEXP initialSEXP, SEXP tSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
+RcppExport SEXP _LNAPhyloDyn_General_ODE_rk45(SEXP initialSEXP, SEXP tSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -623,7 +623,7 @@ END_RCPP
 }
 // General_IntSigmaF
 List General_IntSigmaF(arma::mat Traj_par, arma::vec param, arma::vec x_r, arma::ivec x_i);
-RcppExport SEXP LNAPhyloDyn_General_IntSigmaF(SEXP Traj_parSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
+RcppExport SEXP _LNAPhyloDyn_General_IntSigmaF(SEXP Traj_parSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -637,7 +637,7 @@ END_RCPP
 }
 // General_KOM_Filter
 List General_KOM_Filter(arma::mat OdeTraj, arma::vec param, int gridsize, arma::vec x_r, arma::ivec x_i);
-RcppExport SEXP LNAPhyloDyn_General_KOM_Filter(SEXP OdeTrajSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
+RcppExport SEXP _LNAPhyloDyn_General_KOM_Filter(SEXP OdeTrajSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP x_rSEXP, SEXP x_iSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -652,7 +652,7 @@ END_RCPP
 }
 // log_like_traj_general
 double log_like_traj_general(arma::mat SdeTraj, arma::mat OdeTraj, List Filter, int gridsize, double t_correct);
-RcppExport SEXP LNAPhyloDyn_log_like_traj_general(SEXP SdeTrajSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP) {
+RcppExport SEXP _LNAPhyloDyn_log_like_traj_general(SEXP SdeTrajSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -667,7 +667,7 @@ END_RCPP
 }
 // Traj_sim_general
 List Traj_sim_general(arma::mat OdeTraj, List Filter, double t_correct);
-RcppExport SEXP LNAPhyloDyn_Traj_sim_general(SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP t_correctSEXP) {
+RcppExport SEXP _LNAPhyloDyn_Traj_sim_general(SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP t_correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -680,7 +680,7 @@ END_RCPP
 }
 // Traj_sim_ezG
 List Traj_sim_ezG(arma::vec initial, arma::vec times, arma::vec param, int gridsize, arma::vec x_r, arma::ivec x_i, double t_correct);
-RcppExport SEXP LNAPhyloDyn_Traj_sim_ezG(SEXP initialSEXP, SEXP timesSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP t_correctSEXP) {
+RcppExport SEXP _LNAPhyloDyn_Traj_sim_ezG(SEXP initialSEXP, SEXP timesSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP t_correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -697,7 +697,7 @@ END_RCPP
 }
 // ESlice_general
 arma::mat ESlice_general(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, arma::vec betaN, double t_correct, double lambda, int reps, int gridsize, bool volz);
-RcppExport SEXP LNAPhyloDyn_ESlice_general(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP volzSEXP) {
+RcppExport SEXP _LNAPhyloDyn_ESlice_general(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP volzSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -718,7 +718,7 @@ END_RCPP
 }
 // SIR_BD_period_ODE_one
 arma::vec SIR_BD_period_ODE_one(arma::vec states, double N, arma::vec param, double t, double period);
-RcppExport SEXP LNAPhyloDyn_SIR_BD_period_ODE_one(SEXP statesSEXP, SEXP NSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIR_BD_period_ODE_one(SEXP statesSEXP, SEXP NSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -733,7 +733,7 @@ END_RCPP
 }
 // SIR_BD_period_ODE_one2
 arma::vec SIR_BD_period_ODE_one2(arma::vec states, double N, arma::vec param, double t, double period);
-RcppExport SEXP LNAPhyloDyn_SIR_BD_period_ODE_one2(SEXP statesSEXP, SEXP NSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIR_BD_period_ODE_one2(SEXP statesSEXP, SEXP NSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -748,7 +748,7 @@ END_RCPP
 }
 // SIR_BD_Fm_LNA
 arma::mat SIR_BD_Fm_LNA(double X, double Y, double theta1, double theta2, double mu, double alpha, double t, double period);
-RcppExport SEXP LNAPhyloDyn_SIR_BD_Fm_LNA(SEXP XSEXP, SEXP YSEXP, SEXP theta1SEXP, SEXP theta2SEXP, SEXP muSEXP, SEXP alphaSEXP, SEXP tSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIR_BD_Fm_LNA(SEXP XSEXP, SEXP YSEXP, SEXP theta1SEXP, SEXP theta2SEXP, SEXP muSEXP, SEXP alphaSEXP, SEXP tSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -766,7 +766,7 @@ END_RCPP
 }
 // SIR_BD_IntSigma
 List SIR_BD_IntSigma(arma::mat Traj_par, double dt, double theta1, double theta2, double theta3, double alpha, double N, double period);
-RcppExport SEXP LNAPhyloDyn_SIR_BD_IntSigma(SEXP Traj_parSEXP, SEXP dtSEXP, SEXP theta1SEXP, SEXP theta2SEXP, SEXP theta3SEXP, SEXP alphaSEXP, SEXP NSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIR_BD_IntSigma(SEXP Traj_parSEXP, SEXP dtSEXP, SEXP theta1SEXP, SEXP theta2SEXP, SEXP theta3SEXP, SEXP alphaSEXP, SEXP NSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -784,7 +784,7 @@ END_RCPP
 }
 // SIR_BD_ODE
 arma::mat SIR_BD_ODE(arma::vec initial, arma::vec t, arma::vec param, double N, double period);
-RcppExport SEXP LNAPhyloDyn_SIR_BD_ODE(SEXP initialSEXP, SEXP tSEXP, SEXP paramSEXP, SEXP NSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIR_BD_ODE(SEXP initialSEXP, SEXP tSEXP, SEXP paramSEXP, SEXP NSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -799,7 +799,7 @@ END_RCPP
 }
 // SIR_BD_SDE
 arma::mat SIR_BD_SDE(arma::vec init, double N, arma::vec param, arma::vec t, double period);
-RcppExport SEXP LNAPhyloDyn_SIR_BD_SDE(SEXP initSEXP, SEXP NSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIR_BD_SDE(SEXP initSEXP, SEXP NSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -814,7 +814,7 @@ END_RCPP
 }
 // SIR_BD_period_SDE
 arma::mat SIR_BD_period_SDE(arma::vec init, double N, arma::vec param, arma::vec t, double period);
-RcppExport SEXP LNAPhyloDyn_SIR_BD_period_SDE(SEXP initSEXP, SEXP NSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIR_BD_period_SDE(SEXP initSEXP, SEXP NSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -829,7 +829,7 @@ END_RCPP
 }
 // SIR_BD_KOM_Filter
 List SIR_BD_KOM_Filter(arma::mat OdeTraj, arma::vec param, int gridsize, double N, double period);
-RcppExport SEXP LNAPhyloDyn_SIR_BD_KOM_Filter(SEXP OdeTrajSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP NSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIR_BD_KOM_Filter(SEXP OdeTrajSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP NSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -844,7 +844,7 @@ END_RCPP
 }
 // log_like_trajSIR_BD
 double log_like_trajSIR_BD(arma::mat SdeTraj, arma::mat OdeTraj, List Filter, int gridsize, double t_correct);
-RcppExport SEXP LNAPhyloDyn_log_like_trajSIR_BD(SEXP SdeTrajSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP) {
+RcppExport SEXP _LNAPhyloDyn_log_like_trajSIR_BD(SEXP SdeTrajSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -859,7 +859,7 @@ END_RCPP
 }
 // Traj_sim_SIR_BD
 List Traj_sim_SIR_BD(arma::vec initial, arma::mat OdeTraj, List Filter, double t_correct);
-RcppExport SEXP LNAPhyloDyn_Traj_sim_SIR_BD(SEXP initialSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP t_correctSEXP) {
+RcppExport SEXP _LNAPhyloDyn_Traj_sim_SIR_BD(SEXP initialSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP t_correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -873,7 +873,7 @@ END_RCPP
 }
 // Traj_sim_SIR_BD_ez
 List Traj_sim_SIR_BD_ez(arma::vec initial, arma::vec times, arma::vec param, int gridsize, double N, double t_correct, double period);
-RcppExport SEXP LNAPhyloDyn_Traj_sim_SIR_BD_ez(SEXP initialSEXP, SEXP timesSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP NSEXP, SEXP t_correctSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_Traj_sim_SIR_BD_ez(SEXP initialSEXP, SEXP timesSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP NSEXP, SEXP t_correctSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -890,7 +890,7 @@ END_RCPP
 }
 // ESlice_SIR_BD
 arma::mat ESlice_SIR_BD(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, arma::vec betaN, double t_correct, double lambda, int reps, int gridsize, bool volz);
-RcppExport SEXP LNAPhyloDyn_ESlice_SIR_BD(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP volzSEXP) {
+RcppExport SEXP _LNAPhyloDyn_ESlice_SIR_BD(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP volzSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -911,7 +911,7 @@ END_RCPP
 }
 // StateSpace_Like
 double StateSpace_Like(arma::vec state, double beta, double N, arma::vec w, arma::vec C, arma::vec y);
-RcppExport SEXP LNAPhyloDyn_StateSpace_Like(SEXP stateSEXP, SEXP betaSEXP, SEXP NSEXP, SEXP wSEXP, SEXP CSEXP, SEXP ySEXP) {
+RcppExport SEXP _LNAPhyloDyn_StateSpace_Like(SEXP stateSEXP, SEXP betaSEXP, SEXP NSEXP, SEXP wSEXP, SEXP CSEXP, SEXP ySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -927,7 +927,7 @@ END_RCPP
 }
 // StateSpace_Period_Like2
 double StateSpace_Period_Like2(arma::vec state, double beta, double N, arma::vec w, arma::vec C, arma::vec y, double t, double A, double period);
-RcppExport SEXP LNAPhyloDyn_StateSpace_Period_Like2(SEXP stateSEXP, SEXP betaSEXP, SEXP NSEXP, SEXP wSEXP, SEXP CSEXP, SEXP ySEXP, SEXP tSEXP, SEXP ASEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_StateSpace_Period_Like2(SEXP stateSEXP, SEXP betaSEXP, SEXP NSEXP, SEXP wSEXP, SEXP CSEXP, SEXP ySEXP, SEXP tSEXP, SEXP ASEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -946,7 +946,7 @@ END_RCPP
 }
 // SampleWithReplace
 arma::vec SampleWithReplace(arma::vec prob, int N);
-RcppExport SEXP LNAPhyloDyn_SampleWithReplace(SEXP probSEXP, SEXP NSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SampleWithReplace(SEXP probSEXP, SEXP NSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -958,7 +958,7 @@ END_RCPP
 }
 // SIR_BD_SMC
 List SIR_BD_SMC(arma::vec params, double N, List init, int D, arma::vec TimeGrid, int OdeSize, double t_correct, arma::vec prior);
-RcppExport SEXP LNAPhyloDyn_SIR_BD_SMC(SEXP paramsSEXP, SEXP NSEXP, SEXP initSEXP, SEXP DSEXP, SEXP TimeGridSEXP, SEXP OdeSizeSEXP, SEXP t_correctSEXP, SEXP priorSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIR_BD_SMC(SEXP paramsSEXP, SEXP NSEXP, SEXP initSEXP, SEXP DSEXP, SEXP TimeGridSEXP, SEXP OdeSizeSEXP, SEXP t_correctSEXP, SEXP priorSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -976,7 +976,7 @@ END_RCPP
 }
 // SIR_BD_PMCMC
 List SIR_BD_PMCMC(List Init, double N, int D, arma::vec TimeGrid, int OdeSize, double t_correct, int niter, double period, double mu, double A, arma::vec priorAlpha, arma::vec priorGamma, double pR0, double pgamma);
-RcppExport SEXP LNAPhyloDyn_SIR_BD_PMCMC(SEXP InitSEXP, SEXP NSEXP, SEXP DSEXP, SEXP TimeGridSEXP, SEXP OdeSizeSEXP, SEXP t_correctSEXP, SEXP niterSEXP, SEXP periodSEXP, SEXP muSEXP, SEXP ASEXP, SEXP priorAlphaSEXP, SEXP priorGammaSEXP, SEXP pR0SEXP, SEXP pgammaSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIR_BD_PMCMC(SEXP InitSEXP, SEXP NSEXP, SEXP DSEXP, SEXP TimeGridSEXP, SEXP OdeSizeSEXP, SEXP t_correctSEXP, SEXP niterSEXP, SEXP periodSEXP, SEXP muSEXP, SEXP ASEXP, SEXP priorAlphaSEXP, SEXP priorGammaSEXP, SEXP pR0SEXP, SEXP pgammaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1000,7 +1000,7 @@ END_RCPP
 }
 // LogTraj
 arma::mat LogTraj(arma::mat Traj);
-RcppExport SEXP LNAPhyloDyn_LogTraj(SEXP TrajSEXP) {
+RcppExport SEXP _LNAPhyloDyn_LogTraj(SEXP TrajSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1011,7 +1011,7 @@ END_RCPP
 }
 // SIR_ODE2
 arma::vec SIR_ODE2(double X, double Y, double theta1, double theta2);
-RcppExport SEXP LNAPhyloDyn_SIR_ODE2(SEXP XSEXP, SEXP YSEXP, SEXP theta1SEXP, SEXP theta2SEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIR_ODE2(SEXP XSEXP, SEXP YSEXP, SEXP theta1SEXP, SEXP theta2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1025,7 +1025,7 @@ END_RCPP
 }
 // SIR_ODE
 arma::vec SIR_ODE(double X, double Y, double theta1, double theta2);
-RcppExport SEXP LNAPhyloDyn_SIR_ODE(SEXP XSEXP, SEXP YSEXP, SEXP theta1SEXP, SEXP theta2SEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIR_ODE(SEXP XSEXP, SEXP YSEXP, SEXP theta1SEXP, SEXP theta2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1039,7 +1039,7 @@ END_RCPP
 }
 // betaDyn
 arma::vec betaDyn(double beta, double alpha, arma::vec times, double period);
-RcppExport SEXP LNAPhyloDyn_betaDyn(SEXP betaSEXP, SEXP alphaSEXP, SEXP timesSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_betaDyn(SEXP betaSEXP, SEXP alphaSEXP, SEXP timesSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1053,7 +1053,7 @@ END_RCPP
 }
 // SIRS2_period_SDE
 arma::mat SIRS2_period_SDE(arma::vec init, double N, arma::vec param, arma::vec t, double period);
-RcppExport SEXP LNAPhyloDyn_SIRS2_period_SDE(SEXP initSEXP, SEXP NSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIRS2_period_SDE(SEXP initSEXP, SEXP NSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1068,7 +1068,7 @@ END_RCPP
 }
 // log_like_traj
 double log_like_traj(arma::mat SdeTraj, arma::mat OdeTraj, List Filter, int gridsize, double t_correct);
-RcppExport SEXP LNAPhyloDyn_log_like_traj(SEXP SdeTrajSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP) {
+RcppExport SEXP _LNAPhyloDyn_log_like_traj(SEXP SdeTrajSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1083,7 +1083,7 @@ END_RCPP
 }
 // SIR_log_KOM_Filter2
 List SIR_log_KOM_Filter2(arma::mat OdeTraj, double theta1, double theta2, int gridsize, std::string funname);
-RcppExport SEXP LNAPhyloDyn_SIR_log_KOM_Filter2(SEXP OdeTrajSEXP, SEXP theta1SEXP, SEXP theta2SEXP, SEXP gridsizeSEXP, SEXP funnameSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIR_log_KOM_Filter2(SEXP OdeTrajSEXP, SEXP theta1SEXP, SEXP theta2SEXP, SEXP gridsizeSEXP, SEXP funnameSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1098,7 +1098,7 @@ END_RCPP
 }
 // ODE
 arma::mat ODE(arma::vec initial, arma::vec t, arma::vec param, std::string funname);
-RcppExport SEXP LNAPhyloDyn_ODE(SEXP initialSEXP, SEXP tSEXP, SEXP paramSEXP, SEXP funnameSEXP) {
+RcppExport SEXP _LNAPhyloDyn_ODE(SEXP initialSEXP, SEXP tSEXP, SEXP paramSEXP, SEXP funnameSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1112,7 +1112,7 @@ END_RCPP
 }
 // Traj_sim
 List Traj_sim(arma::vec initial, arma::mat OdeTraj, List Filter, double t_correct);
-RcppExport SEXP LNAPhyloDyn_Traj_sim(SEXP initialSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP t_correctSEXP) {
+RcppExport SEXP _LNAPhyloDyn_Traj_sim(SEXP initialSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP t_correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1126,7 +1126,7 @@ END_RCPP
 }
 // Traj_sim_ez
 List Traj_sim_ez(arma::vec initial, arma::vec times, double theta1, double theta2, int gridsize, double t_correct, std::string funname);
-RcppExport SEXP LNAPhyloDyn_Traj_sim_ez(SEXP initialSEXP, SEXP timesSEXP, SEXP theta1SEXP, SEXP theta2SEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP, SEXP funnameSEXP) {
+RcppExport SEXP _LNAPhyloDyn_Traj_sim_ez(SEXP initialSEXP, SEXP timesSEXP, SEXP theta1SEXP, SEXP theta2SEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP, SEXP funnameSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1143,7 +1143,7 @@ END_RCPP
 }
 // log_like_traj2
 double log_like_traj2(arma::mat SdeTraj, arma::vec times, arma::vec state, double theta1, double theta2, int gridsize, double t_correct, std::string funname);
-RcppExport SEXP LNAPhyloDyn_log_like_traj2(SEXP SdeTrajSEXP, SEXP timesSEXP, SEXP stateSEXP, SEXP theta1SEXP, SEXP theta2SEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP, SEXP funnameSEXP) {
+RcppExport SEXP _LNAPhyloDyn_log_like_traj2(SEXP SdeTrajSEXP, SEXP timesSEXP, SEXP stateSEXP, SEXP theta1SEXP, SEXP theta2SEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP, SEXP funnameSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1161,7 +1161,7 @@ END_RCPP
 }
 // coal_loglik2
 double coal_loglik2(List init, arma::mat f1, double t_correct, double lambda, int gridsize);
-RcppExport SEXP LNAPhyloDyn_coal_loglik2(SEXP initSEXP, SEXP f1SEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP gridsizeSEXP) {
+RcppExport SEXP _LNAPhyloDyn_coal_loglik2(SEXP initSEXP, SEXP f1SEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP gridsizeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1176,7 +1176,7 @@ END_RCPP
 }
 // coal_loglik
 double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int gridsize, std::string transX);
-RcppExport SEXP LNAPhyloDyn_coal_loglik(SEXP initSEXP, SEXP f1SEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP gridsizeSEXP, SEXP transXSEXP) {
+RcppExport SEXP _LNAPhyloDyn_coal_loglik(SEXP initSEXP, SEXP f1SEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP gridsizeSEXP, SEXP transXSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1192,7 +1192,7 @@ END_RCPP
 }
 // volz_loglik
 double volz_loglik(List init, arma::mat f1, double t_correct, double betaN, int gridsize);
-RcppExport SEXP LNAPhyloDyn_volz_loglik(SEXP initSEXP, SEXP f1SEXP, SEXP t_correctSEXP, SEXP betaNSEXP, SEXP gridsizeSEXP) {
+RcppExport SEXP _LNAPhyloDyn_volz_loglik(SEXP initSEXP, SEXP f1SEXP, SEXP t_correctSEXP, SEXP betaNSEXP, SEXP gridsizeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1207,7 +1207,7 @@ END_RCPP
 }
 // volz_loglik_nh
 double volz_loglik_nh(List init, arma::mat f1, arma::vec betaN, double t_correct, int gridsize);
-RcppExport SEXP LNAPhyloDyn_volz_loglik_nh(SEXP initSEXP, SEXP f1SEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP gridsizeSEXP) {
+RcppExport SEXP _LNAPhyloDyn_volz_loglik_nh(SEXP initSEXP, SEXP f1SEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP gridsizeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1222,7 +1222,7 @@ END_RCPP
 }
 // ESlice
 arma::mat ESlice(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, double t_correct, double lambda, int reps, int gridsize, std::string funname);
-RcppExport SEXP LNAPhyloDyn_ESlice(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP funnameSEXP) {
+RcppExport SEXP _LNAPhyloDyn_ESlice(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP funnameSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1242,7 +1242,7 @@ END_RCPP
 }
 // ESlice2
 arma::mat ESlice2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, double t_correct, double lambda, int reps, int gridsize, std::string funname, bool volz, double beta);
-RcppExport SEXP LNAPhyloDyn_ESlice2(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP funnameSEXP, SEXP volzSEXP, SEXP betaSEXP) {
+RcppExport SEXP _LNAPhyloDyn_ESlice2(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP funnameSEXP, SEXP volzSEXP, SEXP betaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1264,7 +1264,7 @@ END_RCPP
 }
 // ESlice2_log
 arma::mat ESlice2_log(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, double t_correct, double lambda, int reps, int gridsize, std::string funname, bool volz, double beta);
-RcppExport SEXP LNAPhyloDyn_ESlice2_log(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP funnameSEXP, SEXP volzSEXP, SEXP betaSEXP) {
+RcppExport SEXP _LNAPhyloDyn_ESlice2_log(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP funnameSEXP, SEXP volzSEXP, SEXP betaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1286,7 +1286,7 @@ END_RCPP
 }
 // DegenerateDet3
 double DegenerateDet3(arma::mat M);
-RcppExport SEXP LNAPhyloDyn_DegenerateDet3(SEXP MSEXP) {
+RcppExport SEXP _LNAPhyloDyn_DegenerateDet3(SEXP MSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1297,7 +1297,7 @@ END_RCPP
 }
 // PseudoInverse
 arma::mat PseudoInverse(arma::mat M);
-RcppExport SEXP LNAPhyloDyn_PseudoInverse(SEXP MSEXP) {
+RcppExport SEXP _LNAPhyloDyn_PseudoInverse(SEXP MSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1308,7 +1308,7 @@ END_RCPP
 }
 // SIRS_IntSigma
 List SIRS_IntSigma(arma::mat Traj_par, double dt, double theta1, double theta2, double theta3, double alpha, double period);
-RcppExport SEXP LNAPhyloDyn_SIRS_IntSigma(SEXP Traj_parSEXP, SEXP dtSEXP, SEXP theta1SEXP, SEXP theta2SEXP, SEXP theta3SEXP, SEXP alphaSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIRS_IntSigma(SEXP Traj_parSEXP, SEXP dtSEXP, SEXP theta1SEXP, SEXP theta2SEXP, SEXP theta3SEXP, SEXP alphaSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1325,7 +1325,7 @@ END_RCPP
 }
 // log_like_trajSIRS
 double log_like_trajSIRS(arma::mat SdeTraj, arma::mat OdeTraj, List Filter, int gridsize, double t_correct);
-RcppExport SEXP LNAPhyloDyn_log_like_trajSIRS(SEXP SdeTrajSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP) {
+RcppExport SEXP _LNAPhyloDyn_log_like_trajSIRS(SEXP SdeTrajSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1340,7 +1340,7 @@ END_RCPP
 }
 // SIRS_ODE
 arma::vec SIRS_ODE(arma::vec states, arma::vec param, double t, double period);
-RcppExport SEXP LNAPhyloDyn_SIRS_ODE(SEXP statesSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIRS_ODE(SEXP statesSEXP, SEXP paramSEXP, SEXP tSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1354,7 +1354,7 @@ END_RCPP
 }
 // SIRS_KOM_Filter
 List SIRS_KOM_Filter(arma::mat OdeTraj, arma::vec param, int gridsize, double period);
-RcppExport SEXP LNAPhyloDyn_SIRS_KOM_Filter(SEXP OdeTrajSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_SIRS_KOM_Filter(SEXP OdeTrajSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1368,7 +1368,7 @@ END_RCPP
 }
 // ODE2
 arma::mat ODE2(arma::vec initial, arma::vec t, arma::vec param, double period);
-RcppExport SEXP LNAPhyloDyn_ODE2(SEXP initialSEXP, SEXP tSEXP, SEXP paramSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_ODE2(SEXP initialSEXP, SEXP tSEXP, SEXP paramSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1382,7 +1382,7 @@ END_RCPP
 }
 // Traj_sim_SIRS
 List Traj_sim_SIRS(arma::vec initial, arma::mat OdeTraj, List Filter, double t_correct);
-RcppExport SEXP LNAPhyloDyn_Traj_sim_SIRS(SEXP initialSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP t_correctSEXP) {
+RcppExport SEXP _LNAPhyloDyn_Traj_sim_SIRS(SEXP initialSEXP, SEXP OdeTrajSEXP, SEXP FilterSEXP, SEXP t_correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1396,7 +1396,7 @@ END_RCPP
 }
 // Traj_sim_SIRS_ez
 List Traj_sim_SIRS_ez(arma::vec initial, arma::vec times, arma::vec param, int gridsize, double t_correct, double period);
-RcppExport SEXP LNAPhyloDyn_Traj_sim_SIRS_ez(SEXP initialSEXP, SEXP timesSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP, SEXP periodSEXP) {
+RcppExport SEXP _LNAPhyloDyn_Traj_sim_SIRS_ez(SEXP initialSEXP, SEXP timesSEXP, SEXP paramSEXP, SEXP gridsizeSEXP, SEXP t_correctSEXP, SEXP periodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1412,7 +1412,7 @@ END_RCPP
 }
 // ESlice_SIRS
 arma::mat ESlice_SIRS(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state, List init, arma::vec params4, double t_correct, double lambda, int reps, int gridsize, bool volz);
-RcppExport SEXP LNAPhyloDyn_ESlice_SIRS(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP params4SEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP volzSEXP) {
+RcppExport SEXP _LNAPhyloDyn_ESlice_SIRS(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP stateSEXP, SEXP initSEXP, SEXP params4SEXP, SEXP t_correctSEXP, SEXP lambdaSEXP, SEXP repsSEXP, SEXP gridsizeSEXP, SEXP volzSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1430,4 +1430,236 @@ BEGIN_RCPP
     rcpp_result_gen = Rcpp::wrap(ESlice_SIRS(f_cur, OdeTraj, FTs, state, init, params4, t_correct, lambda, reps, gridsize, volz));
     return rcpp_result_gen;
 END_RCPP
+}
+// colik2cpp
+double colik2cpp(const NumericVector heights, const List Fs, const List Gs, const List Ys, const IntegerVector eventIndicator, const IntegerVector eventIndicatorNode, const NumericVector eventHeights, const arma::mat sortedSampleStates, const IntegerMatrix daughters, const int n, const int Nnode, const int m, double AgtYboundaryCondition);
+RcppExport SEXP _LNAPhyloDyn_colik2cpp(SEXP heightsSEXP, SEXP FsSEXP, SEXP GsSEXP, SEXP YsSEXP, SEXP eventIndicatorSEXP, SEXP eventIndicatorNodeSEXP, SEXP eventHeightsSEXP, SEXP sortedSampleStatesSEXP, SEXP daughtersSEXP, SEXP nSEXP, SEXP NnodeSEXP, SEXP mSEXP, SEXP AgtYboundaryConditionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector >::type heights(heightsSEXP);
+    Rcpp::traits::input_parameter< const List >::type Fs(FsSEXP);
+    Rcpp::traits::input_parameter< const List >::type Gs(GsSEXP);
+    Rcpp::traits::input_parameter< const List >::type Ys(YsSEXP);
+    Rcpp::traits::input_parameter< const IntegerVector >::type eventIndicator(eventIndicatorSEXP);
+    Rcpp::traits::input_parameter< const IntegerVector >::type eventIndicatorNode(eventIndicatorNodeSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type eventHeights(eventHeightsSEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type sortedSampleStates(sortedSampleStatesSEXP);
+    Rcpp::traits::input_parameter< const IntegerMatrix >::type daughters(daughtersSEXP);
+    Rcpp::traits::input_parameter< const int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const int >::type Nnode(NnodeSEXP);
+    Rcpp::traits::input_parameter< const int >::type m(mSEXP);
+    Rcpp::traits::input_parameter< double >::type AgtYboundaryCondition(AgtYboundaryConditionSEXP);
+    rcpp_result_gen = Rcpp::wrap(colik2cpp(heights, Fs, Gs, Ys, eventIndicator, eventIndicatorNode, eventHeights, sortedSampleStates, daughters, n, Nnode, m, AgtYboundaryCondition));
+    return rcpp_result_gen;
+END_RCPP
+}
+// sourceAttribMultiDemeCpp
+List sourceAttribMultiDemeCpp(const NumericVector heights, const List Fs, const List Gs, const List Ys, const IntegerVector eventIndicator, const IntegerVector eventIndicatorNode, const NumericVector eventHeights, const arma::mat sortedSampleStates, const IntegerMatrix daughters, const int n, const int Nnode, const int m, double AgtYboundaryCondition, const double maxHeight);
+RcppExport SEXP _LNAPhyloDyn_sourceAttribMultiDemeCpp(SEXP heightsSEXP, SEXP FsSEXP, SEXP GsSEXP, SEXP YsSEXP, SEXP eventIndicatorSEXP, SEXP eventIndicatorNodeSEXP, SEXP eventHeightsSEXP, SEXP sortedSampleStatesSEXP, SEXP daughtersSEXP, SEXP nSEXP, SEXP NnodeSEXP, SEXP mSEXP, SEXP AgtYboundaryConditionSEXP, SEXP maxHeightSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector >::type heights(heightsSEXP);
+    Rcpp::traits::input_parameter< const List >::type Fs(FsSEXP);
+    Rcpp::traits::input_parameter< const List >::type Gs(GsSEXP);
+    Rcpp::traits::input_parameter< const List >::type Ys(YsSEXP);
+    Rcpp::traits::input_parameter< const IntegerVector >::type eventIndicator(eventIndicatorSEXP);
+    Rcpp::traits::input_parameter< const IntegerVector >::type eventIndicatorNode(eventIndicatorNodeSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type eventHeights(eventHeightsSEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type sortedSampleStates(sortedSampleStatesSEXP);
+    Rcpp::traits::input_parameter< const IntegerMatrix >::type daughters(daughtersSEXP);
+    Rcpp::traits::input_parameter< const int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const int >::type Nnode(NnodeSEXP);
+    Rcpp::traits::input_parameter< const int >::type m(mSEXP);
+    Rcpp::traits::input_parameter< double >::type AgtYboundaryCondition(AgtYboundaryConditionSEXP);
+    Rcpp::traits::input_parameter< const double >::type maxHeight(maxHeightSEXP);
+    rcpp_result_gen = Rcpp::wrap(sourceAttribMultiDemeCpp(heights, Fs, Gs, Ys, eventIndicator, eventIndicatorNode, eventHeights, sortedSampleStates, daughters, n, Nnode, m, AgtYboundaryCondition, maxHeight));
+    return rcpp_result_gen;
+END_RCPP
+}
+// birthMx
+arma::mat birthMx(arma::vec states, arma::vec thetas, arma::vec x_r);
+RcppExport SEXP _LNAPhyloDyn_birthMx(SEXP statesSEXP, SEXP thetasSEXP, SEXP x_rSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type states(statesSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type thetas(thetasSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type x_r(x_rSEXP);
+    rcpp_result_gen = Rcpp::wrap(birthMx(states, thetas, x_r));
+    return rcpp_result_gen;
+END_RCPP
+}
+// MigrationMx
+arma::mat MigrationMx(arma::vec states, arma::vec thetas, arma::vec x_r);
+RcppExport SEXP _LNAPhyloDyn_MigrationMx(SEXP statesSEXP, SEXP thetasSEXP, SEXP x_rSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type states(statesSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type thetas(thetasSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type x_r(x_rSEXP);
+    rcpp_result_gen = Rcpp::wrap(MigrationMx(states, thetas, x_r));
+    return rcpp_result_gen;
+END_RCPP
+}
+// DeathMX
+Rcpp::NumericVector DeathMX(arma::vec states, arma::vec thetas, arma::vec x_r);
+RcppExport SEXP _LNAPhyloDyn_DeathMX(SEXP statesSEXP, SEXP thetasSEXP, SEXP x_rSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type states(statesSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type thetas(thetasSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type x_r(x_rSEXP);
+    rcpp_result_gen = Rcpp::wrap(DeathMX(states, thetas, x_r));
+    return rcpp_result_gen;
+END_RCPP
+}
+// TFGY_list
+List TFGY_list(arma::mat LatentTraj, arma::vec param, arma::vec x_r, arma::ivec x_i, std::string transP, std::string model, std::string transX);
+RcppExport SEXP _LNAPhyloDyn_TFGY_list(SEXP LatentTrajSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type LatentTraj(LatentTrajSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type param(paramSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type x_r(x_rSEXP);
+    Rcpp::traits::input_parameter< arma::ivec >::type x_i(x_iSEXP);
+    Rcpp::traits::input_parameter< std::string >::type transP(transPSEXP);
+    Rcpp::traits::input_parameter< std::string >::type model(modelSEXP);
+    Rcpp::traits::input_parameter< std::string >::type transX(transXSEXP);
+    rcpp_result_gen = Rcpp::wrap(TFGY_list(LatentTraj, param, x_r, x_i, transP, model, transX));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Structural_Coal_lik
+double Structural_Coal_lik(List Init_Details, arma::mat LatentTraj, arma::vec param, arma::vec x_r, arma::ivec x_i, std::string transP, std::string model, std::string transX, double AgtYboundCondition);
+RcppExport SEXP _LNAPhyloDyn_Structural_Coal_lik(SEXP Init_DetailsSEXP, SEXP LatentTrajSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP, SEXP AgtYboundConditionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type Init_Details(Init_DetailsSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type LatentTraj(LatentTrajSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type param(paramSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type x_r(x_rSEXP);
+    Rcpp::traits::input_parameter< arma::ivec >::type x_i(x_iSEXP);
+    Rcpp::traits::input_parameter< std::string >::type transP(transPSEXP);
+    Rcpp::traits::input_parameter< std::string >::type model(modelSEXP);
+    Rcpp::traits::input_parameter< std::string >::type transX(transXSEXP);
+    Rcpp::traits::input_parameter< double >::type AgtYboundCondition(AgtYboundConditionSEXP);
+    rcpp_result_gen = Rcpp::wrap(Structural_Coal_lik(Init_Details, LatentTraj, param, x_r, x_i, transP, model, transX, AgtYboundCondition));
+    return rcpp_result_gen;
+END_RCPP
+}
+
+RcppExport SEXP _rcpp_module_boot_mod_Foo();
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_LNAPhyloDyn_inv2", (DL_FUNC) &_LNAPhyloDyn_inv2, 1},
+    {"_LNAPhyloDyn_chols", (DL_FUNC) &_LNAPhyloDyn_chols, 1},
+    {"_LNAPhyloDyn_mvrnormArma", (DL_FUNC) &_LNAPhyloDyn_mvrnormArma, 2},
+    {"_LNAPhyloDyn_mvrnormArma2", (DL_FUNC) &_LNAPhyloDyn_mvrnormArma2, 2},
+    {"_LNAPhyloDyn_expM", (DL_FUNC) &_LNAPhyloDyn_expM, 1},
+    {"_LNAPhyloDyn_betaTs", (DL_FUNC) &_LNAPhyloDyn_betaTs, 4},
+    {"_LNAPhyloDyn_param_transform", (DL_FUNC) &_LNAPhyloDyn_param_transform, 4},
+    {"_LNAPhyloDyn_ODE_SIR_one", (DL_FUNC) &_LNAPhyloDyn_ODE_SIR_one, 7},
+    {"_LNAPhyloDyn_ODE_SEIR_one", (DL_FUNC) &_LNAPhyloDyn_ODE_SEIR_one, 7},
+    {"_LNAPhyloDyn_ODE_SIRS_one", (DL_FUNC) &_LNAPhyloDyn_ODE_SIRS_one, 7},
+    {"_LNAPhyloDyn_SIRS_F", (DL_FUNC) &_LNAPhyloDyn_SIRS_F, 3},
+    {"_LNAPhyloDyn_SIR_F", (DL_FUNC) &_LNAPhyloDyn_SIR_F, 3},
+    {"_LNAPhyloDyn_SEIR2_F", (DL_FUNC) &_LNAPhyloDyn_SEIR2_F, 3},
+    {"_LNAPhyloDyn_SEIR_F", (DL_FUNC) &_LNAPhyloDyn_SEIR_F, 3},
+    {"_LNAPhyloDyn_SIR_h", (DL_FUNC) &_LNAPhyloDyn_SIR_h, 3},
+    {"_LNAPhyloDyn_SEIR2_h", (DL_FUNC) &_LNAPhyloDyn_SEIR2_h, 3},
+    {"_LNAPhyloDyn_SEIR_h", (DL_FUNC) &_LNAPhyloDyn_SEIR_h, 3},
+    {"_LNAPhyloDyn_ODE_rk45", (DL_FUNC) &_LNAPhyloDyn_ODE_rk45, 8},
+    {"_LNAPhyloDyn_SigmaF", (DL_FUNC) &_LNAPhyloDyn_SigmaF, 7},
+    {"_LNAPhyloDyn_KF_param", (DL_FUNC) &_LNAPhyloDyn_KF_param, 8},
+    {"_LNAPhyloDyn_KF_param_chol", (DL_FUNC) &_LNAPhyloDyn_KF_param_chol, 8},
+    {"_LNAPhyloDyn_log_like_traj_general2", (DL_FUNC) &_LNAPhyloDyn_log_like_traj_general2, 5},
+    {"_LNAPhyloDyn_log_like_traj_general_ez", (DL_FUNC) &_LNAPhyloDyn_log_like_traj_general_ez, 10},
+    {"_LNAPhyloDyn_log_like_traj_general_adjust", (DL_FUNC) &_LNAPhyloDyn_log_like_traj_general_adjust, 5},
+    {"_LNAPhyloDyn_Traj_sim_general3", (DL_FUNC) &_LNAPhyloDyn_Traj_sim_general3, 3},
+    {"_LNAPhyloDyn_Traj_sim_general_noncentral", (DL_FUNC) &_LNAPhyloDyn_Traj_sim_general_noncentral, 3},
+    {"_LNAPhyloDyn_TransformTraj", (DL_FUNC) &_LNAPhyloDyn_TransformTraj, 3},
+    {"_LNAPhyloDyn_Traj_sim_ezG2", (DL_FUNC) &_LNAPhyloDyn_Traj_sim_ezG2, 10},
+    {"_LNAPhyloDyn_Traj_sim_ezG_NC", (DL_FUNC) &_LNAPhyloDyn_Traj_sim_ezG_NC, 10},
+    {"_LNAPhyloDyn_coal_loglik3", (DL_FUNC) &_LNAPhyloDyn_coal_loglik3, 6},
+    {"_LNAPhyloDyn_volz_loglik_nh2", (DL_FUNC) &_LNAPhyloDyn_volz_loglik_nh2, 6},
+    {"_LNAPhyloDyn_ESlice_general_NC", (DL_FUNC) &_LNAPhyloDyn_ESlice_general_NC, 13},
+    {"_LNAPhyloDyn_ESlice_general2", (DL_FUNC) &_LNAPhyloDyn_ESlice_general2, 13},
+    {"_LNAPhyloDyn_InitializeMCMC", (DL_FUNC) &_LNAPhyloDyn_InitializeMCMC, 9},
+    {"_LNAPhyloDyn_InitializeData", (DL_FUNC) &_LNAPhyloDyn_InitializeData, 10},
+    {"_LNAPhyloDyn_betaf", (DL_FUNC) &_LNAPhyloDyn_betaf, 4},
+    {"_LNAPhyloDyn_betafs", (DL_FUNC) &_LNAPhyloDyn_betafs, 4},
+    {"_LNAPhyloDyn_ODE_general_one", (DL_FUNC) &_LNAPhyloDyn_ODE_general_one, 5},
+    {"_LNAPhyloDyn_general_F", (DL_FUNC) &_LNAPhyloDyn_general_F, 5},
+    {"_LNAPhyloDyn_General_ODE_rk45", (DL_FUNC) &_LNAPhyloDyn_General_ODE_rk45, 5},
+    {"_LNAPhyloDyn_General_IntSigmaF", (DL_FUNC) &_LNAPhyloDyn_General_IntSigmaF, 4},
+    {"_LNAPhyloDyn_General_KOM_Filter", (DL_FUNC) &_LNAPhyloDyn_General_KOM_Filter, 5},
+    {"_LNAPhyloDyn_log_like_traj_general", (DL_FUNC) &_LNAPhyloDyn_log_like_traj_general, 5},
+    {"_LNAPhyloDyn_Traj_sim_general", (DL_FUNC) &_LNAPhyloDyn_Traj_sim_general, 3},
+    {"_LNAPhyloDyn_Traj_sim_ezG", (DL_FUNC) &_LNAPhyloDyn_Traj_sim_ezG, 7},
+    {"_LNAPhyloDyn_ESlice_general", (DL_FUNC) &_LNAPhyloDyn_ESlice_general, 11},
+    {"_LNAPhyloDyn_SIR_BD_period_ODE_one", (DL_FUNC) &_LNAPhyloDyn_SIR_BD_period_ODE_one, 5},
+    {"_LNAPhyloDyn_SIR_BD_period_ODE_one2", (DL_FUNC) &_LNAPhyloDyn_SIR_BD_period_ODE_one2, 5},
+    {"_LNAPhyloDyn_SIR_BD_Fm_LNA", (DL_FUNC) &_LNAPhyloDyn_SIR_BD_Fm_LNA, 8},
+    {"_LNAPhyloDyn_SIR_BD_IntSigma", (DL_FUNC) &_LNAPhyloDyn_SIR_BD_IntSigma, 8},
+    {"_LNAPhyloDyn_SIR_BD_ODE", (DL_FUNC) &_LNAPhyloDyn_SIR_BD_ODE, 5},
+    {"_LNAPhyloDyn_SIR_BD_SDE", (DL_FUNC) &_LNAPhyloDyn_SIR_BD_SDE, 5},
+    {"_LNAPhyloDyn_SIR_BD_period_SDE", (DL_FUNC) &_LNAPhyloDyn_SIR_BD_period_SDE, 5},
+    {"_LNAPhyloDyn_SIR_BD_KOM_Filter", (DL_FUNC) &_LNAPhyloDyn_SIR_BD_KOM_Filter, 5},
+    {"_LNAPhyloDyn_log_like_trajSIR_BD", (DL_FUNC) &_LNAPhyloDyn_log_like_trajSIR_BD, 5},
+    {"_LNAPhyloDyn_Traj_sim_SIR_BD", (DL_FUNC) &_LNAPhyloDyn_Traj_sim_SIR_BD, 4},
+    {"_LNAPhyloDyn_Traj_sim_SIR_BD_ez", (DL_FUNC) &_LNAPhyloDyn_Traj_sim_SIR_BD_ez, 7},
+    {"_LNAPhyloDyn_ESlice_SIR_BD", (DL_FUNC) &_LNAPhyloDyn_ESlice_SIR_BD, 11},
+    {"_LNAPhyloDyn_StateSpace_Like", (DL_FUNC) &_LNAPhyloDyn_StateSpace_Like, 6},
+    {"_LNAPhyloDyn_StateSpace_Period_Like2", (DL_FUNC) &_LNAPhyloDyn_StateSpace_Period_Like2, 9},
+    {"_LNAPhyloDyn_SampleWithReplace", (DL_FUNC) &_LNAPhyloDyn_SampleWithReplace, 2},
+    {"_LNAPhyloDyn_SIR_BD_SMC", (DL_FUNC) &_LNAPhyloDyn_SIR_BD_SMC, 8},
+    {"_LNAPhyloDyn_SIR_BD_PMCMC", (DL_FUNC) &_LNAPhyloDyn_SIR_BD_PMCMC, 14},
+    {"_LNAPhyloDyn_LogTraj", (DL_FUNC) &_LNAPhyloDyn_LogTraj, 1},
+    {"_LNAPhyloDyn_SIR_ODE2", (DL_FUNC) &_LNAPhyloDyn_SIR_ODE2, 4},
+    {"_LNAPhyloDyn_SIR_ODE", (DL_FUNC) &_LNAPhyloDyn_SIR_ODE, 4},
+    {"_LNAPhyloDyn_betaDyn", (DL_FUNC) &_LNAPhyloDyn_betaDyn, 4},
+    {"_LNAPhyloDyn_SIRS2_period_SDE", (DL_FUNC) &_LNAPhyloDyn_SIRS2_period_SDE, 5},
+    {"_LNAPhyloDyn_log_like_traj", (DL_FUNC) &_LNAPhyloDyn_log_like_traj, 5},
+    {"_LNAPhyloDyn_SIR_log_KOM_Filter2", (DL_FUNC) &_LNAPhyloDyn_SIR_log_KOM_Filter2, 5},
+    {"_LNAPhyloDyn_ODE", (DL_FUNC) &_LNAPhyloDyn_ODE, 4},
+    {"_LNAPhyloDyn_Traj_sim", (DL_FUNC) &_LNAPhyloDyn_Traj_sim, 4},
+    {"_LNAPhyloDyn_Traj_sim_ez", (DL_FUNC) &_LNAPhyloDyn_Traj_sim_ez, 7},
+    {"_LNAPhyloDyn_log_like_traj2", (DL_FUNC) &_LNAPhyloDyn_log_like_traj2, 8},
+    {"_LNAPhyloDyn_coal_loglik2", (DL_FUNC) &_LNAPhyloDyn_coal_loglik2, 5},
+    {"_LNAPhyloDyn_coal_loglik", (DL_FUNC) &_LNAPhyloDyn_coal_loglik, 6},
+    {"_LNAPhyloDyn_volz_loglik", (DL_FUNC) &_LNAPhyloDyn_volz_loglik, 5},
+    {"_LNAPhyloDyn_volz_loglik_nh", (DL_FUNC) &_LNAPhyloDyn_volz_loglik_nh, 5},
+    {"_LNAPhyloDyn_ESlice", (DL_FUNC) &_LNAPhyloDyn_ESlice, 10},
+    {"_LNAPhyloDyn_ESlice2", (DL_FUNC) &_LNAPhyloDyn_ESlice2, 12},
+    {"_LNAPhyloDyn_ESlice2_log", (DL_FUNC) &_LNAPhyloDyn_ESlice2_log, 12},
+    {"_LNAPhyloDyn_DegenerateDet3", (DL_FUNC) &_LNAPhyloDyn_DegenerateDet3, 1},
+    {"_LNAPhyloDyn_PseudoInverse", (DL_FUNC) &_LNAPhyloDyn_PseudoInverse, 1},
+    {"_LNAPhyloDyn_SIRS_IntSigma", (DL_FUNC) &_LNAPhyloDyn_SIRS_IntSigma, 7},
+    {"_LNAPhyloDyn_log_like_trajSIRS", (DL_FUNC) &_LNAPhyloDyn_log_like_trajSIRS, 5},
+    {"_LNAPhyloDyn_SIRS_ODE", (DL_FUNC) &_LNAPhyloDyn_SIRS_ODE, 4},
+    {"_LNAPhyloDyn_SIRS_KOM_Filter", (DL_FUNC) &_LNAPhyloDyn_SIRS_KOM_Filter, 4},
+    {"_LNAPhyloDyn_ODE2", (DL_FUNC) &_LNAPhyloDyn_ODE2, 4},
+    {"_LNAPhyloDyn_Traj_sim_SIRS", (DL_FUNC) &_LNAPhyloDyn_Traj_sim_SIRS, 4},
+    {"_LNAPhyloDyn_Traj_sim_SIRS_ez", (DL_FUNC) &_LNAPhyloDyn_Traj_sim_SIRS_ez, 6},
+    {"_LNAPhyloDyn_ESlice_SIRS", (DL_FUNC) &_LNAPhyloDyn_ESlice_SIRS, 11},
+    {"_LNAPhyloDyn_colik2cpp", (DL_FUNC) &_LNAPhyloDyn_colik2cpp, 13},
+    {"_LNAPhyloDyn_sourceAttribMultiDemeCpp", (DL_FUNC) &_LNAPhyloDyn_sourceAttribMultiDemeCpp, 14},
+    {"_LNAPhyloDyn_birthMx", (DL_FUNC) &_LNAPhyloDyn_birthMx, 3},
+    {"_LNAPhyloDyn_MigrationMx", (DL_FUNC) &_LNAPhyloDyn_MigrationMx, 3},
+    {"_LNAPhyloDyn_DeathMX", (DL_FUNC) &_LNAPhyloDyn_DeathMX, 3},
+    {"_LNAPhyloDyn_TFGY_list", (DL_FUNC) &_LNAPhyloDyn_TFGY_list, 7},
+    {"_LNAPhyloDyn_Structural_Coal_lik", (DL_FUNC) &_LNAPhyloDyn_Structural_Coal_lik, 9},
+    {"_rcpp_module_boot_mod_Foo", (DL_FUNC) &_rcpp_module_boot_mod_Foo, 0},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_LNAPhyloDyn(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }

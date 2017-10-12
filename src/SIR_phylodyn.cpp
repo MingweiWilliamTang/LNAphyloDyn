@@ -471,12 +471,12 @@ double coal_loglik(List init, arma::mat f1, double t_correct, double lambda, int
 
 //[[Rcpp::export()]]
 double volz_loglik(List init, arma::mat f1, double t_correct, double betaN, int gridsize = 1){
-
+  Rcout << "aaa" <<endl;
   int n0 = 0;
   while(f1(n0,0) < t_correct){
     n0 ++;
   }
-
+  Rcout << n0 <<endl;
   if(f1.submat(0,1,n0,2).min() < 0){
     return -10000000;
   }

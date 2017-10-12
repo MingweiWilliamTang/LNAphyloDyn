@@ -273,3 +273,218 @@ coal_lik_init = function(samp_times, n_sampled, coal_times, grid, t_correct)
                         grid=grid),
               grid_idx = grid_idx))
 }
+
+
+as.DatePhylo = function(phy, endTime, States){
+  n = phy$Nnode + 1
+  Sampling_Times = branching_sampling_times2(phy)
+  Sampling_Times = endTime - Sampling_Times[n:(2 * n - 1)]
+  names(Sampling_Times) = phy$tip.label
+  return(DatedTree(phy,sampleTimes = Sampling_Times,sampleStates = States))
+}
+
+
+
+
+
+
+
+branching_sampling_times2 <- function(phy)
+{
+  phy = ape::new2old.phylo(phy)
+
+ # if (class(phy) != "phylo")
+ #   stop("object \"phy\" is not of class \"phylo\"")
+
+  tmp <- as.numeric(phy$edge)
+  nb.tip <- max(tmp)
+  nb.node <- -min(tmp)
+  xx <- as.numeric(rep(NA, nb.tip + nb.node))
+  names(xx) <- as.character(c(-(1:nb.node), 1:nb.tip))
+  xx["-1"] <- 0
+
+  for (i in 2:length(xx))
+  {
+    nod <- names(xx[i])
+    ind <- which(phy$edge[, 2] == nod)
+    base <- phy$edge[ind, 1]
+    xx[i] <- xx[base] + phy$edge.length[ind]
+  }
+
+  depth <- max(xx)
+  branching_sampling_times <- depth - xx
+
+  return(branching_sampling_times)
+}
+
+
+colikcpp_prepare <- function (bdt, times,DEMES, timeOfOriginBoundaryCondition = TRUE,
+                       AgtYboundaryCondition = TRUE, maxHeight = Inf)
+{
+
+  bdt <- reorder.phylo(bdt, "postorder")
+  bdt$heights <- signif(bdt$heights, digits = floor(1/bdt$maxHeight/10) +
+                          6)
+  #times <- tfgy[[1]]
+  #Fs <- tfgy[[2]]
+  #Gs <- tfgy[[3]]
+  #Ys <- tfgy[[4]]
+  m <- length(DEMES)
+  if (m < 2)
+    stop("Currently only models with at least two demes are supported")
+
+  if (m == 2 & DEMES[2] == "V2" & ncol(bdt$sampleStates) ==
+      1) {
+    bdt$sampleStates <- cbind(bdt$sampleStates, rep(0, bdt$n))
+    bdt$sortedSampleStates <- cbind(bdt$sortedSampleStates,
+                                    rep(0, bdt$n))
+  }
+  fgyi <- 1:length(times)
+  if (times[2] > times[1])
+    fgyi <- length(times):1
+
+  t0 <- times[fgyi[length(fgyi)]]
+  if (timeOfOriginBoundaryCondition) {
+    if ((bdt$maxSampleTime - t0) < bdt$maxHeight)
+      return(-Inf)
+  }
+
+  heights <- times[fgyi[1]] - times[fgyi]
+  ndesc <- rep(0, bdt$n + bdt$Nnode)
+  for (iedge in 1:nrow(bdt$edge)) {
+    a <- bdt$edge[iedge, 1]
+    u <- bdt$edge[iedge, 2]
+    ndesc[a] <- ndesc[a] + ndesc[u] + 1
+  }
+  uniqhgts <- sort(unique(bdt$heights))
+  eventHeights <- rep(NA, (bdt$n + bdt$Nnode))
+  eventIndicatorNode <- rep(NA, bdt$n + bdt$Nnode)
+  events <- rep(NA, bdt$n + bdt$Nnode)
+  hgts2node <- lapply(uniqhgts, function(h) which(bdt$heights ==
+                                                    h))
+  k <- 1
+  l <- 1
+  for (h in uniqhgts) {
+    us <- hgts2node[[k]]
+    if (k < length(hgts2node) | length(us) == 1) {
+      if (length(us) > 1) {
+        i_us <- sort(index.return = TRUE, decreasing = FALSE,
+                     ndesc[us])$ix
+        for (u in us[i_us]) {
+          eventHeights[l] <- h
+          events[l] <- ifelse(u <= bdt$n, 0, 1)
+          eventIndicatorNode[l] <- u
+          l <- l + 1
+        }
+      }
+      else {
+        eventHeights[l] <- h
+        events[l] <- ifelse(us <= bdt$n, 0, 1)
+        eventIndicatorNode[l] <- us
+        l <- l + 1
+      }
+    }
+    k <- k + 1
+  }
+  excl <- is.na(eventHeights) | is.na(events) | is.na(eventIndicatorNode) |
+    (eventHeights > maxHeight)
+  events <- events[!excl]
+  eventIndicatorNode <- eventIndicatorNode[!excl]
+  eventHeights <- eventHeights[!excl]
+ # ll <- colik2cpp(heights, Fs[fgyi], Gs[fgyi], Ys[fgyi],
+  #                events, eventIndicatorNode, eventHeights, t(bdt$sortedSampleStates),
+   #               bdt$daughters, bdt$n, bdt$Nnode, m, AgtYboundaryCondition)
+  return(list(heights = heights, events = events, eventIndicatorNode = eventIndicatorNode,
+              eventHeights = eventHeights, sortedSampleStates = t(bdt$sortedSampleStates),
+              daughters = bdt$daughters, n = bdt$n, Nnode = bdt$Nnode, m = m))
+}
+
+
+colik.fgy <- function (bdt, tfgy, timeOfOriginBoundaryCondition = TRUE,
+                       AgtYboundaryCondition = TRUE, maxHeight = Inf, expmat = FALSE)
+{
+
+  bdt <- reorder.phylo(bdt, "postorder")
+  bdt$heights <- signif(bdt$heights, digits = floor(1/bdt$maxHeight/10) +
+                          6)
+  times <- tfgy[[1]]
+  Fs <- tfgy[[2]]
+  Gs <- tfgy[[3]]
+  Ys <- tfgy[[4]]
+  m <- nrow(Fs[[1]])
+  if (m < 2)
+    stop("Currently only models with at least two demes are supported")
+  DEMES <- names(Ys[[1]])
+  if (is.null(DEMES)){
+    DEMES <- rownames(Fs[[1]])
+  }
+  if (is.null(DEMES)){
+    DEMES <- rownames(Gs[[1]])
+  }
+  if (is.null(DEMES)){
+    stop('demographic model returns trajectory without deme names')
+  }
+  if (m == 2 & DEMES[2] == "V2" & ncol(bdt$sampleStates) ==
+      1) {
+    bdt$sampleStates <- cbind(bdt$sampleStates, rep(0, bdt$n))
+    bdt$sortedSampleStates <- cbind(bdt$sortedSampleStates,
+                                    rep(0, bdt$n))
+  }
+  fgyi <- 1:length(Fs)
+  if (times[2] > times[1])
+    fgyi <- length(Fs):1
+
+  t0 <- times[fgyi[length(fgyi)]]
+  if (timeOfOriginBoundaryCondition) {
+    if ((bdt$maxSampleTime - t0) < bdt$maxHeight)
+      return(-Inf)
+  }
+
+  heights <- times[fgyi[1]] - times[fgyi]
+  ndesc <- rep(0, bdt$n + bdt$Nnode)
+  for (iedge in 1:nrow(bdt$edge)) {
+    a <- bdt$edge[iedge, 1]
+    u <- bdt$edge[iedge, 2]
+    ndesc[a] <- ndesc[a] + ndesc[u] + 1
+  }
+  uniqhgts <- sort(unique(bdt$heights))
+  eventHeights <- rep(NA, (bdt$n + bdt$Nnode))
+  eventIndicatorNode <- rep(NA, bdt$n + bdt$Nnode)
+  events <- rep(NA, bdt$n + bdt$Nnode)
+  hgts2node <- lapply(uniqhgts, function(h) which(bdt$heights ==
+                                                    h))
+  k <- 1
+  l <- 1
+  for (h in uniqhgts) {
+    us <- hgts2node[[k]]
+    if (k < length(hgts2node) | length(us) == 1) {
+      if (length(us) > 1) {
+        i_us <- sort(index.return = TRUE, decreasing = FALSE,
+                     ndesc[us])$ix
+        for (u in us[i_us]) {
+          eventHeights[l] <- h
+          events[l] <- ifelse(u <= bdt$n, 0, 1)
+          eventIndicatorNode[l] <- u
+          l <- l + 1
+        }
+      }
+      else {
+        eventHeights[l] <- h
+        events[l] <- ifelse(us <= bdt$n, 0, 1)
+        eventIndicatorNode[l] <- us
+        l <- l + 1
+      }
+    }
+    k <- k + 1
+  }
+  excl <- is.na(eventHeights) | is.na(events) | is.na(eventIndicatorNode) |
+    (eventHeights > maxHeight)
+  events <- events[!excl]
+  eventIndicatorNode <- eventIndicatorNode[!excl]
+  eventHeights <- eventHeights[!excl]
+  ll <- colik2cpp(heights, Fs[fgyi], Gs[fgyi], Ys[fgyi],
+                  events, eventIndicatorNode, eventHeights, t(bdt$sortedSampleStates),
+                  bdt$daughters, bdt$n, bdt$Nnode, m, AgtYboundaryCondition)
+
+  return(ll)
+}

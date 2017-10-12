@@ -1,3 +1,4 @@
+/*
 #include "basic_util.h"
 #include "SIR_phylodyn.h"
 #define pi 3.14159265358979323846264338327950288
@@ -6,7 +7,8 @@ typedef arma::vec (*parat)(double, arma::vec, arma::vec, arma::ivec);
 typedef arma::vec (*ODE_fun)(arma::vec, arma::vec, double, arma::vec, arma::ivec, std::string, std::string);
 typedef arma::mat (*F_fun)(arma::vec, arma::vec, std::string);
 typedef arma::vec (*h_fun)(arma::vec, arma::vec, std::string);
-
+*/
+#include "LNA_functional.h"
 /*
  *
  * Generate a vector of beta corresponds to each time grid

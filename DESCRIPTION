@@ -11,7 +11,7 @@ Description: Bayesian inference on coalescent-based phylodynamics using linear
     noise approximation
 License: What license is it under?
 LazyData: TRUE
-LinkingTo: Rcpp,RcppArmadillo
+LinkingTo: Rcpp,RcppArmadillo,BH
 Depends:
     R (>= 3.1.0), Rcpp, RcppArmadillo, abind, smfsb
 RcppModules: mod_Foo
@@ -23,6 +23,8 @@ Imports:
     smfsb,
     Matrix,
     graphics,
-    stats
+    stats,
+    BH
 RoxygenNote: 5.0.1
 VignetteBuilder: knitr
+Suggests: testthat
