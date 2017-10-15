@@ -396,3 +396,7 @@ Structural_Coal_lik <- function(Init_Details, LatentTraj, param, x_r, x_i, trans
     .Call('_LNAPhyloDyn_Structural_Coal_lik', PACKAGE = 'LNAPhyloDyn', Init_Details, LatentTraj, param, x_r, x_i, transP, model, transX, AgtYboundCondition)
 }
 
+ESlice_general_NC_Structural <- function(f_cur, OdeTraj, FTs, init, param, x_r, x_i, coal_log = 0, model = "SEIR2", transX = "standard") {
+    .Call('_LNAPhyloDyn_ESlice_general_NC_Structural', PACKAGE = 'LNAPhyloDyn', f_cur, OdeTraj, FTs, init, param, x_r, x_i, coal_log, model, transX)
+}
+

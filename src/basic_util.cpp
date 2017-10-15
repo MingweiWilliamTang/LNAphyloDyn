@@ -19,7 +19,7 @@ arma::mat chols(arma::mat S){
   res(0,1) = S(1,0) / res(0,0);
   res(1,0) = 0;
   res(1,1) = sqrt(S(1,1) - res(0,1) * res(0,1));
-  return res;
+  return res.t();
 }
 
 //[[Rcpp::export()]]
@@ -29,7 +29,7 @@ arma::mat mvrnormArma(int n, arma::mat sigma) {
 // arma::mat res = arma::chol(sigma+0.00000000001 * arma::diagmat(ones(3))) * Y;
 arma::mat res;
 if(n == 2){
-  res = chols(sigma).t() * Y;
+  res = chols(sigma) * Y;
 }else{
   res = arma::chol(sigma + 0.0000000000001 * arma::diagmat(ones(n)) ).t() * Y;
 }

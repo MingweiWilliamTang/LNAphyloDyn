@@ -904,6 +904,7 @@ List TFGY_list(arma::mat LatentTraj, arma::vec param,
   return tfgy;
 }
 
+
 //[[Rcpp::export]]
 double Structural_Coal_lik(List Init_Details, arma::mat LatentTraj,
                            arma::vec param,
@@ -944,5 +945,75 @@ double Structural_Coal_lik(List Init_Details, arma::mat LatentTraj,
 
 
 
+
+//[[Rcpp::export()]]
+List ESlice_general_NC_Structural(arma::mat f_cur, arma::mat OdeTraj, List FTs,
+                                  List init, arma::vec param, arma::vec x_r, arma::ivec x_i,
+                                  double coal_log = 0,
+                                  std::string model = "SEIR2",
+                                  std::string transX = "standard"){
+  // OdeTraj is the one with low resolution
+
+  int p = f_cur.n_cols;
+  arma::mat newTraj(f_cur.n_rows, f_cur.n_cols);
+  double logy;
+
+  arma::mat v_traj = arma::randn(f_cur.n_rows, f_cur.n_cols);
+  double u = R::runif(0,1);
+  //  if(funname == "standard"){
+  // logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
+  if(coal_log != 0){
+    logy = coal_log + log(u);
+  }else{
+    logy = Structural_Coal_lik(init, TransformTraj(OdeTraj,f_cur, FTs), param, x_r, x_i); + log(u);
+  }
+
+  double theta = R::runif(0,2 * pi);
+
+  double theta_min = theta - 2*pi;
+  double theta_max = theta;
+
+  arma::mat f_prime = f_cur * cos(theta) + v_traj * sin(theta);
+  newTraj = TransformTraj(OdeTraj,f_prime, FTs);
+  int i = 0;
+  double loglike;
+
+  loglike = Structural_Coal_lik(init, newTraj, param, x_r, x_i);
+
+  while(newTraj.cols(1,p).min() <0 || loglike <= logy){
+    // shrink the bracket
+    i += 1;
+    if(i>20){
+      newTraj = TransformTraj(OdeTraj,f_cur, FTs);
+      loglike = Structural_Coal_lik(init, newTraj, param, x_r, x_i);
+      f_prime = f_cur;
+      Rcout<<"theta = "<<theta<<endl;
+      break;
+    }
+    if(theta < 0){
+      theta_min = theta;
+    }else{
+      theta_max = theta;
+    }
+    theta = R::runif(theta_min,theta_max);
+    f_prime = f_cur * cos(theta) + v_traj * sin(theta);
+    newTraj = TransformTraj(OdeTraj,f_prime, FTs);
+
+    loglike = Structural_Coal_lik(init, newTraj, param, x_r, x_i);
+
+  }
+  List Res;
+  double logOrigin = 0;
+  for(int j = 0; j < f_cur.n_rows - 1; j ++){
+    for(int k = 0; k < p; k ++){
+      logOrigin -= 0.5 * f_prime(j,k) * f_prime(j,k);
+    }
+  }
+  Res["LatentTraj"] = newTraj;
+  Res["OriginTraj"] = f_prime;
+  Res["logOrigin"] = logOrigin;
+  Res["CoalLog"] = loglike;
+  return Res;
+}
 
 

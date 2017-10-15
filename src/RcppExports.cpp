@@ -1553,6 +1553,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// ESlice_general_NC_Structural
+List ESlice_general_NC_Structural(arma::mat f_cur, arma::mat OdeTraj, List FTs, List init, arma::vec param, arma::vec x_r, arma::ivec x_i, double coal_log, std::string model, std::string transX);
+RcppExport SEXP _LNAPhyloDyn_ESlice_general_NC_Structural(SEXP f_curSEXP, SEXP OdeTrajSEXP, SEXP FTsSEXP, SEXP initSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP coal_logSEXP, SEXP modelSEXP, SEXP transXSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type f_cur(f_curSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type OdeTraj(OdeTrajSEXP);
+    Rcpp::traits::input_parameter< List >::type FTs(FTsSEXP);
+    Rcpp::traits::input_parameter< List >::type init(initSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type param(paramSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type x_r(x_rSEXP);
+    Rcpp::traits::input_parameter< arma::ivec >::type x_i(x_iSEXP);
+    Rcpp::traits::input_parameter< double >::type coal_log(coal_logSEXP);
+    Rcpp::traits::input_parameter< std::string >::type model(modelSEXP);
+    Rcpp::traits::input_parameter< std::string >::type transX(transXSEXP);
+    rcpp_result_gen = Rcpp::wrap(ESlice_general_NC_Structural(f_cur, OdeTraj, FTs, init, param, x_r, x_i, coal_log, model, transX));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 RcppExport SEXP _rcpp_module_boot_mod_Foo();
 
@@ -1655,6 +1675,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LNAPhyloDyn_DeathMX", (DL_FUNC) &_LNAPhyloDyn_DeathMX, 3},
     {"_LNAPhyloDyn_TFGY_list", (DL_FUNC) &_LNAPhyloDyn_TFGY_list, 7},
     {"_LNAPhyloDyn_Structural_Coal_lik", (DL_FUNC) &_LNAPhyloDyn_Structural_Coal_lik, 9},
+    {"_LNAPhyloDyn_ESlice_general_NC_Structural", (DL_FUNC) &_LNAPhyloDyn_ESlice_general_NC_Structural, 10},
     {"_rcpp_module_boot_mod_Foo", (DL_FUNC) &_rcpp_module_boot_mod_Foo, 0},
     {NULL, NULL, 0}
 };
