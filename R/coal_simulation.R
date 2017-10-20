@@ -201,7 +201,7 @@ coal_loglik_hom = function(eff_pop,t_correct,gene,lambda){
 #'
 
 
-coal_lik_init = function(samp_times, n_sampled, coal_times, grid, t_correct)
+coal_lik_init = function(samp_times, n_sampled, coal_times, grid)
 {
   ns = length(samp_times)
   nc = length(coal_times)
@@ -210,7 +210,9 @@ coal_lik_init = function(samp_times, n_sampled, coal_times, grid, t_correct)
 
   #n0 = which.min(grid < t_correct)
   Tcoal = max(coal_times)
-
+  if(Tcoal > max(grid)){
+    stop("coalescent time out of grid")
+  }
   n0 = which.min(grid < Tcoal)
   grid = grid[1:n0]
 
@@ -275,6 +277,8 @@ coal_lik_init = function(samp_times, n_sampled, coal_times, grid, t_correct)
 }
 
 
+
+
 as.DatePhylo = function(phy, endTime, States){
   n = phy$Nnode + 1
   Sampling_Times = branching_sampling_times2(phy)
@@ -282,8 +286,6 @@ as.DatePhylo = function(phy, endTime, States){
   names(Sampling_Times) = phy$tip.label
   return(DatedTree(phy,sampleTimes = Sampling_Times,sampleStates = States))
 }
-
-
 
 
 

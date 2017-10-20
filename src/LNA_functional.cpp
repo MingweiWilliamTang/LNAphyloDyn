@@ -496,7 +496,7 @@ List SigmaF(arma::mat Traj_par,arma::vec param,
   int p = Traj_par.n_cols - 1;
 
   arma::mat Q = arma::eye(p,p);
-  arma::mat Sigma,F,F0 = arma::eye(p,p);
+  arma::mat Sigma,F,F0 = arma::eye(p,p); // F0 be the fundemental matrix
   Sigma.zeros(p,p);
   int k = Traj_par.n_rows;
   arma::mat A;
@@ -960,6 +960,63 @@ double coal_loglik3(List init, arma::mat f1, double t_correct, double lambda, in
 }
 
 
+//[[Rcpp::export()]]
+double volz_loglik_nh3(List init, arma::mat f1, arma::vec betaN, double t_correct, arma::ivec index,
+                       std::string transX = "standard"){
+
+  int p = f1.n_cols - 1;
+  int n2 = f1.n_rows;
+  int n0 = as<int>(init[9]) - 1;
+  int L = 0;
+  while(f1(L,0) < t_correct){
+      L ++;
+      if(L == n2 - 1) break;
+    }
+
+  if(f1.submat(0,1,n0,p).min() < 0){
+    return -10000000;
+  }
+  // Rcout<<f1 <<endl;
+  arma::mat f2(n0,p);
+  arma::vec betanh(n0);
+  for(int i = 1; i<= n0; i++){
+    f2.submat((n0-i),0,(n0-i),p - 1) = f1.submat(L-i+1,1,L-i+1,p);
+    betanh(n0-i) = betaN(L-i+1);
+  }
+  // Rcout<<f2.n_rows<<"\t"<<as<int>(init[9])<<endl;
+  if(n0 != f2.n_rows){
+    Rcout<<"Incorrect length for f"<<endl;
+  }
+
+  arma::vec gridrep;
+  gridrep = as<vec>(init[6]);
+  int k = sum(as<arma::vec>(init[6]));
+
+  arma::vec f(k);
+  arma::vec s(k);
+  arma::vec e(k);
+  arma::vec betas(k);
+  int start = 0;
+  for(int i = 0; i < n0; i++){
+    for(int j = 0; j < gridrep(i);j++){
+      if(transX == "standard"){
+        f(start) = log(f2(n0-i-1,index(1)));
+        s(start) = log(f2(n0-i-1,index(0)));
+        e(start) = log(f2(n0-i-1,1));
+      }else if(transX == "log"){
+        f(start) = f2(f2.n_rows-i-1,index(1));
+        s(start) = f2(f2.n_rows-i-1,index(0));
+        e(start) = f2(f2.n_rows-i-1,1);
+      }
+      betas(start) = betanh(n0-i-1);
+      start ++;
+    }
+  }
+  arma::vec ll = -2 * (as<vec>(init[2]) % as<vec>(init[3]) % betas % (arma::exp(- f)) % (arma::exp(s))) +\
+    as<vec>(init[4]) % (log(betas) -f + s);
+  //Rcout<< ll <<endl;
+  return sum(ll);
+}
 
 
 
@@ -969,10 +1026,12 @@ double volz_loglik_nh2(List init, arma::mat f1, arma::vec betaN, double t_correc
                        std::string transX = "standard"){
 
   int p = f1.n_cols - 1;
+  int n2 = f1.n_rows;
   int n0 = as<int>(init[9]) - 1;
   int L = 0;
   while(f1(L,0) < t_correct){
     L ++;
+    if(L == n2 - 1) break;
   }
   if(f1.submat(0,1,n0,p).min() < 0){
     return -10000000;

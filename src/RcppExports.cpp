@@ -449,6 +449,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// volz_loglik_nh3
+double volz_loglik_nh3(List init, arma::mat f1, arma::vec betaN, double t_correct, arma::ivec index, std::string transX);
+RcppExport SEXP _LNAPhyloDyn_volz_loglik_nh3(SEXP initSEXP, SEXP f1SEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP indexSEXP, SEXP transXSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type init(initSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type f1(f1SEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type betaN(betaNSEXP);
+    Rcpp::traits::input_parameter< double >::type t_correct(t_correctSEXP);
+    Rcpp::traits::input_parameter< arma::ivec >::type index(indexSEXP);
+    Rcpp::traits::input_parameter< std::string >::type transX(transXSEXP);
+    rcpp_result_gen = Rcpp::wrap(volz_loglik_nh3(init, f1, betaN, t_correct, index, transX));
+    return rcpp_result_gen;
+END_RCPP
+}
 // volz_loglik_nh2
 double volz_loglik_nh2(List init, arma::mat f1, arma::vec betaN, double t_correct, arma::ivec index, std::string transX);
 RcppExport SEXP _LNAPhyloDyn_volz_loglik_nh2(SEXP initSEXP, SEXP f1SEXP, SEXP betaNSEXP, SEXP t_correctSEXP, SEXP indexSEXP, SEXP transXSEXP) {
@@ -1607,6 +1623,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LNAPhyloDyn_Traj_sim_ezG2", (DL_FUNC) &_LNAPhyloDyn_Traj_sim_ezG2, 10},
     {"_LNAPhyloDyn_Traj_sim_ezG_NC", (DL_FUNC) &_LNAPhyloDyn_Traj_sim_ezG_NC, 10},
     {"_LNAPhyloDyn_coal_loglik3", (DL_FUNC) &_LNAPhyloDyn_coal_loglik3, 6},
+    {"_LNAPhyloDyn_volz_loglik_nh3", (DL_FUNC) &_LNAPhyloDyn_volz_loglik_nh3, 6},
     {"_LNAPhyloDyn_volz_loglik_nh2", (DL_FUNC) &_LNAPhyloDyn_volz_loglik_nh2, 6},
     {"_LNAPhyloDyn_ESlice_general_NC", (DL_FUNC) &_LNAPhyloDyn_ESlice_general_NC, 13},
     {"_LNAPhyloDyn_ESlice_general2", (DL_FUNC) &_LNAPhyloDyn_ESlice_general2, 13},

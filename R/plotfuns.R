@@ -195,7 +195,7 @@ randomR0_traj = function(times,MCMC_obj,R0_id,col_id,idx,ylim=c(0,2),main = ""){
 }
 
 
-randomR0_traj_V = function(times,MCMC_obj,R0_id,col_id,idx,ylim=c(0,2),main = ""){
+randomR0_traj_V = function(times,MCMC_obj,R0_id,col_id,idx,xlim,ylim=c(0,2),main = ""){
   R0 = MCMC_obj$par[idx,R0_id]
   R0_traj = matrix(ncol= length(col_id)+1, nrow = length(idx))
   R0_traj[,1] = R0
@@ -216,11 +216,11 @@ randomR0_traj_V = function(times,MCMC_obj,R0_id,col_id,idx,ylim=c(0,2),main = ""
   step2 = stepfun(times, CIup, f = 0)
   step3 = stepfun(times, CIlow, f = 0)
   plot(step1,ylab = "R0",col = "red",lwd = 2.5,ylim=ylim,
-       main=main,verticals = F,xlim=c(0,1.36),xlab = "time")
+       main=main,verticals = F,xlim=xlim,xlab = "time")
   #polygon(x = c(times,rev(times)),
    #       y = c(CIup,rev(CIlow)),col = "grey",border = NA)
-  lines(step2, lty=2,lwd = 1,verticals = F, col = "blue")
-  lines(step3, lty=2,lwd = 1,verticals = F, col = "blue")
+  lines(step2, lty=2,lwd = 1,verticals = F, col = "blue",xlim=xlim)
+  lines(step3, lty=2,lwd = 1,verticals = F, col = "blue",xlim=xlim)
   #lines(times,m,type="l",col = "red",lwd = 2)
 }
 
@@ -247,11 +247,11 @@ effpopPlot = function(NP_res,LNA_res,t_correct,idx,row=id,lid=5,ylab="",xlab="",
 
 
 CI_Curve_eff2 = function(MCMC_obj,ids, col = "black", fill_col = "grey", Irow = 3,method = "qtile",alpha=0.05,fill = T,likelihood ="volz",
-                         x_r,x_i){
+                         x_r,x_i,p=3){
   if(likelihood == "volz"){
     Mx = 1/(2 * MCMC_obj$Trajectory[,2,ids]/MCMC_obj$Trajectory[,Irow,ids])
     scale = sapply(ids,function(x){
-      return(betaTs(MCMC_obj$par[x,4:(3 + x_i[1] + x_i[2])],
+      return(betaTs(MCMC_obj$par[x,(p+1):(p + x_i[1] + x_i[2])],
                    MCMC_obj$Trajectory[,1,1],x_r, x_i))})
     Mx = Mx/scale
     }else{

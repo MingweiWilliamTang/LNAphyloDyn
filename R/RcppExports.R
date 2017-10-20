@@ -124,6 +124,10 @@ coal_loglik3 <- function(init, f1, t_correct, lambda, Index, transX = "standard"
     .Call('_LNAPhyloDyn_coal_loglik3', PACKAGE = 'LNAPhyloDyn', init, f1, t_correct, lambda, Index, transX)
 }
 
+volz_loglik_nh3 <- function(init, f1, betaN, t_correct, index, transX = "standard") {
+    .Call('_LNAPhyloDyn_volz_loglik_nh3', PACKAGE = 'LNAPhyloDyn', init, f1, betaN, t_correct, index, transX)
+}
+
 volz_loglik_nh2 <- function(init, f1, betaN, t_correct, index, transX = "standard") {
     .Call('_LNAPhyloDyn_volz_loglik_nh2', PACKAGE = 'LNAPhyloDyn', init, f1, betaN, t_correct, index, transX)
 }
