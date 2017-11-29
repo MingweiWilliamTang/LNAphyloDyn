@@ -983,6 +983,7 @@ List ESlice_general_NC_Structural(arma::mat f_cur, arma::mat OdeTraj, List FTs,
   while(newTraj.cols(1,p).min() <0 || loglike <= logy){
     // shrink the bracket
     i += 1;
+   // Rcout << -i << endl;
     if(i>20){
       newTraj = TransformTraj(OdeTraj,f_cur, FTs);
       loglike = Structural_Coal_lik(init, newTraj, param, x_r, x_i);
@@ -998,7 +999,7 @@ List ESlice_general_NC_Structural(arma::mat f_cur, arma::mat OdeTraj, List FTs,
     theta = R::runif(theta_min,theta_max);
     f_prime = f_cur * cos(theta) + v_traj * sin(theta);
     newTraj = TransformTraj(OdeTraj,f_prime, FTs);
-
+    //Rcout << -i * 10 << endl;
     loglike = Structural_Coal_lik(init, newTraj, param, x_r, x_i);
 
   }

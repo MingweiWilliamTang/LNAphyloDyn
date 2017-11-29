@@ -111,7 +111,43 @@ CI_Curve = function(MCMC_obj,ids,scale = 1, col = "black", fill_col = "grey", ro
   }
 }
 
+CI_Curve3 = function(times,Trajectory,ids,scale = 1, col = "black", fill_col = "grey", row = 3,method = "qtile",alpha=0.05,fill = T){
 
+  if(method == "NormApp"){
+    midcur = apply(Trajectory[,row,ids]/scale,1,mean)
+    midSd = apply(Trajectory[,row,ids]/scale,1,sd)
+    qt = qnorm(1-alpha/2)
+    upper = midcur + qt * midSd
+    lower = midcur - qt * midSd
+    #lines(MCMC_obj$Trajectory[,1,1],upper,lty=2,
+    #      col=col,lwd=2)
+
+    #lines(MCMC_obj$Trajectory[,1,1],lower,lty=2,
+    #      col=col,lwd=2)
+  }else if(method == "qtile"){
+    qt1 = 1 - alpha/2
+    qt2 = alpha/2
+    upper = apply(Trajectory[,row,ids]/scale,1,function(x){
+      return(quantile(x,qt1))
+    })
+    mid = apply(Trajectory[,row,ids]/scale,1,function(x){
+      return(median(x,qt1))
+    })
+    lower = apply(Trajectory[,row,ids]/scale,1,function(x){
+      return(quantile(x,qt2))
+    })
+    # lines(MCMC_obj$Trajectory[,1,1],midcur + qt * midSd,lty=2,
+    #      col=col,lwd=2)
+
+    #lines(MCMC_obj$Trajectory[,1,1],midcur - qt * midSd,lty=2,
+    #     col=col,lwd=2)
+  }
+  if(fill == T){
+    polygon(x = c(times,rev(times)),
+            y = c(upper,rev(lower)),col = fill_col,border = NA)
+    lines(times,mid,col="red",lwd=2,lty=2)
+  }
+}
 CI_Curve_eff = function(MCMC_obj,ids,scale = 1, col = "black", fill_col = "grey", row = 3,method = "qtile",alpha=0.05,fill = T,likelihood ="volz"){
   if(likelihood == "volz"){
     Mx = 1/(2 * MCMC_obj$Trajectory[,2,ids]/MCMC_obj$Trajectory[,3,ids])
@@ -195,7 +231,7 @@ randomR0_traj = function(times,MCMC_obj,R0_id,col_id,idx,ylim=c(0,2),main = ""){
 }
 
 
-randomR0_traj_V = function(times,MCMC_obj,R0_id,col_id,idx,xlim,ylim=c(0,2),main = ""){
+randomR0_traj_V = function(times,MCMC_obj,R0_id,col_id,idx,xlim,ylim=c(0,2),main = "",fill_col = rgb(1,0,0,0.3)){
   R0 = MCMC_obj$par[idx,R0_id]
   R0_traj = matrix(ncol= length(col_id)+1, nrow = length(idx))
   R0_traj[,1] = R0
@@ -215,12 +251,14 @@ randomR0_traj_V = function(times,MCMC_obj,R0_id,col_id,idx,xlim,ylim=c(0,2),main
   step1 = stepfun(times, m, f = 0)
   step2 = stepfun(times, CIup, f = 0)
   step3 = stepfun(times, CIlow, f = 0)
-  plot(step1,ylab = "R0",col = "red",lwd = 2.5,ylim=ylim,
-       main=main,verticals = F,xlim=xlim,xlab = "time")
+  plot(step1,ylab = expression(R0(t)),col = "red",lwd = 2.5,ylim=ylim,
+       main=main,verticals = F,xlim=xlim,xlab = "time",lty=2,xaxt = "n",cex.lab=1.3,cex.axis = 1.2)
   #polygon(x = c(times,rev(times)),
    #       y = c(CIup,rev(CIlow)),col = "grey",border = NA)
-  lines(step2, lty=2,lwd = 1,verticals = F, col = "blue",xlim=xlim)
-  lines(step3, lty=2,lwd = 1,verticals = F, col = "blue",xlim=xlim)
+  polygon(x = c(c(0,rep(times,each=2),1.4), rev(c(0,rep(times,each=2),1.4))),
+          c(rep(CIlow,each=2), rev(rep(CIup,each=2))),col = fill_col,border = NA)
+  #lines(step2, lty=2,lwd = 1,verticals = F, col = "blue",xlim=xlim)
+  #lines(step3, lty=2,lwd = 1,verticals = F, col = "blue",xlim=xlim)
   #lines(times,m,type="l",col = "red",lwd = 2)
 }
 

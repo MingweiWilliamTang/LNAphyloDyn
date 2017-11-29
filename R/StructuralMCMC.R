@@ -183,11 +183,11 @@ updateR0_general_NC = function(MCMC_obj, MCMC_setting, i){
   LatentTraj_new = TransformTraj(Ode_Traj_coarse_new, MCMC_obj$OriginTraj, FT_new)
 
   logMultiNorm_new = log_like_traj_general_adjust(LatentTraj_new, Ode_Traj_coarse_new,FT_new,MCMC_setting$gridsize,MCMC_setting$t_correct)
-
+  betaN_new = betaTs(param_new, Ode_Traj_coarse_new[,1],MCMC_setting$x_r,MCMC_setting$x_i)
 
   if(MCMC_setting$likelihood == "volz"){
     coalLog_new = volz_loglik_nh2(MCMC_setting$Init, LatentTraj_new,
-                                  betaTs(param_new, Ode_Traj_coarse_new[,1],MCMC_setting$x_r,MCMC_setting$x_i),
+                                  betaN_new,
                                   MCMC_setting$t_correct,MCMC_setting$x_i[3:4])
   }else if(MCMC_setting$likelihood == "structural"){
     coalLog_new = Structural_Coal_lik(MCMC_setting$Init_Detail, LatentTraj = LatentTraj_new, param = param_new,
@@ -220,6 +220,7 @@ updateR0_general_NC = function(MCMC_obj, MCMC_setting, i){
     MCMC_obj$coalLog = coalLog_new
     MCMC_obj$FT = FT_new
     MCMC_obj$LatentTraj = LatentTraj_new
+    MCMC_obj$betaN = betaN_new
   }
   return(list(MCMC_obj = MCMC_obj, AR = AR))
 }
@@ -248,9 +249,10 @@ updategamma_general_NC = function(MCMC_obj, MCMC_setting, i){
 
   logMultiNorm_new = log_like_traj_general_adjust(LatentTraj_new, Ode_Traj_coarse_new,FT_new,MCMC_setting$gridsize,MCMC_setting$t_correct)
 
+  betaN_new = betaTs(param_new, Ode_Traj_coarse_new[,1], MCMC_setting$x_r,MCMC_setting$x_i)
   if(MCMC_setting$likelihood == "volz"){
     coalLog_new = volz_loglik_nh2(MCMC_setting$Init, LatentTraj_new,
-                                  betaTs(param_new, Ode_Traj_coarse_new[,1], MCMC_setting$x_r,MCMC_setting$x_i),
+                                  betaN_new,
                                   MCMC_setting$t_correct,MCMC_setting$x_i[3:4])
   }else if(MCMC_setting$likelihood == "structural"){
     coalLog_new = Structural_Coal_lik(MCMC_setting$Init_Detail, LatentTraj = LatentTraj_new, param = param_new,
@@ -288,6 +290,7 @@ updategamma_general_NC = function(MCMC_obj, MCMC_setting, i){
     MCMC_obj$coalLog = coalLog_new
     MCMC_obj$FT = FT_new
     MCMC_obj$LatentTraj = LatentTraj_new
+    MCMC_obj$betaN = betaN_new
   }
   return(list(MCMC_obj = MCMC_obj, AR = AR))
 }

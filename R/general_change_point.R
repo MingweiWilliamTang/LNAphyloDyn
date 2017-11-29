@@ -148,10 +148,12 @@ updateR0_general = function(MCMC_obj, MCMC_setting, i){
 
   LatentTraj_new = cbind(MCMC_obj$LatentTraj[,1],MCMC_obj$LatentTraj[,2:3] - MCMC_obj$Ode_Traj_coarse[,2:3] +
                            Ode_Traj_coarse_new[,2:3])
+
   logMultiNorm_new = log_like_traj_general(LatentTraj_new, Ode_Traj_coarse_new,FT_new,MCMC_setting$gridsize,MCMC_setting$t_correct)
+  betaN_new = betafs(Ode_Traj_coarse_new[,1],param_new, MCMC_setting$x_r,MCMC_setting$x_i)
   if(MCMC_setting$likelihood == "volz"){
     coalLog_new = volz_loglik_nh(MCMC_setting$Init, LogTraj(LatentTraj_new),
-                                 betafs(Ode_Traj_coarse_new[,1],param_new, MCMC_setting$x_r,MCMC_setting$x_i),
+                                 betaN_new,
                                  MCMC_setting$t_correct,
                                  MCMC_setting$gridsize)
   }else{
@@ -276,6 +278,23 @@ updateLambdaGeneral = function(MCMC_obj,MCMC_setting, i){
   return(list(MCMC_obj = MCMC_obj, AR = AR))
 }
 
+update_ChangePoint_ESlice = function(MCMC_obj, MCMC_setting,i){
+  p = MCMC_setting$p
+  param_id = (p+1):(length(MCMC_obj$par))
+  param = MCMC_obj$par[param_id]
+  ESlice_Result = ESlice_change_points(c(param, MCMC_setting$prior$ch_pr), MCMC_obj$par[1:p],MCMC_setting$times, MCMC_obj$OriginTraj,
+                                       MCMC_setting$x_r, MCMC_setting$x_i, MCMC_setting$Init, MCMC_setting$gridsize, MCMC_obj$coalLog,
+                                       MCMC_setting$t_correct, model = MCMC_setting$model,
+                                       volz = MCMC_setting$likelihood == "volz")
+
+  MCMC_obj$par[param_id] = ESlice_Result$param[1:length(param_id)]
+  MCMC_obj$LatentTraj = ESlice_Result$LatentTraj
+  MCMC_obj$betaN = ESlice_Result$betaN
+  MCMC_obj$FT = ESlice_Result$FT
+  MCMC_obj$coalLog = ESlice_Result$CoalLog
+  MCMC_obj$Ode_Traj_coarse = ESlice_Result$OdeTraj
+  return(MCMC_obj)
+}
 
 update_ChangePoint_general = function(MCMC_obj, MCMC_setting, i){
   chpxid =  (MCMC_setting$x_i[2]+3):(sum(MCMC_setting$x_i)+2)
@@ -423,6 +442,7 @@ MCMC_initialize_general = function(MCMC_setting){
       }
       priorLog[MCMC_setting$p+2] = dnorm(log(mu),MCMC_setting$prior$mu_pr[1],MCMC_setting$prior$mu_pr[2],log = T)
     }
+
     if(is.null(MCMC_setting$control$gamma)){
       gamma = exp(rnorm(1,MCMC_setting$prior$gamma_pr[1], MCMC_setting$prior$gamma_pr[2]))
     }else{
@@ -439,17 +459,21 @@ MCMC_initialize_general = function(MCMC_setting){
       }
     }
     if(MCMC_setting$model == "SEIR" || MCMC_setting$model == "SEIR2"){
-      param = c(R0,mu,gamma,ch)
+      param = c(R0,mu,gamma,ch,MCMC_setting$chpr)
     }else if(MCMC_setting$model == "SIR"){
-      param = c(R0, gamma,ch)
+      param = c(R0, gamma,ch,MCMC_setting$chpr)
     }
+    paramlist = New_Param_List(param, state, MCMC_setting$gridsize, MCMC_setting$times, MCMC_setting$x_r,
+                               MCMC_setting$x_i, model = MCMC_setting$model)
 
-    Ode_Traj_thin = ODE_rk45(state, MCMC_setting$times, param, MCMC_setting$x_r, MCMC_setting$x_i,model = MCMC_setting$model)
+   # Ode_Traj_thin = ODE_rk45(state, MCMC_setting$times, param, MCMC_setting$x_r, MCMC_setting$x_i,model = MCMC_setting$model)
 
-    Ode_Traj_coarse = Ode_Traj_thin[MCMC_setting$gridset,]
+    Ode_Traj_coarse = paramlist$Ode
+    FT = paramlist$FT
+    betaN = paramlist$betaN
+    # FT = KF_param_chol(Ode_Traj_thin,param,MCMC_setting$gridsize, MCMC_setting$x_r,MCMC_setting$x_i,model = MCMC_setting$model)
 
-    FT = KF_param_chol(Ode_Traj_thin,param,MCMC_setting$gridsize, MCMC_setting$x_r,MCMC_setting$x_i,model = MCMC_setting$model)
-
+    #betaN = beta
     if(is.null(MCMC_setting$control$traj)){
       Latent = Traj_sim_general_noncentral(Ode_Traj_coarse,FT,MCMC_setting$t_correct)
       #LatentTraj = Latent$SimuTraj
@@ -472,8 +496,7 @@ MCMC_initialize_general = function(MCMC_setting){
     #coalLog = Structural_Coal_lik(MCMC_setting$Init_Detail,LatentTraj,param, MCMC_setting$x_r, MCMC_setting$x_i,
      #                             model = "SEIR2")
     coalLog = volz_loglik_nh2(MCMC_setting$Init,LatentTraj,
-                              betaTs(param, Ode_Traj_coarse[,1],MCMC_setting$x_r,MCMC_setting$x_i),
-                              MCMC_setting$t_correct, MCMC_setting$x_i[3:4])
+                              betaN, MCMC_setting$t_correct, MCMC_setting$x_i[3:4])
 
     print(paste("coalescent likelihood after initialization ", coalLog))
 
@@ -494,12 +517,11 @@ MCMC_initialize_general = function(MCMC_setting){
   #LogGamma = dlnorm(gamma,MCMC_setting$prior$gamma_pr[1],MCMC_setting$prior$gamma_pr[2],log = T)
   #LogE = dlnorm(mu, MCMC_setting$prior$mu_pr[1], MCMC_setting$prior$mu_pr[2],log = T)
   plot(LatentTraj[,1],LatentTraj[,3],type="l",xlab = "time",col="blue", lwd = 2)
-  #lines(LatentTraj[,1],LatentTraj[,3],col="red", lwd = 2)
 
   paras =  c(state,param)
   MCMC_obj = list(par = paras,LatentTraj = LatentTraj, logMultiNorm = logMultiNorm,p = MCMC_setting$p,
                   Ode_Traj_coarse = Ode_Traj_coarse, FT = FT, coalLog = coalLog, OriginTraj = OriginTraj,logOrigin = logOrigin,
-                  priorLog = priorLog)
+                  priorLog = priorLog, betaN = betaN)
   ##########
   cat("Initialize MCMC \n")
   print(paste("population size = ", MCMC_setting$N))
@@ -526,14 +548,14 @@ updateR0gamma_general_NC = function(MCMC_obj, MCMC_setting, i){
   FT_new = KF_param_chol(Ode_Traj_thin_new,param_new,
                          MCMC_setting$gridsize,MCMC_setting$x_r,MCMC_setting$x_i,model = MCMC_setting$model)
 
-
   LatentTraj_new = TransformTraj(Ode_Traj_coarse_new, MCMC_obj$OriginTraj, FT_new)
 
   logMultiNorm_new = log_like_traj_general_adjust(LatentTraj_new, Ode_Traj_coarse_new,FT_new,MCMC_setting$gridsize,MCMC_setting$t_correct)
+  betaN_new = betaTs(param_new, Ode_Traj_coarse_new[,1], MCMC_setting$x_r,MCMC_setting$x_i)
 
   if(MCMC_setting$likelihood == "volz"){
     coalLog_new = volz_loglik_nh2(MCMC_setting$Init, LatentTraj_new,
-                                  betaTs(param_new, Ode_Traj_coarse_new[,1], MCMC_setting$x_r,MCMC_setting$x_i),
+                                  betaN_new,
                                   MCMC_setting$t_correct,MCMC_setting$x_i[3:4])
   }else if(MCMC_setting$likelihood == "structural"){
     coalLog_new = Structural_Coal_lik(MCMC_setting$Init_Detail, LatentTraj = LatentTraj_new, param = param_new,
@@ -572,6 +594,7 @@ updateR0gamma_general_NC = function(MCMC_obj, MCMC_setting, i){
     MCMC_obj$coalLog = coalLog_new
     MCMC_obj$FT = FT_new
     MCMC_obj$LatentTraj = LatentTraj_new
+    MCMC_obj$betaN = betaN_new
   }
   return(list(MCMC_obj = MCMC_obj, AR = AR))
 }
@@ -700,8 +723,10 @@ General_MCMC = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000, 
   MCMC_setting = MCMC_setup_general(coal_obs, times,t_correct,N,gridsize,niter,burn,
                                     thin,changetime, DEMS,prior,proposal,
                                     control,likelihood,model,Index,nparam, PCOV)
+
   nparam = sum(MCMC_setting$x_i[1:2])
   MCMC_obj = MCMC_initialize_general(MCMC_setting)
+
   if(MCMC_setting$likelihood == "volz"){
     params = matrix(nrow = niter, ncol = nparam + MCMC_obj$p)
     ARMS = matrix(nrow = niter, ncol =  nparam + MCMC_obj$p)
@@ -737,12 +762,21 @@ General_MCMC = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000, 
         MCMC_obj = step1$MCMC_obj
         ARvec[1] = step1$AR
       }
+   # if(i == burn1){
+    #  idx = floor(burn1/2) : (burn1-1)
+    #  SigmaN = (2.38^2) * cov(cbind(params[idx,MCMC_obj$p + MCMC_setting$x_i[3] + 1],
+    #                 log(params[idx,-(1:(MCMC_obj$p+1))]))) / nparam
+    #  MCMC_setting$PCOV = beta * SigmaN + (1 - beta) * diag(rep(1,nparam)) * 0.01 / nparam
+    #  print(MCMC_setting$PCOV)
+  #  }
+
     if(i == burn1){
       idx = floor(burn1/2) : (burn1-1)
       SigmaN = (2.38^2) * cov(cbind(params[idx,MCMC_obj$p + MCMC_setting$x_i[3] + 1],
-                     log(params[idx,-(1:(MCMC_obj$p+1))]))) / nparam
-      MCMC_setting$PCOV = beta * SigmaN + (1 - beta) * diag(rep(1,nparam)) * 0.01 / nparam
-      print(MCMC_setting$PCOV)
+                                log(params[idx,MCMC_obj$p + MCMC_setting$x_i[4] + 1])))/2
+
+      MCMC_setting$PCOV = beta * SigmaN + (1 - beta) * diag(rep(1,2)) * 0.01 / 2
+
     }
     if(i < burn1){
       if(updateVec[2] == 1){
@@ -757,14 +791,23 @@ General_MCMC = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000, 
         MCMC_obj = step3$MCMC_obj
         ARvec[3] = step3$AR
       }
+
       if(updateVec[5] == 1){
-        MCMC_obj = update_ChangePoint_general_NC(MCMC_obj,MCMC_setting,i)$MCMC_obj
+        #MCMC_obj = update_ChangePoint_general_NC(MCMC_obj,MCMC_setting,i)$MCMC_obj
+        MCMC_obj = update_ChangePoint_ESlice(MCMC_obj,MCMC_setting,i)
       }
     }else{
-      step2 = update_All_general_NC(MCMC_obj,MCMC_setting,i)
-      #step2 = update_All_general_NC_Adaptive(MCMC_obj,MCMC_setting,i,beta = 0.05, M1, M2)
+      #step2 = update_All_general_NC(MCMC_obj,MCMC_setting,i)
+      #MCMC_obj = step2$MCMC_obj
+      #ARvec[2] = step2$AR
+      step2 = updateR0gamma_general_NC(MCMC_obj, MCMC_setting, i)
       MCMC_obj = step2$MCMC_obj
       ARvec[2] = step2$AR
+      if(updateVec[5] == 1){
+        #MCMC_obj = update_ChangePoint_general_NC(MCMC_obj,MCMC_setting,i)$MCMC_obj
+        MCMC_obj = update_ChangePoint_ESlice(MCMC_obj,MCMC_setting,i)
+      }
+
       if(updateVec[6] == 1){
         MCMC_obj = updateTraj_general_NC(MCMC_obj,MCMC_setting,i)$MCMC_obj
       }

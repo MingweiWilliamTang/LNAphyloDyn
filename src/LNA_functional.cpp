@@ -787,12 +787,15 @@ arma::mat TransformTraj(arma::mat OdeTraj,arma::mat OriginLatent, List Filter_NC
   int n = OriginLatent.n_rows;
   int p = OriginLatent.n_cols;
   arma::vec X0(p),X1(p);
+
    for(int i = 0; i < p; i ++){
     X0(i) = 0;
   }
+
   arma::cube Acube = as<arma::cube>(Filter_NC[0]);
   arma::cube Lcube = as<arma::cube>(Filter_NC[1]);
   arma::mat LNA_traj = OdeTraj;
+
   for(int i = 0; i< n; i++){
     arma::mat epsilons_i = OriginLatent.row(i).t();
     arma::mat L_i = Lcube.slice((i));
@@ -937,7 +940,7 @@ double coal_loglik3(List init, arma::mat f1, double t_correct, double lambda, in
       f2(n0 - i) = f1(i, Index + 1);
     }
   }
-  // Rcout<<f2.n_rows<<"\t"<<as<int>(init[9])<<endl;
+
   if(as<int>(init[9]) != f2.n_rows){
     Rcout<<"Incorrect length for f"<<endl;
   }
@@ -1078,6 +1081,125 @@ double volz_loglik_nh2(List init, arma::mat f1, arma::vec betaN, double t_correc
   return sum(ll);
 }
 
+//[[Rcpp::export()]]
+arma::mat Ode_Coarse_Slicer(arma::mat Ode_thin, int gridsize){
+  int n = Ode_thin.n_rows;
+  int p = Ode_thin.n_cols;
+  int d = (n / gridsize) + 1;
+  arma::mat Ode_Coarse(d,p);
+  for(int i = 0; i < d; i ++){
+    Ode_Coarse.row(i) = Ode_thin.row(i * gridsize);
+  }
+  return Ode_Coarse;
+}
+
+//[[Rcpp::export()]]
+List New_Param_List(arma::vec param, arma::vec initial, int gridsize, arma::vec t, arma::vec x_r, arma::ivec x_i,
+                    std::string transP = "changepoint",
+                    std::string model = "SIR", std::string transX = "standard"){
+
+  arma::mat OdeTraj_thin = ODE_rk45(initial,t, param,
+                                   x_r, x_i, transP, model, transX);
+
+  List FT_new = KF_param_chol(OdeTraj_thin, param, gridsize, x_r, x_i, transP, model, transX);
+
+  arma::mat Ode_Coarse = Ode_Coarse_Slicer(OdeTraj_thin, gridsize);
+  arma::vec betaNs = betaTs(param,Ode_Coarse.col(0),x_r, x_i);
+  List result;
+  result["FT"] = FT_new;
+  result["Ode"] = Ode_Coarse;
+  result["betaN"] = betaNs;
+
+  return result;
+}
+
+//[[Rcpp::export()]]
+arma::vec Param_Slice_update(arma::vec param, arma::vec x_r, arma::ivec x_i, double theta, arma::vec newChs, double rho = 1){
+
+  arma::vec param_new = param;
+  arma::vec OdeChs = arma::log(param.subvec(x_i(1),x_i(1) + x_i(0) - 1));
+  arma::vec Chs_prime = OdeChs * cos(theta) + newChs * sin(theta);
+  param_new.subvec(x_i(1), x_i(0) + x_i(1) - 1) = arma::exp(Chs_prime);
+  return param_new;
+}
+
+
+//[[Rcpp::export()]]
+List ESlice_change_points(arma::vec param, arma::vec initial, arma::vec t, arma::mat OriginTraj,
+                          arma::vec x_r, arma::ivec x_i, List init, int gridsize,
+                          double coal_log=0, double t_correct = 0, std::string transP = "changepoint",
+                          std::string model = "SIR", std::string transX = "standard", bool volz = true){
+
+  int nch = x_i[0];
+  arma::ivec Index(2);
+  if(model == "SIR"){
+    Index(0) = 0; Index(1) = 1;
+  }else if(model == "SEIR"){
+    Index(0) = 0; Index(1) = 2;
+  }
+
+  //param.subvec(x_i(1),x_i(1) + x_i(0) - 1)
+  double u = R::runif(0,1);
+  double logy = coal_log + log(u);
+
+  double theta = R::runif(0,2*pi);
+  double theta_min = theta - 2*pi;
+  double theta_max = theta;
+
+  arma::vec newChs = arma::randn(nch,1) * param(x_i(0) + x_i(1));
+  arma::vec param_new = Param_Slice_update(param, x_r, x_i, theta, newChs);
+
+  List param_list = New_Param_List(param_new, initial, gridsize, t, x_r, x_i,
+                                   transP, model, transX);
+
+  List FT_new = as<Rcpp::List>(param_list[0]);
+
+  arma::vec betaN = as<arma::vec>(param_list[2]);
+
+  arma::mat OdeTraj_new  = as<arma::mat>(param_list[1]);
+  arma::mat NewTraj = TransformTraj(OdeTraj_new, OriginTraj, FT_new);
+
+  double loglike = volz_loglik_nh2(init, NewTraj,betaN,t_correct,Index ,transX);
+  int i = 0;
+
+  while(loglike <= logy){
+    i += 1;
+
+    if(i>20){
+      NewTraj = TransformTraj(OdeTraj_new, OriginTraj, FT_new);
+      loglike = volz_loglik_nh2(init, NewTraj,betaN,t_correct,Index ,transX);
+
+      break;
+    }
+    if(theta < 0){
+      theta_min = theta;
+    }else{
+      theta_max = theta;
+    }
+
+    theta = R::runif(theta_min,theta_max);
+
+    param_new = Param_Slice_update(param, x_r, x_i, theta, newChs);
+
+    param_list = New_Param_List(param_new, initial, gridsize, t, x_r, x_i,
+                                     transP, model, transX);
+
+    FT_new = as<Rcpp::List>(param_list[0]);
+    betaN = as<arma::vec>(param_list[2]);
+    OdeTraj_new  = as<arma::mat>(param_list[1]);
+    NewTraj = TransformTraj(OdeTraj_new, OriginTraj, FT_new);
+
+    loglike = volz_loglik_nh2(init, NewTraj, betaN, t_correct, Index ,transX);
+  }
+  List result;
+  result["betaN"] = betaN;
+  result["FT"] = FT_new;
+  result["OdeTraj"] = OdeTraj_new;
+  result["param"] = param_new;
+  result["LatentTraj"] = NewTraj;
+  result["CoalLog"] = loglike;
+  return result;
+}
 
 //[[Rcpp::export()]]
 List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
@@ -1305,7 +1427,9 @@ public:
   std::string TransP;
   std::string TransX;
   arma::ivec Index;
-  Data_setting(List init, arma::vec times, double t_correct,
+  int P;
+
+  Data_setting(List init, arma::vec times, double t_correct, int p,
                arma::vec x_r, arma::ivec x_i,double gridset, double gridsize,
                std::string model = "SIR", std::string transP = "changepoint",
                std::string transX = "standard"){
@@ -1320,6 +1444,7 @@ public:
     this->Model = model;
     this->TransP = transP;
     this->TransX = transX;
+    this->P = p;
     Index.zeros(2);
     if(model == "SIR"){
       Index(0) = 0; Index(1) = 1;
@@ -1327,7 +1452,10 @@ public:
       Index(0) = 0; Index(1) = 2;
     }
   }
+
 };
+
+
 
 
 //[[Rcpp::export()]]
@@ -1343,14 +1471,13 @@ void InitializeMCMC(arma::vec initial, arma::vec param, double lambda,
 
 
 //[[Rcpp::export()]]
-void InitializeData(List init, arma::vec times, double t_correct,
+void InitializeData(List init, arma::vec times, double t_correct, int p,
                     arma::vec x_r, arma::ivec x_i,double gridset, double gridsize,
                     std::string model = "SIR", std::string transP = "changepoint",
                     std::string transX = "standard"){
 
-  Data_setting dt(init,times, t_correct,
+  Data_setting dt(init,times, t_correct,p,
                   x_r,x_i,gridset, gridsize, model, transP,transX);
-
 
 }
 
