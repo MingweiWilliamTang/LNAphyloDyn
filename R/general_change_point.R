@@ -278,11 +278,46 @@ updateLambdaGeneral = function(MCMC_obj,MCMC_setting, i){
   return(list(MCMC_obj = MCMC_obj, AR = AR))
 }
 
+update_hyper = function(MCMC_obj, MCMC_setting, i){
+  p = MCMC_setting$p
+  x_i = MCMC_setting$x_i
+  param_id = (p+1):(p + x_i[1] + x_i[2] + 1)
+  param = MCMC_obj$par[param_id]
+  hyper_scale = param[x_i[1] + x_i[2] + 1]
+  u = runif(1, - MCMC_setting$proposal$hyper_prop, MCMC_setting$proposal$hyper_prop)
+  hyper_scale_new = hyper_scale * exp(u)
+
+  param_new = param
+  param_new[x_i[1] + x_i[2] + 1] = hyper_scale_new
+  param_new[(x_i[2] + 1):(x_i[1] + x_i[2])] = exp(log(param_new[(x_i[2] + 1):(x_i[1] + x_i[2])]) *
+                                                      hyper_scale / hyper_scale_new)
+
+  prior_proposal_offset = dgamma(hyper_scale_new,MCMC_setting$prior$hyper_pr[1], MCMC_setting$prior$hyper_pr[2], log = T) -
+      dgamma(hyper_scale, MCMC_setting$prior$hyper_pr[1], MCMC_setting$prior$hyper_pr[2], log = T) + u
+
+  update_res = Update_Param(param_new, MCMC_obj$par[1:p],MCMC_setting$times, MCMC_obj$OriginTraj,
+                 MCMC_setting$x_r, MCMC_setting$x_i, MCMC_setting$Init, MCMC_setting$gridsize, MCMC_obj$coalLog, prior_proposal_offset,
+                 MCMC_setting$t_correct, model = MCMC_setting$model,
+                 volz = MCMC_setting$likelihood == "volz")
+
+  if(update_res$accept){
+      MCMC_obj$par[param_id] = param_new
+      MCMC_obj$FT = update_res$FT_new
+      MCMC_obj$Ode_Traj_coarse = update_res$Ode
+      MCMC_obj$betaN = update_res$betaN
+      MCMC_obj$coalLog = update_res$coalLog
+      MCMC_obj$LatentTraj = update_res$LatentTraj
+      MCMC_obj$LogHyper =  dgamma(hyper_scale_new,MCMC_setting$prior$hyper_pr[1], MCMC_setting$prior$hyper_pr[2], log = T)
+  }
+  return(list(MCMC_obj = MCMC_obj))
+}
+
+
 update_ChangePoint_ESlice = function(MCMC_obj, MCMC_setting,i){
   p = MCMC_setting$p
-  param_id = (p+1):(length(MCMC_obj$par))
+  param_id = (p+1):(p + MCMC_setting$x_i[1] + MCMC_setting$x_i[2]+1)
   param = MCMC_obj$par[param_id]
-  ESlice_Result = ESlice_change_points(c(param, MCMC_setting$prior$ch_pr), MCMC_obj$par[1:p],MCMC_setting$times, MCMC_obj$OriginTraj,
+  ESlice_Result = ESlice_change_points(param, MCMC_obj$par[1:p],MCMC_setting$times, MCMC_obj$OriginTraj,
                                        MCMC_setting$x_r, MCMC_setting$x_i, MCMC_setting$Init, MCMC_setting$gridsize, MCMC_obj$coalLog,
                                        MCMC_setting$t_correct, model = MCMC_setting$model,
                                        volz = MCMC_setting$likelihood == "volz")
@@ -379,7 +414,7 @@ updateTraj_general = function(MCMC_obj,MCMC_setting,i){
 
 
 MCMC_setup_general = function(coal_obs,times,t_correct,N,gridsize=50,niter = 1000,burn = 500,thin = 5, changetime,DEMS = c("E", "I"),
-                              prior=list(pop_pr=c(1,10), R0_pr=c(1,7), mu_pr = c(3,0.2), gamma_pr = c(3,0.2), ch_pr = 1),
+                              prior=list(pop_pr=c(1,10), R0_pr=c(1,7), mu_pr = c(3,0.2), gamma_pr = c(3,0.2), ch_pr = 1,hyper_pr=c(0.01,0.01)),
                               proposal = list(pop_prop = 1, R0_prop = c(0.01), mu_prop=0.1, gamma_prop = 0.2, ch_prop=0.05),
                               control = list(), likelihood = "volz", model = "SIR", Index = c(0,1), nparam = 2,PCOV = NULL){
 
@@ -409,23 +444,16 @@ MCMC_initialize_general = function(MCMC_setting){
   ########
   priorLog = numeric(MCMC_setting$p+MCMC_setting$x_i[2])
   while(is.nan(logMultiNorm)||is.nan(coalLog)){
-
-    # initialize the parameters
-    alpha = numeric(MCMC_setting$p)
-    if(is.null(MCMC_setting$control$alpha)){
-      alpha = numeric(MCMC_setting$p)
-      for(i in 1:MCMC_setting$p){
-        alpha[i] = exp(rnorm(1,MCMC_setting$prior$pop_pr[2 * i - 1],MCMC_setting$prior$pop_pr[2 * i]))
-      }
-    }else{
-      for(i in 1:MCMC_setting$p){
-        alpha[i] = MCMC_setting$control$alpha[i]
-      }
-    }
     state = numeric(MCMC_setting$p)
-    for(i in 1:MCMC_setting$p){
-      state[i] = MCMC_setting$x_r[1] * alpha[i]
-      priorLog[i] = dnorm(log(alpha[i]), MCMC_setting$prior$pop_pr[2 * i - 1],MCMC_setting$prior$pop_pr[2 * i],log = T)
+    state[1] = MCMC_setting$x_r[1]
+    for(i in 2:MCMC_setting$p){
+
+      if(is.null(MCMC_setting$control$alpha)){
+        state[i] = rlnorm(1, MCMC_setting$prior$pop_pr[2*i-3],MCMC_setting$prior$pop_pr[2 * i-2])
+      }else{
+        state[i] = MCMC_setting$control$alpha[i-1] * MCMC_setting$x_r[1]
+      }
+      priorLog[i] = dnorm(log(state[i]), MCMC_setting$prior$pop_pr[2 * i - 3],MCMC_setting$prior$pop_pr[2 * i - 2],log = T)
     }
 
     if(is.null(MCMC_setting$control$R0)){
@@ -451,18 +479,24 @@ MCMC_initialize_general = function(MCMC_setting){
     priorLog[MCMC_setting$p+MCMC_setting$x_i[4]+1] = dnorm(log(gamma),MCMC_setting$prior$gamma_pr[1],MCMC_setting$prior$gamma_pr[2],log = T)
 
     ch=c()
+    if(is.null(MCMC_setting$control$hyper)){
+      hyper = rgamma(1, MCMC_setting$prior$hyper_pr[1],MCMC_setting$prior$hyper_pr[1])
+    }else{
+      hyper = MCMC_setting$control$hyper
+    }
     if(length(MCMC_setting$x_r) > 1){
       if(is.null(MCMC_setting$control$ch)){
-        ch = rlnorm(MCMC_setting$x_i[1],0,MCMC_setting$chpr)
+        ch = rlnorm(MCMC_setting$x_i[1],0,1/hyper)
       }else{
         ch = MCMC_setting$control$ch
       }
     }
     if(MCMC_setting$model == "SEIR" || MCMC_setting$model == "SEIR2"){
-      param = c(R0,mu,gamma,ch,MCMC_setting$chpr)
+      param = c(R0,mu,gamma,ch,hyper)
     }else if(MCMC_setting$model == "SIR"){
-      param = c(R0, gamma,ch,MCMC_setting$chpr)
+      param = c(R0, gamma,ch,hyper)
     }
+
     paramlist = New_Param_List(param, state, MCMC_setting$gridsize, MCMC_setting$times, MCMC_setting$x_r,
                                MCMC_setting$x_i, model = MCMC_setting$model)
 
@@ -511,7 +545,7 @@ MCMC_initialize_general = function(MCMC_setting){
   chprob = 0
 
   for(i in 1:MCMC_setting$x_i[1]){
-    chprob = chprob + dnorm(log(param[MCMC_setting$x_i[2] + i]), 0, MCMC_setting$prior$ch_pr,log = T)
+    chprob = chprob + dnorm(log(param[MCMC_setting$x_i[2] + i]), 0, 1/hyper,log = T)
   }
   priorLog[MCMC_setting$p + MCMC_setting$x_i[2] +1] = chprob
   #LogGamma = dlnorm(gamma,MCMC_setting$prior$gamma_pr[1],MCMC_setting$prior$gamma_pr[2],log = T)
@@ -714,6 +748,8 @@ update_All_general_NC_Adaptive = function(MCMC_obj, MCMC_setting, i, beta = 0.95
 }
 
 
+
+
 General_MCMC = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000, burn = 0, thin = 5,changetime,DEMS=c("S","I"),
                         prior=list(pop_pr=c(1,10,1,10), R0_pr=c(1,7), mu_pr = c(3,0.2), gamma_pr = c(3,0.2), ch_pr = 1),
                         proposal = list(pop_prop = 1, R0_prop = c(0.01), mu_prop=0.1, gamma_prop = 0.2, ch_prop=0.05),
@@ -744,7 +780,8 @@ General_MCMC = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000, 
   l2 = l
   l3 = l
   l0 = l
-  tjs = NULL
+  tjs = array(dim = c(dim(MCMC_obj$LatentTraj),niter))
+
   for (i in 1:MCMC_setting$niter) {
     if (i %% 100 == 0) {
       print(i)
@@ -758,7 +795,6 @@ General_MCMC = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000, 
     ARvec = numeric(dim(ARMS)[2])
       if(updateVec[1] == 1){
         step1 = updateAlphas_General(MCMC_obj,MCMC_setting,i)
-        # print(c(MCMC_obj$coalLog,MCMC_obj$logMultiNorm))
         MCMC_obj = step1$MCMC_obj
         ARvec[1] = step1$AR
       }
@@ -796,10 +832,11 @@ General_MCMC = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000, 
         #MCMC_obj = update_ChangePoint_general_NC(MCMC_obj,MCMC_setting,i)$MCMC_obj
         MCMC_obj = update_ChangePoint_ESlice(MCMC_obj,MCMC_setting,i)
       }
+      if(updateVec[7] == 1){
+        MCMC_obj = update_hyper(MCMC_obj, MCMC_setting, i)$MCMC_obj
+      }
     }else{
-      #step2 = update_All_general_NC(MCMC_obj,MCMC_setting,i)
-      #MCMC_obj = step2$MCMC_obj
-      #ARvec[2] = step2$AR
+
       step2 = updateR0gamma_general_NC(MCMC_obj, MCMC_setting, i)
       MCMC_obj = step2$MCMC_obj
       ARvec[2] = step2$AR
@@ -828,7 +865,8 @@ General_MCMC = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000, 
     #ARvec[8] = step4$AR
     #MCMC_obj = step4$MCMC_obj
     ARMS[i,] = ARvec
-    tjs = abind(tjs,MCMC_obj$LatentTraj,along = 3)
+    #tjs = abind(tjs,MCMC_obj$LatentTraj,along = 3)
+    tjs[,,i] = MCMC_obj$LetentTra
     params[i,] = MCMC_obj$par
     l[i] =  MCMC_obj$priorLog[MCMC_obj$p + MCMC_setting$x_i[4] + 1] #+ MCMC_obj$LogAlpha1 + MCMC_obj$LogAlpha2
     l1[i] = MCMC_obj$coalLog

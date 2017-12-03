@@ -132,6 +132,26 @@ volz_loglik_nh2 <- function(init, f1, betaN, t_correct, index, transX = "standar
     .Call('_LNAPhyloDyn_volz_loglik_nh2', PACKAGE = 'LNAPhyloDyn', init, f1, betaN, t_correct, index, transX)
 }
 
+Ode_Coarse_Slicer <- function(Ode_thin, gridsize) {
+    .Call('_LNAPhyloDyn_Ode_Coarse_Slicer', PACKAGE = 'LNAPhyloDyn', Ode_thin, gridsize)
+}
+
+New_Param_List <- function(param, initial, gridsize, t, x_r, x_i, transP = "changepoint", model = "SIR", transX = "standard") {
+    .Call('_LNAPhyloDyn_New_Param_List', PACKAGE = 'LNAPhyloDyn', param, initial, gridsize, t, x_r, x_i, transP, model, transX)
+}
+
+Update_Param <- function(param, initial, t, OriginTraj, x_r, x_i, init, gridsize, coal_log = 0, prior_proposal_offset = 0, t_correct = 0, transP = "changepoint", model = "SIR", transX = "standard", volz = TRUE) {
+    .Call('_LNAPhyloDyn_Update_Param', PACKAGE = 'LNAPhyloDyn', param, initial, t, OriginTraj, x_r, x_i, init, gridsize, coal_log, prior_proposal_offset, t_correct, transP, model, transX, volz)
+}
+
+Param_Slice_update <- function(param, x_r, x_i, theta, newChs, rho = 1) {
+    .Call('_LNAPhyloDyn_Param_Slice_update', PACKAGE = 'LNAPhyloDyn', param, x_r, x_i, theta, newChs, rho)
+}
+
+ESlice_change_points <- function(param, initial, t, OriginTraj, x_r, x_i, init, gridsize, coal_log = 0, t_correct = 0, transP = "changepoint", model = "SIR", transX = "standard", volz = TRUE) {
+    .Call('_LNAPhyloDyn_ESlice_change_points', PACKAGE = 'LNAPhyloDyn', param, initial, t, OriginTraj, x_r, x_i, init, gridsize, coal_log, t_correct, transP, model, transX, volz)
+}
+
 ESlice_general_NC <- function(f_cur, OdeTraj, FTs, state, init, betaN, t_correct, lambda = 10, coal_log = 0, gridsize = 100L, volz = FALSE, model = "SIR", transX = "standard") {
     .Call('_LNAPhyloDyn_ESlice_general_NC', PACKAGE = 'LNAPhyloDyn', f_cur, OdeTraj, FTs, state, init, betaN, t_correct, lambda, coal_log, gridsize, volz, model, transX)
 }
@@ -144,8 +164,8 @@ InitializeMCMC <- function(initial, param, lambda, ode_traj_coarse, trajectory, 
     invisible(.Call('_LNAPhyloDyn_InitializeMCMC', PACKAGE = 'LNAPhyloDyn', initial, param, lambda, ode_traj_coarse, trajectory, ft, coal_log, traj_log, param_log))
 }
 
-InitializeData <- function(init, times, t_correct, x_r, x_i, gridset, gridsize, model = "SIR", transP = "changepoint", transX = "standard") {
-    invisible(.Call('_LNAPhyloDyn_InitializeData', PACKAGE = 'LNAPhyloDyn', init, times, t_correct, x_r, x_i, gridset, gridsize, model, transP, transX))
+InitializeData <- function(init, times, t_correct, p, x_r, x_i, gridset, gridsize, model = "SIR", transP = "changepoint", transX = "standard") {
+    invisible(.Call('_LNAPhyloDyn_InitializeData', PACKAGE = 'LNAPhyloDyn', init, times, t_correct, p, x_r, x_i, gridset, gridsize, model, transP, transX))
 }
 
 betaf <- function(t, param, x_r, x_i) {

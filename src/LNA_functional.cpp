@@ -589,7 +589,7 @@ List KF_param_chol(arma::mat OdeTraj, arma::vec param,int gridsize,arma::vec x_r
     List tempres = SigmaF(Traj_part,param,x_r,x_i,transP, model, transX);
     // Rcout<< tempres<<endl;
     Acube.slice(i) = as<arma::mat>(tempres[0]);
-    Lcube.slice(i) = arma::chol(as<arma::mat>(tempres[1]) + 0.0000000000001 * arma::diagmat(ones(p))).t();
+    Lcube.slice(i) = arma::chol(as<arma::mat>(tempres[1]) + 0.00000001 * arma::diagmat(ones(p))).t();
   }
   List Res;
   Res["A"] = Acube;
@@ -1113,6 +1113,39 @@ List New_Param_List(arma::vec param, arma::vec initial, int gridsize, arma::vec 
   return result;
 }
 
+
+//[[Rcpp::export()]]
+List Update_Param(arma::vec param, arma::vec initial, arma::vec t, arma::mat OriginTraj,
+                  arma::vec x_r, arma::ivec x_i, List init, int gridsize,
+                  double coal_log=0, double prior_proposal_offset = 0, double t_correct = 0, std::string transP = "changepoint",
+                  std::string model = "SIR", std::string transX = "standard", bool volz = true){
+
+  arma::mat OdeTraj_thin = ODE_rk45(initial,t, param,
+                                    x_r, x_i, transP, model, transX);
+
+  List FT_new = KF_param_chol(OdeTraj_thin, param, gridsize, x_r, x_i, transP, model, transX);
+
+  arma::mat Ode_Coarse = Ode_Coarse_Slicer(OdeTraj_thin, gridsize);
+  arma::vec betaNs = betaTs(param,Ode_Coarse.col(0),x_r, x_i);
+
+  arma::mat NewTraj = TransformTraj(Ode_Coarse, OriginTraj, FT_new);
+  double coal_log_new = volz_loglik_nh2(init, NewTraj,betaNs, t_correct, x_i.subvec(2,3) ,transX);
+
+  double a = coal_log_new - coal_log + prior_proposal_offset;
+  List Result;
+  if(log(R::runif(0,1)) < a){
+    Result["accept"] = true;
+    Result["FT"] = FT_new;
+    Result["Ode"] = Ode_Coarse;
+    Result["betaN"] = betaNs;
+    Result["coalLog"] = coal_log_new;
+    Result["LatentTraj"] = NewTraj;
+  }else{
+    Result["accept"] = false;
+  }
+  return Result;
+}
+
 //[[Rcpp::export()]]
 arma::vec Param_Slice_update(arma::vec param, arma::vec x_r, arma::ivec x_i, double theta, arma::vec newChs, double rho = 1){
 
@@ -1146,7 +1179,7 @@ List ESlice_change_points(arma::vec param, arma::vec initial, arma::vec t, arma:
   double theta_min = theta - 2*pi;
   double theta_max = theta;
 
-  arma::vec newChs = arma::randn(nch,1) * param(x_i(0) + x_i(1));
+  arma::vec newChs = arma::randn(nch,1) / param(x_i(0) + x_i(1));
   arma::vec param_new = Param_Slice_update(param, x_r, x_i, theta, newChs);
 
   List param_list = New_Param_List(param_new, initial, gridsize, t, x_r, x_i,
@@ -1200,6 +1233,9 @@ List ESlice_change_points(arma::vec param, arma::vec initial, arma::vec t, arma:
   result["CoalLog"] = loglike;
   return result;
 }
+
+
+
 
 //[[Rcpp::export()]]
 List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,

@@ -430,48 +430,7 @@ update_ChangePoint_general_NC = function(MCMC_obj, MCMC_setting, i){
 ################
 
 
-updateTraj_general_NC = function(MCMC_obj,MCMC_setting,i){
 
-  if(MCMC_setting$likelihood == "structural"){
-    Res = ESlice_general_NC_Structural(MCMC_obj$OriginTraj, MCMC_obj$Ode_Traj_coarse,
-                                     MCMC_obj$FT, MCMC_setting$Init_Detail,
-                                     MCMC_obj$par[(MCMC_obj$p+1):(MCMC_obj$p + MCMC_setting$x_i[1] + MCMC_setting$x_i[2])],
-                                     MCMC_setting$x_r, MCMC_setting$x_i,
-                                     coal_log = MCMC_obj$coalLog,
-                                     model = MCMC_setting$model)
-    MCMC_obj$coalLog = Res$CoalLog
-  }else{
-
-    Res = ESlice_general_NC(MCMC_obj$OriginTraj,MCMC_obj$Ode_Traj_coarse,
-                            MCMC_obj$FT, MCMC_obj$par[1:MCMC_obj$p], MCMC_setting$Init,
-                            betaN = betaTs(MCMC_obj$par[(MCMC_obj$p+1):(MCMC_setting$x_i[1]+MCMC_setting$x_i[2]+MCMC_obj$p)],MCMC_obj$LatentTraj[,1], MCMC_setting$x_r,MCMC_setting$x_i),
-                            MCMC_setting$t_correct,lambda = 1,
-                            coal_log = MCMC_obj$coalLog, MCMC_setting$gridsize,
-                            volz = (MCMC_setting$likelihood == "volz"), model = MCMC_setting$model)
-
-   # MCMC_obj$LatentTraj =  Res$LatentTraj
-    #MCMC_obj$OriginTraj = Res$OriginTraj
-    #MCMC_obj$logOrigin = Res$logOrigin
-    if(MCMC_setting$likelihood == "volz"){
-      MCMC_obj$coalLog = volz_loglik_nh2(MCMC_setting$Init, Res$LatentTraj,
-                                         betaTs(MCMC_obj$par[(MCMC_obj$p+1):(MCMC_setting$x_i[1]+MCMC_setting$x_i[2]+MCMC_obj$p)],MCMC_obj$LatentTraj[,1], MCMC_setting$x_r,MCMC_setting$x_i),
-                                         MCMC_setting$t_correct,
-                                         index = MCMC_setting$x_i[3:4])
-    }else{
-      MCMC_obj$coalLog = coal_loglik(MCMC_setting$Init,LogTraj(Res$LatentTraj ),MCMC_setting$t_correct,
-                                     MCMC_obj$par[5],MCMC_setting$gridsize)
-    }
-  }
-
-
-
-  MCMC_obj$LatentTraj = Res$LatentTraj
-  MCMC_obj$OriginTraj = Res$OriginTraj
-  MCMC_obj$logOrigin = Res$logOrigin
-
-
-  return(list(MCMC_obj = MCMC_obj))
-}
 
 
 
