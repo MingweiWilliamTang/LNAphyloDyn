@@ -25,7 +25,6 @@ Imports:
     graphics,
     stats,
     BH,
-    phydynR,
     MASS
 RoxygenNote: 5.0.1
 VignetteBuilder: knitr
