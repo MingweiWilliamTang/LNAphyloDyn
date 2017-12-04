@@ -333,6 +333,10 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
   priorId = which(updateVec[c(1:4,7)] == 1)
   proposeId = which(updateVec[c(1:4,7)] == 1)
 
+  print(paste("parameter ID", parId))
+  print(paste("logId", logId))
+  print(paste("priorId", priorId))
+  print(paste("proposeId", proposeId))
   for (i in 1:MCMC_setting$niter) {
     if (i %% 100 == 0 && verbose == T) {
       print(i)
@@ -355,15 +359,22 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
 
     if(i < options$burn1){
 
-      MCMC_obj = Update_Param_each(MCMC_obj, MCMC_setting, options$parIdlist[-3],
-                                   options$isLoglist[-3], options$priorIdlist[-3],options$priorIdlist[-3])$MCMC_obj
+      #MCMC_obj = update_Param_joint(MCMC_obj, MCMC_setting, method = "jointProp", parId, logId, priorId, proposeId)$MCMC_obj
+      MCMC_obj = Update_Param_each(MCMC_obj, MCMC_setting, options$parIdlist[-4],
+                                   options$isLoglist[-4], options$priorIdlist[-4],options$priorIdlist[-4])$MCMC_obj
 
       if(updateVec[6] == 1){
         #MCMC_obj = update_ChangePoint_general_NC(MCMC_obj,MCMC_setting,i)$MCMC_obj
-        MCMC_obj = update_ChangePoint_ESlice(MCMC_obj,MCMC_setting,i)
+        MCMC_obj = tryCatch({update_ChangePoint_ESlice(MCMC_obj,MCMC_setting,i)},
+                            error = function(cond){
+                              message(cond)
+                              # Choose a return value in case of error
+                              return(MCMC_obj)
+                            })
       }
 
     }else{
+      #MCMC_obj = update_Param_joint(MCMC_obj, MCMC_setting, method = "jointProp", parId, logId, priorId, proposeId)$MCMC_obj
 
       #MCMC_obj = update_Param_joint(MCMC_obj, MCMC_setting, method = "jointProp", parId = unlist(options$parIdlist),
        #                             unlist(options$isLoglist), unlist(options$priorIdlist), unlist(options$priorIdlist))$MCMC_obj
@@ -374,10 +385,20 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
 
       if(updateVec[6] == 1){
         #MCMC_obj = update_ChangePoint_general_NC(MCMC_obj,MCMC_setting,i)$MCMC_obj
-        MCMC_obj = update_ChangePoint_ESlice(MCMC_obj,MCMC_setting,i)
+        MCMC_obj = tryCatch({update_ChangePoint_ESlice(MCMC_obj,MCMC_setting,i)},
+                            error = function(cond){
+                              message(cond)
+                              # Choose a return value in case of error
+                              return(MCMC_obj)
+                            })
       }
       if(updateVec[7] == 1){
-        MCMC_obj = updateTraj_general_NC(MCMC_obj,MCMC_setting,i)$MCMC_obj
+        MCMC_obj = tryCatch({updateTraj_general_NC(MCMC_obj,MCMC_setting,i)$MCMC_obj},
+                            error = function(cond){
+                              message(cond)
+                              # Choose a return value in case of error
+                              return(MCMC_obj)
+                            })
       }
     }
 
@@ -389,3 +410,4 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
   }
   return(list(par = params,Trajectory = tjs,l=l,l1=l1,l2 = l2))
 }
+

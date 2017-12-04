@@ -9,6 +9,7 @@ typedef arma::mat (*F_fun)(arma::vec, arma::vec, std::string);
 typedef arma::vec (*h_fun)(arma::vec, arma::vec, std::string);
 */
 #include "LNA_functional.h"
+#include<stdexcept>
 /*
  *
  * Generate a vector of beta corresponds to each time grid
@@ -589,7 +590,12 @@ List KF_param_chol(arma::mat OdeTraj, arma::vec param,int gridsize,arma::vec x_r
     List tempres = SigmaF(Traj_part,param,x_r,x_i,transP, model, transX);
     // Rcout<< tempres<<endl;
     Acube.slice(i) = as<arma::mat>(tempres[0]);
-    Lcube.slice(i) = arma::chol(as<arma::mat>(tempres[1]) + 0.00000001 * arma::diagmat(ones(p))).t();
+    try{
+      Lcube.slice(i) = arma::chol(as<arma::mat>(tempres[1]) + 0.00000001 * arma::diagmat(ones(p))).t();
+    }catch(...){
+      Rcout << as<arma::mat>(tempres[1]) << endl;
+      throw std::invalid_argument("Invalid input for cholesky decomposition.");
+    }
   }
   List Res;
   Res["A"] = Acube;
@@ -1256,6 +1262,10 @@ List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec s
 
     arma::mat v_traj = arma::randn(f_cur.n_rows, f_cur.n_cols);
     double u = R::runif(0,1);
+    if(log(u) < -500){
+      Rcout << "really small u" << endl;
+      Rcout << u << endl;
+    }
     //  if(funname == "standard"){
     // logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
     if(coal_log != 0){
@@ -1399,11 +1409,6 @@ arma::mat ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::ve
     f_cur = newTraj;
   return newTraj;
 }
-
-
-
-
-
 
 
 
