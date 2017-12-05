@@ -490,3 +490,14 @@ colik.fgy <- function (bdt, tfgy, timeOfOriginBoundaryCondition = TRUE,
 
   return(ll)
 }
+
+
+
+
+TruncTree_Fun = function(bigTree, date){
+  cutID = sapply(bigTree$tip.label, function(x){
+    a = strsplit(x,"[|\']")[[1]][7]
+    return(as.Date(a) < as.Date(date))
+  })
+  return(drop.tip(bigTree, bigTree$tip.label[!cutID],subtree = F))
+}

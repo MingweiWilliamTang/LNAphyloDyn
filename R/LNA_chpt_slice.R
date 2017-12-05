@@ -287,7 +287,7 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
                          prior=list(pop_pr=c(1,1,1,10), R0_pr=c(1,7), mu_pr = c(3,0.2), gamma_pr = c(3,0.2), hyper_pr = c(0.001,0.001)),
                          proposal = list(pop_prop = 0.5, R0_prop = c(0.01), mu_prop=0.1, gamma_prop = 0.2, hyper_prop=0.05),
                          control = list(), updateVec = c(1,1,1,1,1,1,1), likelihood = "volz",model = "SIR",
-                         Index = c(0,2), nparam=2, options = list(joint = F, PCOV = NULL,beta = 0.05, burn1 = 5000, parIdlist = NULL, priorIdlist = NULL), verbose = T){
+                         Index = c(0,2), nparam=2, method = "seq",options = list(joint = F, PCOV = NULL,beta = 0.05, burn1 = 5000, parIdlist = NULL, priorIdlist = NULL), verbose = T){
 
   MCMC_setting = MCMC_setup_general(coal_obs, times,t_correct,N,gridsize,niter,burn,
                                     thin,changetime, DEMS,prior,proposal,
@@ -328,16 +328,20 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
   logIndexAll = c(1,0,1,0)
   parIndexALL = c(p:(p + MCMC_setting$x_i[2]), nparam+p)
 
-  parId = parIndexALL[updateVec[c(1:3,7)] == 1]
-  logId = logIndexAll[updateVec[c(1:3,7)] == 1]
-  priorId = which(updateVec[c(1:4,7)] == 1)
-  proposeId = which(updateVec[c(1:4,7)] == 1)
+  parId = parIndexALL[updateVec[c(1:3,5)] == 1]
+  logId = logIndexAll[updateVec[c(1:3,5)] == 1]
+  priorId = which(updateVec[c(1:4,5)] == 1)
+  proposeId = which(updateVec[c(1:4,5)] == 1)
 
   print(paste("parameter ID", parId))
   print(paste("logId", logId))
   print(paste("priorId", priorId))
   print(paste("proposeId", proposeId))
+  print("Warming up")
   for (i in 1:MCMC_setting$niter) {
+    if(i %% 10000 == 0){
+      print(i)
+    }
     if (i %% 100 == 0 && verbose == T) {
       print(i)
       print(MCMC_obj$par)
@@ -348,21 +352,32 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
       lines(MCMC_obj$Ode_Traj_coarse[,1],MCMC_obj$Ode_Traj_coarse[, MCMC_setting$x_i[4] + 2],col="red",lty=2)
     }
 
-  #  if(i == options$burn1){
-  #    idx = floor(options$burn1/2) : (options$burn1-1)
-  #    SigmaN = (2.38^2) * cov(cbind(params[idx,MCMC_obj$p + MCMC_setting$x_i[3] + 1],
-   #                                 log(params[idx,MCMC_obj$p + MCMC_setting$x_i[4] + 1])))/2
-
-#      MCMC_setting$PCOV = beta * SigmaN + (1 - beta) * diag(rep(1,2)) * 0.01 / 2
-#    }
-
+   if(i == options$burn1){
+      print("end warm up phase")
+      idx = floor(options$burn1/2) : (options$burn1-1)
+      if(!is.null(MCMC_setting$PCOV)){
+        SigmaN = NULL
+        for(i in 1:length(parId)){
+          if(logId[i] == 1){
+          SigmaN = cbind(SigmaN, log(params[idx,parId[i]]))
+          }else{
+            SigmaN = cbind(SigmaN, params[idx, parId[i]])
+          }
+        }
+        SigmaN = (2.38^2) * cov(SigmaN) / length(parId)
+        MCMC_setting$PCOV = options$beta * SigmaN + (1 - options$beta) * diag(rep(1,length(parId))) * 0.01 / length(parId)
+      }
+      print(MCMC_setting$PCOV)
+    }
 
     if(i < options$burn1){
 
-      #MCMC_obj = update_Param_joint(MCMC_obj, MCMC_setting, method = "jointProp", parId, logId, priorId, proposeId)$MCMC_obj
-      MCMC_obj = Update_Param_each(MCMC_obj, MCMC_setting, options$parIdlist[-4],
-                                   options$isLoglist[-4], options$priorIdlist[-4],options$priorIdlist[-4])$MCMC_obj
-
+     # if(method == "seq"){
+        MCMC_obj = Update_Param_each(MCMC_obj, MCMC_setting, options$parIdlist[-4],
+                                     options$isLoglist[-4], options$priorIdlist[-4],options$priorIdlist[-4])$MCMC_obj
+      #}else{
+      #  MCMC_obj = update_Param_joint(MCMC_obj, MCMC_setting, method = "jointProp", parId, logId, priorId, proposeId)$MCMC_obj
+      #}
       if(updateVec[6] == 1){
         #MCMC_obj = update_ChangePoint_general_NC(MCMC_obj,MCMC_setting,i)$MCMC_obj
         MCMC_obj = tryCatch({update_ChangePoint_ESlice(MCMC_obj,MCMC_setting,i)},
@@ -372,14 +387,16 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
                               return(MCMC_obj)
                             })
       }
-
     }else{
-      #MCMC_obj = update_Param_joint(MCMC_obj, MCMC_setting, method = "jointProp", parId, logId, priorId, proposeId)$MCMC_obj
 
       #MCMC_obj = update_Param_joint(MCMC_obj, MCMC_setting, method = "jointProp", parId = unlist(options$parIdlist),
        #                             unlist(options$isLoglist), unlist(options$priorIdlist), unlist(options$priorIdlist))$MCMC_obj
-      MCMC_obj = Update_Param_each(MCMC_obj, MCMC_setting, options$parIdlist,
-                                   options$isLoglist, options$priorIdlist,options$priorIdlist)$MCMC_obj
+      if(method == "seq"){
+        MCMC_obj = Update_Param_each(MCMC_obj, MCMC_setting, options$parIdlist,
+                                     options$isLoglist, options$priorIdlist,options$priorIdlist)$MCMC_obj
+      }else{
+        MCMC_obj = update_Param_joint(MCMC_obj, MCMC_setting, method, parId, logId, priorId, proposeId)$MCMC_obj
+      }
 
 
 
