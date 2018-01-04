@@ -76,6 +76,10 @@ ODE_rk45 <- function(initial, t, param, x_r, x_i, transP = "changepoint", model 
     .Call('_LNAPhyloDyn_ODE_rk45', PACKAGE = 'LNAPhyloDyn', initial, t, param, x_r, x_i, transP, model, transX)
 }
 
+ODE_rk45_stop <- function(initial, t, param, x_r, x_i, transP = "changepoint", model = "SIR", transX = "standard", tol = 5) {
+    .Call('_LNAPhyloDyn_ODE_rk45_stop', PACKAGE = 'LNAPhyloDyn', initial, t, param, x_r, x_i, transP, model, transX, tol)
+}
+
 SigmaF <- function(Traj_par, param, x_r, x_i, transP = "changepoint", model = "SIR", transX = "standard") {
     .Call('_LNAPhyloDyn_SigmaF', PACKAGE = 'LNAPhyloDyn', Traj_par, param, x_r, x_i, transP, model, transX)
 }

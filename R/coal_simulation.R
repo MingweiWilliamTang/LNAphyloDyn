@@ -501,3 +501,25 @@ TruncTree_Fun = function(bigTree, date){
   })
   return(drop.tip(bigTree, bigTree$tip.label[!cutID],subtree = F))
 }
+
+
+forwardSimulateODE_RST_core = function(param, LatentTraj, x_r, x_i, p, dt, Ngrid, beginning = F, tol=5){
+  R_tstart = param[p + x_i[3] + 1] * prod(param[(p + x_i[2] + 1):(p+x_i[2]+x_i[1])])
+  if(R_tstart > 0.999){
+    return(Inf)
+  }
+
+  if(is.matrix(LatentTraj)){
+    X1 = tail.matrix(LatentTraj,n=1)
+  }else{
+  X1 = LatentTraj
+  }
+
+  if(beginning == T){
+    t = seq(LatentTraj[1,1], X1[1] + dt * Ngrid, by=dt)
+    return(ODE_rk45_stop(X1[-1], t, param[-(1:p)], x_r, x_i, tol = tol));
+  }else{
+    t = seq(X1[1],X1[1] + dt * Ngrid, by=dt)
+    return(ODE_rk45_stop(X1[-1], t, param[-(1:p)], x_r, x_i, tol = tol));
+  }
+}

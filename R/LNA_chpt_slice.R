@@ -279,6 +279,25 @@ updateTraj_general_NC = function(MCMC_obj,MCMC_setting,i){
 }
 
 
+
+update_ChangePoint_ESlice = function(MCMC_obj, MCMC_setting,i){
+  p = MCMC_setting$p
+  param_id = (p+1):(p + MCMC_setting$x_i[1] + MCMC_setting$x_i[2]+1)
+  param = MCMC_obj$par[param_id]
+  ESlice_Result = ESlice_change_points(param, MCMC_obj$par[1:p],MCMC_setting$times, MCMC_obj$OriginTraj,
+                                       MCMC_setting$x_r, MCMC_setting$x_i, MCMC_setting$Init, MCMC_setting$gridsize, MCMC_obj$coalLog,
+                                       MCMC_setting$t_correct, model = MCMC_setting$model,
+                                       volz = MCMC_setting$likelihood == "volz")
+
+  MCMC_obj$par[param_id] = ESlice_Result$param[1:length(param_id)]
+  MCMC_obj$LatentTraj = ESlice_Result$LatentTraj
+  MCMC_obj$betaN = ESlice_Result$betaN
+  MCMC_obj$FT = ESlice_Result$FT
+  MCMC_obj$coalLog = ESlice_Result$CoalLog
+  MCMC_obj$Ode_Traj_coarse = ESlice_Result$OdeTraj
+  return(MCMC_obj)
+}
+
 #'
 #'
 #' nparam number of parameters in infectious disease model

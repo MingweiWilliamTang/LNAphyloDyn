@@ -251,6 +251,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// ODE_rk45_stop
+double ODE_rk45_stop(arma::vec initial, arma::vec t, arma::vec param, arma::vec x_r, arma::ivec x_i, std::string transP, std::string model, std::string transX, double tol);
+RcppExport SEXP _LNAPhyloDyn_ODE_rk45_stop(SEXP initialSEXP, SEXP tSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP, SEXP tolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type initial(initialSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type t(tSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type param(paramSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type x_r(x_rSEXP);
+    Rcpp::traits::input_parameter< arma::ivec >::type x_i(x_iSEXP);
+    Rcpp::traits::input_parameter< std::string >::type transP(transPSEXP);
+    Rcpp::traits::input_parameter< std::string >::type model(modelSEXP);
+    Rcpp::traits::input_parameter< std::string >::type transX(transXSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(ODE_rk45_stop(initial, t, param, x_r, x_i, transP, model, transX, tol));
+    return rcpp_result_gen;
+END_RCPP
+}
 // SigmaF
 List SigmaF(arma::mat Traj_par, arma::vec param, arma::vec x_r, arma::ivec x_i, std::string transP, std::string model, std::string transX);
 RcppExport SEXP _LNAPhyloDyn_SigmaF(SEXP Traj_parSEXP, SEXP paramSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP) {
@@ -1708,6 +1727,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LNAPhyloDyn_SEIR2_h", (DL_FUNC) &_LNAPhyloDyn_SEIR2_h, 3},
     {"_LNAPhyloDyn_SEIR_h", (DL_FUNC) &_LNAPhyloDyn_SEIR_h, 3},
     {"_LNAPhyloDyn_ODE_rk45", (DL_FUNC) &_LNAPhyloDyn_ODE_rk45, 8},
+    {"_LNAPhyloDyn_ODE_rk45_stop", (DL_FUNC) &_LNAPhyloDyn_ODE_rk45_stop, 9},
     {"_LNAPhyloDyn_SigmaF", (DL_FUNC) &_LNAPhyloDyn_SigmaF, 7},
     {"_LNAPhyloDyn_KF_param", (DL_FUNC) &_LNAPhyloDyn_KF_param, 8},
     {"_LNAPhyloDyn_KF_param_chol", (DL_FUNC) &_LNAPhyloDyn_KF_param_chol, 8},

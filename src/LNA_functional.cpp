@@ -491,6 +491,47 @@ arma::mat ODE_rk45(arma::vec initial, arma::vec t, arma::vec param,
 
 
 //[[Rcpp::export()]]
+double ODE_rk45_stop(arma::vec initial, arma::vec t, arma::vec param,
+                   arma::vec x_r, arma::ivec x_i,
+                   std::string transP = "changepoint",std::string model = "SIR",
+                   std::string transX = "standard", double tol = 5){
+  // XPtr<ODEfuncPtr> SIR_ODEfun = putFunPtrInXPtr(funname);
+  //double N = initial[0] + initial[1] + initial[2];
+
+  /*
+  * example:
+  *
+  traj0 = ODE_rk45(c(10,10),seq(0,1.5,0.01),c(1.5,40,33,0.6),c(975000,0.6),c(1,3,0,2),model = "SEIR2")
+  traj = ODE_rk45(c(10,10),seq(0,1.5,0.01),c(1.5,40,33,0.6),c(1000000,0.6),c(1,3,0,2),model = "SEIR2")
+  traj2 = ODE_rk45(c(1000000,10,10),seq(0,1.5,0.01),c(1.5,40,33,0.6),c(1000000,0.6),c(1,3,0,2),model = "SEIR")
+  plot(traj[,1],traj[,2],col = "red")
+  lines(traj0[,1],traj0[,2],col = "blue")
+  lines(traj2[,1],traj2[,3], col = "green")
+  *
+  */
+  int n = t.n_rows;
+  double dt = t[1] - t[0];
+  arma::vec X0 = initial, k1=initial, k2=initial, k3=initial, k4=initial,X1=initial;
+  XPtr<ODE_fun> ODE_one = ODE_fun_Ptr(model);
+  int i = 1;
+  for(; i < n; i++){
+    X0 = X1;
+    k1 = (*ODE_one)(X0,param,t[i-1], x_r,x_i,transP, transX);
+    k2 = (*ODE_one)(X0 + k1 * dt / 2,param, t[i-1], x_r,x_i,transP, transX);
+    k3 = (*ODE_one)(X0 + k2 * dt / 2,param, t[i-1], x_r,x_i,transP, transX);
+    k4 = (*ODE_one)(X0 + k3 * dt / 2,param, t[i-1], x_r,x_i,transP, transX);
+    X1 = X0 + (k1/6 + k2/3 + k3/3 + k4/6) * dt;
+    if(X1(x_i(3)) < tol){
+      return t[i];
+    }
+  }
+  return t[i-1]+0.1;
+}
+
+
+
+
+//[[Rcpp::export()]]
 List SigmaF(arma::mat Traj_par,arma::vec param,
                   arma::vec x_r, arma::ivec x_i,
                   std::string transP = "changepoint", std::string model = "SIR",std::string transX = "standard"){
@@ -594,6 +635,13 @@ List KF_param_chol(arma::mat OdeTraj, arma::vec param,int gridsize,arma::vec x_r
       Lcube.slice(i) = arma::chol(as<arma::mat>(tempres[1]) + 0.00000001 * arma::diagmat(ones(p))).t();
     }catch(...){
       Rcout << as<arma::mat>(tempres[1]) << endl;
+      Rcout << i << endl;
+      Rcout << param << endl;
+      Rcout << "###" << endl;
+      Rcout << OdeTraj << endl;
+      Rcout << "###" << endl;
+      Rcout << x_r << endl;
+      Rcout << x_i << endl;
       throw std::invalid_argument("Invalid input for cholesky decomposition.");
     }
   }
@@ -1262,7 +1310,7 @@ List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec s
 
     arma::mat v_traj = arma::randn(f_cur.n_rows, f_cur.n_cols);
     double u = R::runif(0,1);
-    if(log(u) < -500){
+    if(log(u) < -25){
       Rcout << "really small u" << endl;
       Rcout << u << endl;
     }
