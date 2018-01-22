@@ -523,3 +523,15 @@ forwardSimulateODE_RST_core = function(param, LatentTraj, x_r, x_i, p, dt, Ngrid
     return(ODE_rk45_stop(X1[-1], t, param[-(1:p)], x_r, x_i, tol = tol));
   }
 }
+
+
+############
+SigmaFirst2 = function(n,mu = 0.0001){
+  return(exp(mean(log(c(1:(n))))))
+}
+
+tauDist = function(a,b,dt){
+  return(qgamma(a,b))
+}
+
+

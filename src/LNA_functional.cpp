@@ -1227,6 +1227,12 @@ List ESlice_change_points(arma::vec param, arma::vec initial, arma::vec t, arma:
 
   //param.subvec(x_i(1),x_i(1) + x_i(0) - 1)
   double u = R::runif(0,1);
+
+  if(log(u) < -25){
+    Rcout << "really small u" << endl;
+    Rcout << u << endl;
+  }
+
   double logy = coal_log + log(u);
 
   double theta = R::runif(0,2*pi);
@@ -1253,9 +1259,18 @@ List ESlice_change_points(arma::vec param, arma::vec initial, arma::vec t, arma:
     i += 1;
 
     if(i>20){
+      theta = 0;
       NewTraj = TransformTraj(OdeTraj_new, OriginTraj, FT_new);
       loglike = volz_loglik_nh2(init, NewTraj,betaN,t_correct,Index ,transX);
 
+      param_new = Param_Slice_update(param, x_r, x_i, theta, newChs);
+
+      param_list = New_Param_List(param_new, initial, gridsize, t, x_r, x_i,
+                                  transP, model, transX);
+
+      FT_new = as<Rcpp::List>(param_list[0]);
+      betaN = as<arma::vec>(param_list[2]);
+      OdeTraj_new  = as<arma::mat>(param_list[1]);
       break;
     }
     if(theta < 0){
@@ -1347,7 +1362,8 @@ List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec s
         newTraj = TransformTraj(OdeTraj,f_cur, FTs);
         loglike = volz_loglik_nh2(init, newTraj,betaN,t_correct,Index ,transX);
         f_prime = f_cur;
-        Rcout<<"theta = "<<theta<<endl;
+        Rcout << "theta = "<< theta << endl;
+        Rcout << "differ1 =" << coal_log - loglike << endl;
         break;
       }
       if(theta < 0){

@@ -23,7 +23,6 @@ update_Param_joint = function(MCMC_obj, MCMC_setting, method = "admcmc", parId, 
     RawTransParam[isLog == 1] = log(RawTransParam[isLog == 1])
     RawTransParam_new = mvrnorm(1,RawTransParam, MCMC_setting$PCOV)
 
-
     prior_proposal_offset = 0
     for(i in 1:length(parId)){
       newdiff = 0
@@ -239,7 +238,7 @@ Update_Param_each = function(MCMC_obj, MCMC_setting, parIdlist, isLoglist, prior
 
 
 updateTraj_general_NC = function(MCMC_obj,MCMC_setting,i){
-
+  new_CoalLog = 0
   if(MCMC_setting$likelihood == "structural"){
 
     Res = ESlice_general_NC_Structural(MCMC_obj$OriginTraj, MCMC_obj$Ode_Traj_coarse,
@@ -260,16 +259,21 @@ updateTraj_general_NC = function(MCMC_obj,MCMC_setting,i){
 
 
     if(MCMC_setting$likelihood == "volz"){
-      MCMC_obj$coalLog = volz_loglik_nh2(MCMC_setting$Init, Res$LatentTraj,
+      new_CoalLog = volz_loglik_nh2(MCMC_setting$Init, Res$LatentTraj,
                                          betaTs(MCMC_obj$par[(MCMC_obj$p+1):(MCMC_setting$x_i[1]+MCMC_setting$x_i[2]+MCMC_obj$p)],MCMC_obj$LatentTraj[,1], MCMC_setting$x_r,MCMC_setting$x_i),
                                          MCMC_setting$t_correct,
                                          index = MCMC_setting$x_i[3:4])
+
     }else{
-      MCMC_obj$coalLog = coal_loglik(MCMC_setting$Init,LogTraj(Res$LatentTraj ),MCMC_setting$t_correct,
+      new_CoalLog = coal_loglik(MCMC_setting$Init,LogTraj(Res$LatentTraj ),MCMC_setting$t_correct,
                                      MCMC_obj$par[5],MCMC_setting$gridsize)
     }
   }
-
+  if(new_CoalLog - MCMC_obj$coalLog < -100){
+    print(paste("problem with eslice traj" , i))
+    print(paste("compare list res", new_CoalLog - Res$CoalLog))
+  }
+  MCMC_obj$coalLog = new_CoalLog
   MCMC_obj$LatentTraj = Res$LatentTraj
   MCMC_obj$OriginTraj = Res$OriginTraj
   MCMC_obj$logOrigin = Res$logOrigin
@@ -293,6 +297,9 @@ update_ChangePoint_ESlice = function(MCMC_obj, MCMC_setting,i){
   MCMC_obj$LatentTraj = ESlice_Result$LatentTraj
   MCMC_obj$betaN = ESlice_Result$betaN
   MCMC_obj$FT = ESlice_Result$FT
+  if(ESlice_Result$CoalLog - MCMC_obj$coalLog < -100){
+    print(paste("ChangePoint slice sampling problem",i))
+  }
   MCMC_obj$coalLog = ESlice_Result$CoalLog
   MCMC_obj$Ode_Traj_coarse = ESlice_Result$OdeTraj
   return(MCMC_obj)
@@ -373,18 +380,20 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
 
    if(i == options$burn1){
       print("end warm up phase")
-      idx = floor(options$burn1/2) : (options$burn1-1)
-      if(!is.null(MCMC_setting$PCOV)){
+      idx = floor(options$burn1/2):(options$burn1-1)
+      if(is.null(MCMC_setting$PCOV)){
         SigmaN = NULL
         for(i in 1:length(parId)){
+
           if(logId[i] == 1){
-          SigmaN = cbind(SigmaN, log(params[idx,parId[i]]))
+          SigmaN = cbind(SigmaN,log(params[idx,parId[i]]))
           }else{
             SigmaN = cbind(SigmaN, params[idx, parId[i]])
           }
         }
         SigmaN = (2.38^2) * cov(SigmaN) / length(parId)
         MCMC_setting$PCOV = options$beta * SigmaN + (1 - options$beta) * diag(rep(1,length(parId))) * 0.01 / length(parId)
+
       }
       print(MCMC_setting$PCOV)
     }
@@ -402,6 +411,7 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
         MCMC_obj = tryCatch({update_ChangePoint_ESlice(MCMC_obj,MCMC_setting,i)},
                             error = function(cond){
                               message(cond)
+
                               # Choose a return value in case of error
                               return(MCMC_obj)
                             })

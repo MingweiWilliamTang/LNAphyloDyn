@@ -263,6 +263,21 @@ randomR0_traj_V = function(times,MCMC_obj,R0_id,col_id,idx,xlim,ylim=c(0,2),main
 }
 
 
+
+randomR0s = function(times,MCMC_obj,R0_id,col_id,idx){
+
+  R0 = MCMC_obj$par[idx,R0_id]
+  R0_traj = matrix(ncol= length(col_id)+1, nrow = length(idx))
+  R0_traj[,1] = R0
+  for(i in 1:length(col_id)){
+    R0_traj[,i+1] = R0_traj[,i] * MCMC_obj$par[idx,col_id[i]]
+  }
+
+  return(R0_traj)
+}
+
+
+
 coal_like_fast = function(traj, lambda = 1, coal_obj,t_correct,col=3){
   init = coal_lik_init(coal_obj$samp_times,coal_obj$n_sampled,coal_obj$coal_times,grid = traj[,1])
   return(coal_loglik(init,LogTraj(traj),t_correct = t_correct, lambda))
