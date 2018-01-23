@@ -264,6 +264,7 @@ randomR0_traj_V = function(times,MCMC_obj,R0_id,col_id,idx,xlim,ylim=c(0,2),main
 
 
 
+
 randomR0s = function(times,MCMC_obj,R0_id,col_id,idx){
 
   R0 = MCMC_obj$par[idx,R0_id]

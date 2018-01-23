@@ -1132,6 +1132,9 @@ double volz_loglik_nh2(List init, arma::mat f1, arma::vec betaN, double t_correc
   arma::vec ll = -2 * (as<vec>(init[2]) % as<vec>(init[3]) % betas % (arma::exp(- f)) % (arma::exp(s))) +\
     as<vec>(init[4]) % (log(betas) -f + s);
   //Rcout<< ll <<endl;
+  if(ll.has_nan()){
+    return -10000000;
+  }
   return sum(ll);
 }
 
@@ -1331,7 +1334,7 @@ List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec s
     }
     //  if(funname == "standard"){
     // logy = coal_loglik(init,LogTraj(f_cur),t_correct,lambda,gridsize) + log(u);
-    if(coal_log != 0){
+    if(coal_log != -99999999){
       logy = coal_log + log(u);
     }else{
       if(volz){
@@ -1363,7 +1366,6 @@ List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec s
         loglike = volz_loglik_nh2(init, newTraj,betaN,t_correct,Index ,transX);
         f_prime = f_cur;
         Rcout << "theta = "<< theta << endl;
-        Rcout << "differ1 =" << coal_log - loglike << endl;
         break;
       }
       if(theta < 0){
@@ -1379,6 +1381,9 @@ List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec s
         loglike = volz_loglik_nh2(init, newTraj, betaN, t_correct, Index ,transX);
       }else{
         loglike = coal_loglik3(init,LogTraj(newTraj),t_correct,lambda,Index(1), transX);
+      }
+      if(isnan(loglike)){
+        Rcout << "NaN in Slice Sampler " << endl;
       }
   }
   List Res;
@@ -1452,7 +1457,7 @@ arma::mat ESlice_general2(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::ve
       i += 1;
       if(i>20){
         newTraj = f_cur;
-        Rcout<<"theta = "<<theta<<endl;
+        Rcout<<"theta = "<< theta <<endl;
         break;
       }
       if(theta < 0){
