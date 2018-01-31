@@ -58,7 +58,6 @@ update_Param_joint = function(MCMC_obj, MCMC_setting, method = "admcmc", parId, 
                               MCMC_setting$x_r, MCMC_setting$x_i, MCMC_setting$Init, MCMC_setting$gridsize, MCMC_obj$coalLog,prior_proposal_offset,
                               MCMC_setting$t_correct, model = MCMC_setting$model,
                               volz = MCMC_setting$likelihood == "volz")
-
     if(update_res$accept){
       MCMC_obj$par = par_new
       MCMC_obj$FT = update_res$FT_new
@@ -401,8 +400,12 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
     if(i < options$burn1){
 
      # if(method == "seq"){
-        MCMC_obj = Update_Param_each(MCMC_obj, MCMC_setting, options$parIdlist[-4],
-                                     options$isLoglist[-4], options$priorIdlist[-4],options$priorIdlist[-4])$MCMC_obj
+        #MCMC_obj = Update_Param_each(MCMC_obj, MCMC_setting, options$parIdlist,
+         #                            options$isLoglist, options$priorIdlist,options$priorIdlist)$MCMC_obj
+
+      MCMC_obj = Update_Param_each(MCMC_obj, MCMC_setting, options$parIdlist[-4],
+                                   options$isLoglist[-4], options$priorIdlist[-4],options$priorIdlist[-4])$MCMC_obj
+
       #}else{
       #  MCMC_obj = update_Param_joint(MCMC_obj, MCMC_setting, method = "jointProp", parId, logId, priorId, proposeId)$MCMC_obj
       #}
@@ -421,12 +424,26 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
       #MCMC_obj = update_Param_joint(MCMC_obj, MCMC_setting, method = "jointProp", parId = unlist(options$parIdlist),
        #                             unlist(options$isLoglist), unlist(options$priorIdlist), unlist(options$priorIdlist))$MCMC_obj
       if(method == "seq"){
-        MCMC_obj = Update_Param_each(MCMC_obj, MCMC_setting, options$parIdlist,
+        MCMC_obj = tryCatch({Update_Param_each(MCMC_obj, MCMC_setting, options$parIdlist,
                                      options$isLoglist, options$priorIdlist,options$priorIdlist)$MCMC_obj
+        }, error = function(cond){
+          message(cond)
+          # Choose a return value in case of error
+          return(MCMC_obj)
+        })
+
       }else{
-        MCMC_obj = update_Param_joint(MCMC_obj, MCMC_setting, method, parId, logId, priorId, proposeId)$MCMC_obj
+        MCMC_obj = tryCatch({update_Param_joint(MCMC_obj, MCMC_setting, method, parId, logId, priorId, proposeId)$MCMC_obj},
+                            error = function(cond){
+                              message(cond)
+                              # Choose a return value in case of error
+                              return(MCMC_obj)
+                            })
       }
 
+      if(updateVec[5] == 0.5){
+        MCMC_obj = update_hyper(MCMC_obj, MCMC_setting, i)$MCMC_obj
+      }
 
 
       if(updateVec[6] == 1){

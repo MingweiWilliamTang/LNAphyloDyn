@@ -852,55 +852,127 @@ List sourceAttribMultiDemeCpp( const NumericVector heights, const List Fs, const
 
 
 //[[Rcpp::export()]]
-arma::mat birthMx(arma::vec states, arma::vec thetas, arma::vec x_r){
+arma::mat birthMx(arma::vec states, arma::vec thetas, arma::vec x_r, std::string model = "SEIR"){
   arma::mat M;
+  if(model == "SEIR"){
+    M << 0 << 0 << arma::endr
+      << thetas[0] * states[0] * states[2] << 0 << arma::endr;
+  }else{
   M << 0 << 0 << arma::endr
     << thetas[0] * x_r[0] * states[1] << 0 << arma::endr;
+  }
   return M;
 }
 
 
 //[[Rcpp::export()]]
-arma::mat MigrationMx(arma::vec states, arma::vec thetas, arma::vec x_r){
+arma::mat MigrationMx(arma::vec states, arma::vec thetas, arma::vec x_r,std::string model = "SEIR"){
   arma::mat M;
-  M << 0 << thetas[1] * states[0] << arma::endr << 0 << 0 << arma::endr;
+  if(model == "SEIR"){
+    M << 0 << thetas[1] * states[1] << arma::endr << 0 << 0 << arma::endr;
+  }else{
+    M << 0 << thetas[1] * states[0] << arma::endr << 0 << 0 << arma::endr;
+  }
   return M;
 }
 
 //[[Rcpp::export()]]
-Rcpp::NumericVector DeathMX(arma::vec states, arma::vec thetas, arma::vec x_r){
+Rcpp::NumericVector DeathMX(arma::vec states, arma::vec thetas, arma::vec x_r, std::string model = "SEIR"){
   NumericVector D(2);
   D(0) = 0;
-  D(1) = states(1) * thetas[2];
+  if(model == "SEIR"){
+    D(1) = states(2) * thetas[2];
+  }else{
+    D(1) = states(1) * thetas[2];
+  }
   return D;
 }
 
 //[[Rcpp::export()]]
 List TFGY_list(arma::mat LatentTraj, arma::vec param,
                arma::vec x_r, arma::ivec x_i,
-               std::string transP = "changepoint", std::string model = "SIR",std::string transX = "standard"){
+               std::string transP = "changepoint", std::string model = "SEIR",std::string transX = "standard"){
   int n = LatentTraj.n_rows;
   int p = LatentTraj.n_cols - 1;
   double t;
   List Births;
   List Migrations;
-  //List Deaths;
+  List Deaths;
   List Ys;
+  arma::mat trajm(n,p+1);
+  trajm.col(0) = LatentTraj.col(0);
+  trajm.col(1) = LatentTraj.col(2);
+  trajm.col(2) = LatentTraj.col(3);
+  trajm.col(3) = LatentTraj.col(1);
+  arma::vec times(n);
   XPtr<parat> param_trans = transformPtr(transP);
   for(int i = n - 1; i >=0; i --){
     t = LatentTraj(i,0);
+    times(n - 1 - i) = t;
     arma::vec states = LatentTraj.submat(i,1,i,p).t();
+    arma::vec state2 = LatentTraj.submat(i,2,i,p).t();
     arma::vec thetas = (*param_trans)(t,param,x_r,x_i);
     Births.push_back(birthMx(states, thetas, x_r));
     Migrations.push_back(MigrationMx(states, thetas, x_r));
-    Ys.push_back(Rcpp::NumericVector(states.begin(), states.end()));
+    Ys.push_back(Rcpp::NumericVector(state2.begin(), state2.end()));
+    Deaths.push_back(DeathMX(states, thetas, x_r));
   }
-    //Deaths.push_back(DeathMX(states, thetas, x_r));
+
   List tfgy;
-  tfgy["Fs"] = Births;
-  tfgy["Gs"] = Migrations;
+  //tfgy["Fs"] = Births;
+  //tfgy["Gs"] = Migrations;
   //tfgy["Ds"] = Deaths;
-  tfgy["Ys"] = Ys;
+  //tfgy["Ys"] = Ys;
+
+  tfgy["times"] = Rcpp::NumericVector(times.begin(),times.end());
+  tfgy["births"] = Births;
+  tfgy["migrations"] = Migrations;
+  tfgy["sizes"] = Ys;
+  tfgy["traj"] = trajm;
+  tfgy["deaths"] = Deaths;
+
+  return tfgy;
+}
+
+
+
+
+
+//[[Rcpp::export()]]
+List TFGY_list2(arma::mat LatentTraj, std::string model = "SEIR"){
+  int n = LatentTraj.n_rows;
+  int p = LatentTraj.n_cols - 1;
+  double t;
+  List Births;
+  List Migrations;
+  List Deaths;
+  List Ys;
+  List SZ;
+  arma::vec times(n);
+  for(int i = n - 1; i >=0; i --){
+    t = LatentTraj(i,0);
+    times(i) = t;
+    arma::vec states = LatentTraj.submat(i,1,i,p).t();
+    arma::mat B(2,2);
+    arma::vec D(2);
+    arma::mat M(2,2);
+    if(i < n - 1){
+      B(1,0) = LatentTraj(i,1) - LatentTraj(i+1, 1);
+      M(0,1) = LatentTraj(i,2) - LatentTraj(i+1, 2) + B(1,0);
+      D(1) = M(0,1) + LatentTraj(i,3) - LatentTraj(i+1, 3);
+    }
+    Births.push_back(B);
+    Migrations.push_back(M);
+    Ys.push_back(Rcpp::NumericVector(states.begin(), states.end()));
+    Deaths.push_back(D);
+  }
+  List tfgy;
+  tfgy["times"] = times;
+  tfgy["births"] = Births;
+  tfgy["migrations"] = Migrations;
+  tfgy["sizes"] = Ys;
+  tfgy["traj"] = LatentTraj;
+  tfgy["deaths"] = Deaths;
   return tfgy;
 }
 
@@ -918,9 +990,9 @@ double Structural_Coal_lik(List Init_Details, arma::mat LatentTraj,
   *
   */
   List tfgy = TFGY_list(LatentTraj, param, x_r, x_i, transP, model, transX);
-  List Fs = tfgy["Fs"];
-  List Gs = tfgy["Gs"];
-  List Ys = tfgy["Ys"];
+  List Fs = tfgy["births"];
+  List Gs = tfgy["migrations"];
+  List Ys = tfgy["sizes"];
   NumericVector heights = Init_Details[0];
   IntegerVector eventIndicator = Init_Details[1];
   IntegerVector eventIndicatorNode = Init_Details[2];

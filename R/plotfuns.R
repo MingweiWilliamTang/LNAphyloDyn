@@ -345,3 +345,17 @@ CI_Curve_eff2 = function(MCMC_obj,ids, col = "black", fill_col = "grey", Irow = 
   }
   lines(MCMC_obj$Trajectory[,1,1],midcur,col = col,lwd=2,lty=2)
 }
+
+
+
+NP_plot = function(coal_obj, ngrids, t_correct, main = "", xlim = c(0,100), ylim = c(0,10)){
+  par(mgp = c(2.5,1,0),mar=c(4,4,1,1))
+  plot(1, type="n", xlab="time", ylab="effective population size",
+       xlim=xlim, ylim=ylim,cex.lab=1.3,cex.axis = 1.2,xaxt = "n")
+  NP_res = BNPR(coal_obj, ngrids)
+  lines(t_correct - NP_res$x, NP_res$effpopmean, type="l" , lwd=2, col = "blue", lty = 2)
+  polygon(c(90 - NP_res$x,rev(90 - NP_res$x)),
+          c(NP_res$effpop025,rev(NP_res$effpop975)),
+          col = rgb(0,0,1,0.3),border = F)
+}
+

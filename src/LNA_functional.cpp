@@ -636,12 +636,6 @@ List KF_param_chol(arma::mat OdeTraj, arma::vec param,int gridsize,arma::vec x_r
     }catch(...){
       Rcout << as<arma::mat>(tempres[1]) << endl;
       Rcout << i << endl;
-      Rcout << param << endl;
-      Rcout << "###" << endl;
-      Rcout << OdeTraj << endl;
-      Rcout << "###" << endl;
-      Rcout << x_r << endl;
-      Rcout << x_i << endl;
       throw std::invalid_argument("Invalid input for cholesky decomposition.");
     }
   }
@@ -1191,12 +1185,14 @@ List Update_Param(arma::vec param, arma::vec initial, arma::vec t, arma::mat Ori
   double a = coal_log_new - coal_log + prior_proposal_offset;
   List Result;
   if(log(R::runif(0,1)) < a){
+
     Result["accept"] = true;
     Result["FT"] = FT_new;
     Result["Ode"] = Ode_Coarse;
     Result["betaN"] = betaNs;
     Result["coalLog"] = coal_log_new;
     Result["LatentTraj"] = NewTraj;
+
   }else{
     Result["accept"] = false;
   }

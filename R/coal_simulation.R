@@ -535,3 +535,12 @@ tauDist = function(a,b,dt){
 }
 
 
+SEIR_simu_tree = function(tfgys, sampleTimes, sampleStates, tree = T){
+  Tree = sim.co.tree.fgy(tfgys, sampleTimes, sampleStates, substitutionRates = NULL, sequenceLength = 0)
+  class(Tree) = "phylo"
+  if(tree == T){
+    return(Tree)
+  }else{
+    return(summarize_phylo(Tree))
+  }
+}
