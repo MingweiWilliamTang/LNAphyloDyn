@@ -268,7 +268,7 @@ updateTraj_general_NC = function(MCMC_obj,MCMC_setting,i){
                                      MCMC_obj$par[5],MCMC_setting$gridsize)
     }
   }
-  if(new_CoalLog - MCMC_obj$coalLog < -100){
+  if(new_CoalLog - MCMC_obj$coalLog < -30){
     print(paste("problem with eslice traj" , i))
     print(paste("compare list res", new_CoalLog - Res$CoalLog))
   }

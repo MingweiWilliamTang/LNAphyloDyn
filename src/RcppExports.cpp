@@ -1611,41 +1611,44 @@ BEGIN_RCPP
 END_RCPP
 }
 // birthMx
-arma::mat birthMx(arma::vec states, arma::vec thetas, arma::vec x_r);
-RcppExport SEXP _LNAPhyloDyn_birthMx(SEXP statesSEXP, SEXP thetasSEXP, SEXP x_rSEXP) {
+arma::mat birthMx(arma::vec states, arma::vec thetas, arma::vec x_r, std::string model);
+RcppExport SEXP _LNAPhyloDyn_birthMx(SEXP statesSEXP, SEXP thetasSEXP, SEXP x_rSEXP, SEXP modelSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec >::type states(statesSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type thetas(thetasSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type x_r(x_rSEXP);
-    rcpp_result_gen = Rcpp::wrap(birthMx(states, thetas, x_r));
+    Rcpp::traits::input_parameter< std::string >::type model(modelSEXP);
+    rcpp_result_gen = Rcpp::wrap(birthMx(states, thetas, x_r, model));
     return rcpp_result_gen;
 END_RCPP
 }
 // MigrationMx
-arma::mat MigrationMx(arma::vec states, arma::vec thetas, arma::vec x_r);
-RcppExport SEXP _LNAPhyloDyn_MigrationMx(SEXP statesSEXP, SEXP thetasSEXP, SEXP x_rSEXP) {
+arma::mat MigrationMx(arma::vec states, arma::vec thetas, arma::vec x_r, std::string model);
+RcppExport SEXP _LNAPhyloDyn_MigrationMx(SEXP statesSEXP, SEXP thetasSEXP, SEXP x_rSEXP, SEXP modelSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec >::type states(statesSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type thetas(thetasSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type x_r(x_rSEXP);
-    rcpp_result_gen = Rcpp::wrap(MigrationMx(states, thetas, x_r));
+    Rcpp::traits::input_parameter< std::string >::type model(modelSEXP);
+    rcpp_result_gen = Rcpp::wrap(MigrationMx(states, thetas, x_r, model));
     return rcpp_result_gen;
 END_RCPP
 }
 // DeathMX
-Rcpp::NumericVector DeathMX(arma::vec states, arma::vec thetas, arma::vec x_r);
-RcppExport SEXP _LNAPhyloDyn_DeathMX(SEXP statesSEXP, SEXP thetasSEXP, SEXP x_rSEXP) {
+Rcpp::NumericVector DeathMX(arma::vec states, arma::vec thetas, arma::vec x_r, std::string model);
+RcppExport SEXP _LNAPhyloDyn_DeathMX(SEXP statesSEXP, SEXP thetasSEXP, SEXP x_rSEXP, SEXP modelSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec >::type states(statesSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type thetas(thetasSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type x_r(x_rSEXP);
-    rcpp_result_gen = Rcpp::wrap(DeathMX(states, thetas, x_r));
+    Rcpp::traits::input_parameter< std::string >::type model(modelSEXP);
+    rcpp_result_gen = Rcpp::wrap(DeathMX(states, thetas, x_r, model));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1663,6 +1666,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string >::type model(modelSEXP);
     Rcpp::traits::input_parameter< std::string >::type transX(transXSEXP);
     rcpp_result_gen = Rcpp::wrap(TFGY_list(LatentTraj, param, x_r, x_i, transP, model, transX));
+    return rcpp_result_gen;
+END_RCPP
+}
+// TFGY_list2
+List TFGY_list2(arma::mat LatentTraj, std::string model);
+RcppExport SEXP _LNAPhyloDyn_TFGY_list2(SEXP LatentTrajSEXP, SEXP modelSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type LatentTraj(LatentTrajSEXP);
+    Rcpp::traits::input_parameter< std::string >::type model(modelSEXP);
+    rcpp_result_gen = Rcpp::wrap(TFGY_list2(LatentTraj, model));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1809,10 +1824,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LNAPhyloDyn_ESlice_SIRS", (DL_FUNC) &_LNAPhyloDyn_ESlice_SIRS, 11},
     {"_LNAPhyloDyn_colik2cpp", (DL_FUNC) &_LNAPhyloDyn_colik2cpp, 13},
     {"_LNAPhyloDyn_sourceAttribMultiDemeCpp", (DL_FUNC) &_LNAPhyloDyn_sourceAttribMultiDemeCpp, 14},
-    {"_LNAPhyloDyn_birthMx", (DL_FUNC) &_LNAPhyloDyn_birthMx, 3},
-    {"_LNAPhyloDyn_MigrationMx", (DL_FUNC) &_LNAPhyloDyn_MigrationMx, 3},
-    {"_LNAPhyloDyn_DeathMX", (DL_FUNC) &_LNAPhyloDyn_DeathMX, 3},
+    {"_LNAPhyloDyn_birthMx", (DL_FUNC) &_LNAPhyloDyn_birthMx, 4},
+    {"_LNAPhyloDyn_MigrationMx", (DL_FUNC) &_LNAPhyloDyn_MigrationMx, 4},
+    {"_LNAPhyloDyn_DeathMX", (DL_FUNC) &_LNAPhyloDyn_DeathMX, 4},
     {"_LNAPhyloDyn_TFGY_list", (DL_FUNC) &_LNAPhyloDyn_TFGY_list, 7},
+    {"_LNAPhyloDyn_TFGY_list2", (DL_FUNC) &_LNAPhyloDyn_TFGY_list2, 2},
     {"_LNAPhyloDyn_Structural_Coal_lik", (DL_FUNC) &_LNAPhyloDyn_Structural_Coal_lik, 9},
     {"_LNAPhyloDyn_ESlice_general_NC_Structural", (DL_FUNC) &_LNAPhyloDyn_ESlice_general_NC_Structural, 10},
     {"_rcpp_module_boot_mod_Foo", (DL_FUNC) &_rcpp_module_boot_mod_Foo, 0},

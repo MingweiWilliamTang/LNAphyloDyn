@@ -404,20 +404,24 @@ sourceAttribMultiDemeCpp <- function(heights, Fs, Gs, Ys, eventIndicator, eventI
     .Call('_LNAPhyloDyn_sourceAttribMultiDemeCpp', PACKAGE = 'LNAPhyloDyn', heights, Fs, Gs, Ys, eventIndicator, eventIndicatorNode, eventHeights, sortedSampleStates, daughters, n, Nnode, m, AgtYboundaryCondition, maxHeight)
 }
 
-birthMx <- function(states, thetas, x_r) {
-    .Call('_LNAPhyloDyn_birthMx', PACKAGE = 'LNAPhyloDyn', states, thetas, x_r)
+birthMx <- function(states, thetas, x_r, model = "SEIR") {
+    .Call('_LNAPhyloDyn_birthMx', PACKAGE = 'LNAPhyloDyn', states, thetas, x_r, model)
 }
 
-MigrationMx <- function(states, thetas, x_r) {
-    .Call('_LNAPhyloDyn_MigrationMx', PACKAGE = 'LNAPhyloDyn', states, thetas, x_r)
+MigrationMx <- function(states, thetas, x_r, model = "SEIR") {
+    .Call('_LNAPhyloDyn_MigrationMx', PACKAGE = 'LNAPhyloDyn', states, thetas, x_r, model)
 }
 
-DeathMX <- function(states, thetas, x_r) {
-    .Call('_LNAPhyloDyn_DeathMX', PACKAGE = 'LNAPhyloDyn', states, thetas, x_r)
+DeathMX <- function(states, thetas, x_r, model = "SEIR") {
+    .Call('_LNAPhyloDyn_DeathMX', PACKAGE = 'LNAPhyloDyn', states, thetas, x_r, model)
 }
 
-TFGY_list <- function(LatentTraj, param, x_r, x_i, transP = "changepoint", model = "SIR", transX = "standard") {
+TFGY_list <- function(LatentTraj, param, x_r, x_i, transP = "changepoint", model = "SEIR", transX = "standard") {
     .Call('_LNAPhyloDyn_TFGY_list', PACKAGE = 'LNAPhyloDyn', LatentTraj, param, x_r, x_i, transP, model, transX)
+}
+
+TFGY_list2 <- function(LatentTraj, model = "SEIR") {
+    .Call('_LNAPhyloDyn_TFGY_list2', PACKAGE = 'LNAPhyloDyn', LatentTraj, model)
 }
 
 Structural_Coal_lik <- function(Init_Details, LatentTraj, param, x_r, x_i, transP = "changepoint", model = "SEIR2", transX = "standard", AgtYboundCondition = 1) {

@@ -1259,17 +1259,14 @@ List ESlice_change_points(arma::vec param, arma::vec initial, arma::vec t, arma:
 
     if(i>20){
       theta = 0;
-      NewTraj = TransformTraj(OdeTraj_new, OriginTraj, FT_new);
-      loglike = volz_loglik_nh2(init, NewTraj,betaN,t_correct,Index ,transX);
-
-      param_new = Param_Slice_update(param, x_r, x_i, theta, newChs);
-
-      param_list = New_Param_List(param_new, initial, gridsize, t, x_r, x_i,
+      param_new = param;
+      param_list = New_Param_List(param, initial, gridsize, t, x_r, x_i,
                                   transP, model, transX);
-
       FT_new = as<Rcpp::List>(param_list[0]);
       betaN = as<arma::vec>(param_list[2]);
       OdeTraj_new  = as<arma::mat>(param_list[1]);
+      NewTraj = TransformTraj(OdeTraj_new, OriginTraj, FT_new);
+      loglike = volz_loglik_nh2(init, NewTraj,betaN,t_correct,Index ,transX);
       break;
     }
     if(theta < 0){
@@ -1308,7 +1305,7 @@ List ESlice_change_points(arma::vec param, arma::vec initial, arma::vec t, arma:
 //[[Rcpp::export()]]
 List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
                          List init, arma::vec betaN, double t_correct, double lambda=10,
-                         double coal_log=0, int gridsize = 100, bool volz = false, std::string model = "SIR",
+                         double coal_log=-99999999, int gridsize = 100, bool volz = false, std::string model = "SIR",
                          std::string transX = "standard"){
   // OdeTraj is the one with low resolution
   arma::ivec Index(2);
@@ -1362,6 +1359,7 @@ List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec s
         loglike = volz_loglik_nh2(init, newTraj,betaN,t_correct,Index ,transX);
         f_prime = f_cur;
         Rcout << "theta = "<< theta << endl;
+        Rcout << "check loglike" <<loglike - coal_log << endl;
         break;
       }
       if(theta < 0){

@@ -21,7 +21,7 @@ simuSIRS = function(theta1,theta2,theta3,S,I,R,times){
   SIRS_FRM = StepFRM(SIRS_exact)
   simu_Traj = simTs(c(X = S, Y = I, Z = R), min(times), max(times), times[2] - times[1], SIRS_FRM)
   plot(times,simu_Traj[,2],type="l")
-  return(cbind(times,simu_Traj))
+  return(matrix(cbind(times,simu_Traj),ncol = 4))
 }
 
 #SIRS_F = simTs(c(X = 9500,Y = 500,Z = 1500),0,200,0.1,SIRS_FRM)
@@ -40,7 +40,22 @@ simuSIR = function(theta1,theta2,S,I,time){
   SIR_F = StepFRM(SIR)
   simu_Traj = simTs(c(X = S, Y = I, Z = R), min(time), max(time), time[2] - time[1], SIR_F)
   plot(time,simu_Traj[,2],type="l")
-  return(cbind(time,simu_Traj))
+  return(matrix(cbind(time,simu_Traj),ncol = 4))
+}
+
+simuSIRt = function(state, time, param1, x_r1, x_i1){
+  R = 0
+  SIR = list()
+  SIR$Pre=matrix(c(1,0,1,1,0,0),ncol=3)
+  SIR$Post = matrix(c(0,0,2,0,0,1),ncol=3)
+  SIR$h = function(x, t, param = param1, x_r = x_r1, x_i = x_i1){
+    beta1 = betaTs(param, t, x_r, x_i)
+    return(c(beta1 * x[1] * x[2], param[2] * x[2]))
+  }
+  SIR_F = StepFRM(SIR)
+  simu_Traj = simTs(c(state,0), min(time), max(time), time[2] - time[1], SIR_F)
+  #plot(time,simu_Traj[,2],type="l")
+  return(matrix(cbind(time, simu_Traj), ncol = 4))
 }
 
 
@@ -61,6 +76,22 @@ simuSEIR = function(theta1,theta2,theta3,S,E,I,time){
   return(matrix(cbind(time,simu_Traj),ncol = 4))
 }
 
+
+
+simuSEIRt = function(state, time, param1, x_r1, x_i1){
+  R = 0
+  SEIR = list()
+  SEIR$Pre=matrix(c(1,0,1,0,1,0,0,0,1),byrow = T,ncol=3)
+  SEIR$Post = matrix(c(0,1,1,0,0,1,0,0,0),byrow = T,ncol=3)
+  SEIR$h = function(x, t, param = param1, x_r = x_r1, x_i = x_i1){
+    beta1 = betaTs(param, t, x_r, x_i)
+    return(c(beta1 * x[1] * x[3], param[2] * x[2], param[3] * x[3]))
+  }
+  SEIR_F = StepFRM(SEIR)
+  simu_Traj = simTs(state, min(time), max(time), time[2] - time[1], SEIR_F)
+  #plot(time,simu_Traj[,2],type="l")
+  return(matrix(cbind(time,simu_Traj),ncol = 4))
+}
 
 
 #' Plot the posterior

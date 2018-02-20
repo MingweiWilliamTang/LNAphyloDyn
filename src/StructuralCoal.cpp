@@ -943,6 +943,7 @@ List TFGY_list2(arma::mat LatentTraj, std::string model = "SEIR"){
   int n = LatentTraj.n_rows;
   int p = LatentTraj.n_cols - 1;
   double t;
+  double dt = LatentTraj(1,0) - LatentTraj(0,0);
   List Births;
   List Migrations;
   List Deaths;
@@ -952,7 +953,7 @@ List TFGY_list2(arma::mat LatentTraj, std::string model = "SEIR"){
   for(int i = n - 1; i >=0; i --){
     t = LatentTraj(i,0);
     times(i) = t;
-    arma::vec states = LatentTraj.submat(i,1,i,p).t();
+    arma::vec state2 = LatentTraj.submat(i,2,i,p).t();
     arma::mat B(2,2);
     arma::vec D(2);
     arma::mat M(2,2);
@@ -961,10 +962,10 @@ List TFGY_list2(arma::mat LatentTraj, std::string model = "SEIR"){
       M(0,1) = LatentTraj(i,2) - LatentTraj(i+1, 2) + B(1,0);
       D(1) = M(0,1) + LatentTraj(i,3) - LatentTraj(i+1, 3);
     }
-    Births.push_back(B);
-    Migrations.push_back(M);
-    Ys.push_back(Rcpp::NumericVector(states.begin(), states.end()));
-    Deaths.push_back(D);
+    Births.push_back(B / dt);
+    Migrations.push_back(M / dt);
+    Ys.push_back(Rcpp::NumericVector(state2.begin(), state2.end()));
+    Deaths.push_back(D / dt);
   }
   List tfgy;
   tfgy["times"] = times;
