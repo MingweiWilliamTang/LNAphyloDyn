@@ -208,7 +208,7 @@ vlineCI = function(data,cred = T){
   abline(v = m ,col="blue",lwd=2)
 }
 
-randomR0_traj = function(times,MCMC_obj,R0_id,col_id,idx,ylim=c(0,2),main = ""){
+randomR0_traj = function(times,MCMC_obj,R0_id,col_id,idx,ylim=c(0,2),fill = rgb(1,0,0,0.3),main = "",xlab = "time",cex.lab=1.3,cex.axis = 1.2,xaxt = "s"){
   R0 = MCMC_obj$par[idx,R0_id]
   R0_traj = matrix(ncol= length(col_id)+2, nrow = length(idx))
   R0_traj[,1] = R0
@@ -224,9 +224,10 @@ randomR0_traj = function(times,MCMC_obj,R0_id,col_id,idx,ylim=c(0,2),main = ""){
     return(quantile(x,0.025))
   })
   m = apply(R0_traj,2,median)
-  plot(times,m,type="l",ylab = "R0",col = "red",lwd = 2,ylim=ylim,main=main)
+  plot(times,m,type="l",ylab = "R0",col = "red",lwd = 2,ylim=ylim,main=main,xlab = xlab,
+       cex.lab= cex.lab,cex.axis = cex.axis, xaxt = xaxt)
   polygon(x = c(times,rev(times)),
-          y = c(CIup,rev(CIlow)),col = "grey",border = NA)
+          y = c(CIup,rev(CIlow)),col = fill,border = NA)
   lines(times,m,type="l",col = "red",lwd = 2)
 }
 

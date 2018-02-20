@@ -156,7 +156,7 @@ ESlice_change_points <- function(param, initial, t, OriginTraj, x_r, x_i, init, 
     .Call('_LNAPhyloDyn_ESlice_change_points', PACKAGE = 'LNAPhyloDyn', param, initial, t, OriginTraj, x_r, x_i, init, gridsize, coal_log, t_correct, transP, model, transX, volz)
 }
 
-ESlice_general_NC <- function(f_cur, OdeTraj, FTs, state, init, betaN, t_correct, lambda = 10, coal_log = 0, gridsize = 100L, volz = FALSE, model = "SIR", transX = "standard") {
+ESlice_general_NC <- function(f_cur, OdeTraj, FTs, state, init, betaN, t_correct, lambda = 10, coal_log = -99999999, gridsize = 100L, volz = FALSE, model = "SIR", transX = "standard") {
     .Call('_LNAPhyloDyn_ESlice_general_NC', PACKAGE = 'LNAPhyloDyn', f_cur, OdeTraj, FTs, state, init, betaN, t_correct, lambda, coal_log, gridsize, volz, model, transX)
 }
 
