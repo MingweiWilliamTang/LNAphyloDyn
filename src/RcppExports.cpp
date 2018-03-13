@@ -572,6 +572,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// Param_Slice_update_all
+arma::vec Param_Slice_update_all(arma::vec par_old, arma::vec x_r, arma::ivec x_i, double theta, arma::vec newChs, double rho);
+RcppExport SEXP _LNAPhyloDyn_Param_Slice_update_all(SEXP par_oldSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP thetaSEXP, SEXP newChsSEXP, SEXP rhoSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type par_old(par_oldSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type x_r(x_rSEXP);
+    Rcpp::traits::input_parameter< arma::ivec >::type x_i(x_iSEXP);
+    Rcpp::traits::input_parameter< double >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type newChs(newChsSEXP);
+    Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
+    rcpp_result_gen = Rcpp::wrap(Param_Slice_update_all(par_old, x_r, x_i, theta, newChs, rho));
+    return rcpp_result_gen;
+END_RCPP
+}
 // ESlice_change_points
 List ESlice_change_points(arma::vec param, arma::vec initial, arma::vec t, arma::mat OriginTraj, arma::vec x_r, arma::ivec x_i, List init, int gridsize, double coal_log, double t_correct, std::string transP, std::string model, std::string transX, bool volz);
 RcppExport SEXP _LNAPhyloDyn_ESlice_change_points(SEXP paramSEXP, SEXP initialSEXP, SEXP tSEXP, SEXP OriginTrajSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP initSEXP, SEXP gridsizeSEXP, SEXP coal_logSEXP, SEXP t_correctSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP, SEXP volzSEXP) {
@@ -593,6 +609,31 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string >::type transX(transXSEXP);
     Rcpp::traits::input_parameter< bool >::type volz(volzSEXP);
     rcpp_result_gen = Rcpp::wrap(ESlice_change_points(param, initial, t, OriginTraj, x_r, x_i, init, gridsize, coal_log, t_correct, transP, model, transX, volz));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ESlice_par
+List ESlice_par(arma::vec param, arma::vec initial, arma::vec t, arma::mat OriginTraj, List priorList, arma::vec x_r, arma::ivec x_i, List init, int gridsize, double coal_log, double t_correct, std::string transP, std::string model, std::string transX, bool volz);
+RcppExport SEXP _LNAPhyloDyn_ESlice_par(SEXP paramSEXP, SEXP initialSEXP, SEXP tSEXP, SEXP OriginTrajSEXP, SEXP priorListSEXP, SEXP x_rSEXP, SEXP x_iSEXP, SEXP initSEXP, SEXP gridsizeSEXP, SEXP coal_logSEXP, SEXP t_correctSEXP, SEXP transPSEXP, SEXP modelSEXP, SEXP transXSEXP, SEXP volzSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type param(paramSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type initial(initialSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type t(tSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type OriginTraj(OriginTrajSEXP);
+    Rcpp::traits::input_parameter< List >::type priorList(priorListSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type x_r(x_rSEXP);
+    Rcpp::traits::input_parameter< arma::ivec >::type x_i(x_iSEXP);
+    Rcpp::traits::input_parameter< List >::type init(initSEXP);
+    Rcpp::traits::input_parameter< int >::type gridsize(gridsizeSEXP);
+    Rcpp::traits::input_parameter< double >::type coal_log(coal_logSEXP);
+    Rcpp::traits::input_parameter< double >::type t_correct(t_correctSEXP);
+    Rcpp::traits::input_parameter< std::string >::type transP(transPSEXP);
+    Rcpp::traits::input_parameter< std::string >::type model(modelSEXP);
+    Rcpp::traits::input_parameter< std::string >::type transX(transXSEXP);
+    Rcpp::traits::input_parameter< bool >::type volz(volzSEXP);
+    rcpp_result_gen = Rcpp::wrap(ESlice_par(param, initial, t, OriginTraj, priorList, x_r, x_i, init, gridsize, coal_log, t_correct, transP, model, transX, volz));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1761,7 +1802,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LNAPhyloDyn_New_Param_List", (DL_FUNC) &_LNAPhyloDyn_New_Param_List, 9},
     {"_LNAPhyloDyn_Update_Param", (DL_FUNC) &_LNAPhyloDyn_Update_Param, 15},
     {"_LNAPhyloDyn_Param_Slice_update", (DL_FUNC) &_LNAPhyloDyn_Param_Slice_update, 6},
+    {"_LNAPhyloDyn_Param_Slice_update_all", (DL_FUNC) &_LNAPhyloDyn_Param_Slice_update_all, 6},
     {"_LNAPhyloDyn_ESlice_change_points", (DL_FUNC) &_LNAPhyloDyn_ESlice_change_points, 14},
+    {"_LNAPhyloDyn_ESlice_par", (DL_FUNC) &_LNAPhyloDyn_ESlice_par, 15},
     {"_LNAPhyloDyn_ESlice_general_NC", (DL_FUNC) &_LNAPhyloDyn_ESlice_general_NC, 13},
     {"_LNAPhyloDyn_ESlice_general2", (DL_FUNC) &_LNAPhyloDyn_ESlice_general2, 13},
     {"_LNAPhyloDyn_InitializeMCMC", (DL_FUNC) &_LNAPhyloDyn_InitializeMCMC, 9},

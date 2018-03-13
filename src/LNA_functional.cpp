@@ -1211,6 +1211,18 @@ arma::vec Param_Slice_update(arma::vec param, arma::vec x_r, arma::ivec x_i, dou
 
 
 //[[Rcpp::export()]]
+arma::vec Param_Slice_update_all(arma::vec par_old, arma::vec x_r, arma::ivec x_i, double theta, arma::vec newChs, double rho = 1){
+
+  arma::vec par_new = par_old;
+  arma::vec OdeChs = arma::log(par_old.subvec(1,x_i(1) + x_i(0) + 1));
+  arma::vec Chs_prime = OdeChs * cos(theta) + newChs * sin(theta);
+  par_new.subvec(1, x_i(0) + x_i(1) + 1) = arma::exp(Chs_prime);
+  return par_new;
+}
+
+
+
+//[[Rcpp::export()]]
 List ESlice_change_points(arma::vec param, arma::vec initial, arma::vec t, arma::mat OriginTraj,
                           arma::vec x_r, arma::ivec x_i, List init, int gridsize,
                           double coal_log=0, double t_correct = 0, std::string transP = "changepoint",
@@ -1289,6 +1301,11 @@ List ESlice_change_points(arma::vec param, arma::vec initial, arma::vec t, arma:
 
     loglike = volz_loglik_nh2(init, NewTraj, betaN, t_correct, Index ,transX);
   }
+  arma::vec delta = arma::log(param_new.subvec(x_i(1),x_i(0) + x_i(1) - 1)) * param_new(x_i(0) + x_i(1));
+  double LogChProb = 0;
+  for(int j = 0; j < delta.n_elem; j ++){
+    LogChProb += -0.5 * delta(j) * delta(j);
+  }
   List result;
   result["betaN"] = betaN;
   result["FT"] = FT_new;
@@ -1296,10 +1313,127 @@ List ESlice_change_points(arma::vec param, arma::vec initial, arma::vec t, arma:
   result["param"] = param_new;
   result["LatentTraj"] = NewTraj;
   result["CoalLog"] = loglike;
+  result["LogChProb"] = LogChProb;
   return result;
 }
 
 
+//[[Rcpp::export()]]
+List ESlice_par(arma::vec param, arma::vec initial, arma::vec t, arma::mat OriginTraj,List priorList,
+                          arma::vec x_r, arma::ivec x_i, List init, int gridsize,
+                          double coal_log=0, double t_correct = 0, std::string transP = "changepoint",
+                          std::string model = "SIR", std::string transX = "standard", bool volz = true){
+
+  int nch = x_i[0];
+
+  arma::ivec Index(2);
+
+  arma::vec I_pr = as<arma::vec>(priorList[0]);
+  arma::vec R0_pr = as<arma::vec>(priorList[1]);
+  arma::vec gamma_pr = as<arma::vec>(priorList[2]);
+
+  if(model == "SIR"){
+    Index(0) = 0; Index(1) = 1;
+  }else if(model == "SEIR"){
+    Index(0) = 0; Index(1) = 2;
+  }
+
+  //param.subvec(x_i(1),x_i(1) + x_i(0) - 1)
+  double u = R::runif(0,1);
+
+  if(log(u) < -25){
+    Rcout << "really small u" << endl;
+    Rcout << u << endl;
+  }
+
+  double logy = coal_log + log(u);
+
+    //+ R::dnorm(initial(1), I_pr(0), I_pr(1),1) + \
+    //R::dnorm(param(0), R0_pr(0), R0_pr(1),1) + \
+    //R::dnorm(param(1), gamma_pr(0), gamma_pr(1),1);
+
+  double theta = R::runif(0,2*pi);
+  double theta_min = theta - 2*pi;
+  double theta_max = theta;
+  arma::vec new_par_raw = arma::randn(3 + nch, 1); // 47 * 1
+
+  new_par_raw[0] = (new_par_raw[0]) * I_pr[1] + I_pr[0];
+  new_par_raw[1] = (new_par_raw[1]) * R0_pr[1] + R0_pr[0];
+  new_par_raw[2] = (new_par_raw[2]) * gamma_pr[1] + gamma_pr[0];
+
+  new_par_raw.subvec(3, 2 + nch) = new_par_raw.subvec(3, 2 + nch) / param(x_i(0) + x_i(1));
+  arma::vec par_old(initial.n_elem + x_i(0) + x_i(1) + 1); // 49
+
+  par_old.subvec(0,1) = initial;
+  par_old.subvec(2, x_i(0) + x_i(1) + 2) = param;
+  arma::vec par_new = Param_Slice_update_all(par_old, x_r, x_i, theta, new_par_raw); // 49
+
+  List param_list = New_Param_List(par_new.subvec(2, x_i(0) + x_i(1) + 2), par_new.subvec(0,1), gridsize, t, x_r, x_i,
+                                   transP, model, transX);
+  List FT_new = as<Rcpp::List>(param_list[0]);
+
+  arma::vec betaN = as<arma::vec>(param_list[2]);
+
+  arma::mat OdeTraj_new  = as<arma::mat>(param_list[1]);
+  arma::mat NewTraj = TransformTraj(OdeTraj_new, OriginTraj, FT_new);
+
+  double loglike = volz_loglik_nh2(init, NewTraj,betaN,t_correct,Index ,transX);
+  int i = 0;
+
+  while(loglike <= logy){
+    i += 1;
+
+    if(i>20){
+      theta = 0;
+      par_new.subvec(2, x_i(0) + x_i(1) + 2) = param;
+      par_new.subvec(0,1) = initial;
+      param_list = New_Param_List(param, initial, gridsize, t, x_r, x_i,
+                                  transP, model, transX);
+      FT_new = as<Rcpp::List>(param_list[0]);
+      betaN = as<arma::vec>(param_list[2]);
+      OdeTraj_new  = as<arma::mat>(param_list[1]);
+      NewTraj = TransformTraj(OdeTraj_new, OriginTraj, FT_new);
+      loglike = volz_loglik_nh2(init, NewTraj,betaN,t_correct,Index ,transX);
+      break;
+    }
+    if(theta < 0){
+      theta_min = theta;
+    }else{
+      theta_max = theta;
+    }
+
+    theta = R::runif(theta_min,theta_max);
+
+    par_new = Param_Slice_update_all(par_old, x_r, x_i, theta, new_par_raw);
+
+    param_list = New_Param_List(par_new.subvec(2, x_i(0) + x_i(1) + 2), par_new.subvec(0,1), gridsize, t, x_r, x_i,
+                                transP, model, transX);
+
+    FT_new = as<Rcpp::List>(param_list[0]);
+    betaN = as<arma::vec>(param_list[2]);
+    OdeTraj_new  = as<arma::mat>(param_list[1]);
+    NewTraj = TransformTraj(OdeTraj_new, OriginTraj, FT_new);
+
+    loglike = volz_loglik_nh2(init, NewTraj, betaN, t_correct, Index ,transX);
+  }
+  List result;
+  arma::vec param_new = par_new.subvec(2, x_i(0) + x_i(1) + 2);
+  arma::vec initial_new = par_new.subvec(0,1);
+  arma::vec delta = arma::log(param_new.subvec(x_i(1),x_i(0) + x_i(1) - 1)) * param_new(x_i(0) + x_i(1));
+  double LogChProb = 0;
+  for(int j = 0; j < delta.n_elem; j ++){
+    LogChProb += -0.5 * delta(j) * delta(j);
+  }
+  result["betaN"] = betaN;
+  result["FT"] = FT_new;
+  result["OdeTraj"] = OdeTraj_new;
+  result["param"] = param_new;
+  result["LatentTraj"] = NewTraj;
+  result["CoalLog"] = loglike;
+  result["initial"] = initial_new;
+  result["LogChProb"] = LogChProb;
+  return result;
+}
 
 
 //[[Rcpp::export()]]
@@ -1359,7 +1493,6 @@ List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec s
         loglike = volz_loglik_nh2(init, newTraj,betaN,t_correct,Index ,transX);
         f_prime = f_cur;
         Rcout << "theta = "<< theta << endl;
-        Rcout << "check loglike" <<loglike - coal_log << endl;
         break;
       }
       if(theta < 0){

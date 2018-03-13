@@ -307,7 +307,7 @@ update_hyper = function(MCMC_obj, MCMC_setting, i){
       MCMC_obj$betaN = update_res$betaN
       MCMC_obj$coalLog = update_res$coalLog
       MCMC_obj$LatentTraj = update_res$LatentTraj
-      MCMC_obj$LogHyper =  dgamma(hyper_scale_new,MCMC_setting$prior$hyper_pr[1], MCMC_setting$prior$hyper_pr[2], log = T)
+      MCMC_obj$par_probs[5] =  dgamma(hyper_scale_new,MCMC_setting$prior$hyper_pr[1], MCMC_setting$prior$hyper_pr[2], log = T)
   }
   return(list(MCMC_obj = MCMC_obj))
 }
@@ -442,7 +442,7 @@ MCMC_initialize_general = function(MCMC_setting){
   coalLog = NaN
 
   ########
-  priorLog = numeric(MCMC_setting$p+MCMC_setting$x_i[2])
+  par_probs = numeric(5)
   while(is.nan(logMultiNorm)||is.nan(coalLog)){
     state = numeric(MCMC_setting$p)
     state[1] = MCMC_setting$x_r[1]
@@ -453,7 +453,7 @@ MCMC_initialize_general = function(MCMC_setting){
       }else{
         state[i] = MCMC_setting$control$alpha[i-1] * MCMC_setting$x_r[1]
       }
-      priorLog[i] = dnorm(log(state[i]), MCMC_setting$prior$pop_pr[2 * i - 3],MCMC_setting$prior$pop_pr[2 * i - 2],log = T)
+      par_probs[i-1] = dnorm(log(state[i]), MCMC_setting$prior$pop_pr[2 * i - 3],MCMC_setting$prior$pop_pr[2 * i - 2],log = T)
     }
 
     if(is.null(MCMC_setting$control$R0)){
@@ -462,13 +462,16 @@ MCMC_initialize_general = function(MCMC_setting){
       R0 = MCMC_setting$control$R0
     }
 
+    par_probs[2] = dunif(R0, MCMC_setting$prior$R0_pr[1], MCMC_setting$prior$R0_pr[2], log = T)
+
     if(MCMC_setting$model == "SEIR" || MCMC_setting$model == "SEIR2"){
+
       if(is.null(MCMC_setting$control$mu)){
         mu = exp(rnorm(1,MCMC_setting$prior$mu_pr[1],MCMC_setting$prior$mu_pr[2]))
       }else{
         mu = MCMC_setting$control$mu
       }
-      priorLog[MCMC_setting$p+2] = dnorm(log(mu),MCMC_setting$prior$mu_pr[1],MCMC_setting$prior$mu_pr[2],log = T)
+      par_probs[4] = dnorm(log(mu),MCMC_setting$prior$mu_pr[1],MCMC_setting$prior$mu_pr[2],log = T)
     }
 
     if(is.null(MCMC_setting$control$gamma)){
@@ -476,14 +479,19 @@ MCMC_initialize_general = function(MCMC_setting){
     }else{
       gamma = MCMC_setting$control$gamma
     }
-    priorLog[MCMC_setting$p+MCMC_setting$x_i[4]+1] = dnorm(log(gamma),MCMC_setting$prior$gamma_pr[1],MCMC_setting$prior$gamma_pr[2],log = T)
+
+    par_probs[3] = dnorm(log(gamma),MCMC_setting$prior$gamma_pr[1],MCMC_setting$prior$gamma_pr[2],log = T)
 
     ch=c()
+
     if(is.null(MCMC_setting$control$hyper)){
-      hyper = rgamma(1, MCMC_setting$prior$hyper_pr[1],MCMC_setting$prior$hyper_pr[1])
+      hyper = rgamma(1, MCMC_setting$prior$hyper_pr[1],MCMC_setting$prior$hyper_pr[2])
     }else{
       hyper = MCMC_setting$control$hyper
     }
+
+    par_probs[5] = dgamma(hyper, MCMC_setting$prior$hyper_pr[1],MCMC_setting$prior$hyper_pr[2], log = T)
+
     if(length(MCMC_setting$x_r) > 1){
       if(is.null(MCMC_setting$control$ch)){
         ch = rlnorm(MCMC_setting$x_i[1],0,1/hyper)
@@ -541,13 +549,8 @@ MCMC_initialize_general = function(MCMC_setting){
     #lines(LatentTraj[,1],LatentTraj[,3],col="red", lwd = 2)
   }
 
+  chprobs = -0.5 * sum((log(param[(MCMC_setting$x_i[2] + 1):(MCMC_setting$x_i[1] + MCMC_setting$x_i[2])]) * hyper)^2)
 
-  chprob = 0
-
-  for(i in 1:MCMC_setting$x_i[1]){
-    chprob = chprob + dnorm(log(param[MCMC_setting$x_i[2] + i]), 0, 1/hyper,log = T)
-  }
-  priorLog[MCMC_setting$p + MCMC_setting$x_i[2] +1] = chprob
   #LogGamma = dlnorm(gamma,MCMC_setting$prior$gamma_pr[1],MCMC_setting$prior$gamma_pr[2],log = T)
   #LogE = dlnorm(mu, MCMC_setting$prior$mu_pr[1], MCMC_setting$prior$mu_pr[2],log = T)
   plot(LatentTraj[,1],LatentTraj[,3],type="l",xlab = "time",col="blue", lwd = 2)
@@ -555,7 +558,7 @@ MCMC_initialize_general = function(MCMC_setting){
   paras =  c(state,param)
   MCMC_obj = list(par = paras,LatentTraj = LatentTraj, logMultiNorm = logMultiNorm,p = MCMC_setting$p,
                   Ode_Traj_coarse = Ode_Traj_coarse, FT = FT, coalLog = coalLog, OriginTraj = OriginTraj,logOrigin = logOrigin,
-                  priorLog = priorLog, betaN = betaN)
+                  par_probs = par_probs, chprobs = chprobs, betaN = betaN)
   ##########
   cat("Initialize MCMC \n")
   print(paste("population size = ", MCMC_setting$N))
