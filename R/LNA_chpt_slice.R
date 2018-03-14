@@ -165,6 +165,106 @@ check_list_eq = function(list1, list2){
 }
 
 
+
+Update_Param_each_Norm = function(MCMC_obj, MCMC_setting, parIdlist, isLoglist, priorIdlist, proposeIdlist,hyper = T){
+
+  if(is.null((parIdlist))){
+    return(list(MCMC_obj = MCMC_obj))
+  }
+
+  if(!check_list_eq(parIdlist, isLoglist)){
+    stop("parameters do not match")
+  }
+
+  if(!check_list_eq(parIdlist, priorIdlist)){
+    stop("priors do not match")
+  }
+
+  if(!check_list_eq(parIdlist, proposeIdlist)){
+    stop("priors do not match")
+  }
+
+  d = length(parIdlist)
+  p = MCMC_obj$p
+  x_i = MCMC_setting$x_i
+  hyperId = (p + MCMC_setting$x_i[1] + MCMC_setting$x_i[2] + 1)
+
+  for(i in 1:d){
+    par_probs = MCMC_obj$par_probs
+    par_new = MCMC_obj$par
+    initial_new = MCMC_obj$par[1:p]
+    param_new = MCMC_obj$par[-(1:p)]
+    subd = length(parIdlist[[i]])
+    parId = parIdlist[[i]]
+    isLog = isLoglist[[i]]
+    priorId = priorIdlist[[i]]
+    proposeId = proposeIdlist[[i]]
+
+    initialId = parId[parId <= p]
+    paramId = parId[parId > p & parId <= (p + x_i[1] + x_i[2] + 1)]
+
+    RawTransParam = MCMC_obj$par[parId]
+    RawTransParam[isLog == 1] = log(RawTransParam[isLog == 1])
+    RawTransParam_new = RawTransParam
+    prior_proposal_offset = 0
+    for(i in 1:length(parId)){
+
+      newdiff = 0
+
+      if(priorId[i] %in% c(1:4)){
+        pr = MCMC_setting$prior[[ priorId[i] ]]
+        po = MCMC_setting$proposal[[proposeId[i]]]
+        RawTransParam_new[i] = RawTransParam[i] + runif(1,-po, po)
+        newdiff = dnorm(RawTransParam_new[i], pr[1], pr[2], log = T) - dnorm(RawTransParam[i], pr[1], pr[2], log = T)
+        par_probs[priorId[i]] = dlnorm(exp(RawTransParam_new[i]), pr[1], pr[2], log = T)
+      }
+
+      if(hyper == T){
+           if(priorId[i] == 5){
+              pr = MCMC_setting$prior[[priorId[i]]]
+             po = MCMC_setting$proposal[[proposeId[i]]]
+            u = runif(1,-po, po)
+           RawTransParam_new[i] = RawTransParam[i] * exp(u)
+          newdiff = dlnorm(RawTransParam_new[i], pr[1], pr[2], log = T) - u - dlnorm(RawTransParam[i], pr[1], pr[2], log = T)
+          par_probs[priorId[i]] = dlnorm(RawTransParam_new[i], pr[1], pr[2], log = T)
+           }
+      }
+
+      prior_proposal_offset = prior_proposal_offset + newdiff
+    }
+
+    RawTransParam_new[isLog == 1] = exp(RawTransParam_new[isLog == 1])
+
+    if(hyperId %in% parId){
+      par_new[(p + x_i[2] + 1): (hyperId - 1)] = exp(log(par_new[(p + x_i[2] + 1): (hyperId - 1)]) *
+                                                       RawTransParam[subd] / RawTransParam_new[subd])
+    }
+
+    par_new[parId] = RawTransParam_new
+    initial_new[initialId] = par_new[initialId]
+    param_new = par_new[-(1:p)]
+
+    update_res = Update_Param(param_new, initial_new, MCMC_setting$times, MCMC_obj$OriginTraj,
+                              MCMC_setting$x_r, MCMC_setting$x_i, MCMC_setting$Init, MCMC_setting$gridsize, MCMC_obj$coalLog,prior_proposal_offset,
+                              MCMC_setting$t_correct, model = MCMC_setting$model,
+                              volz = MCMC_setting$likelihood == "volz")
+
+
+    if(update_res$accept){
+      MCMC_obj$par = par_new
+      MCMC_obj$FT = update_res$FT_new
+      MCMC_obj$Ode_Traj_coarse = update_res$Ode
+      MCMC_obj$betaN = update_res$betaN
+      MCMC_obj$coalLog = update_res$coalLog
+      MCMC_obj$LatentTraj = update_res$LatentTraj
+      MCMC_obj$par_probs = par_probs
+    }
+
+  }
+  return(list(MCMC_obj = MCMC_obj, par_probs = par_probs))
+}
+
+
 Update_Param_each = function(MCMC_obj, MCMC_setting, parIdlist, isLoglist, priorIdlist, proposeIdlist){
 
   if(is.null((parIdlist))){
@@ -340,6 +440,40 @@ update_ChangePoint_ESlice = function(MCMC_obj, MCMC_setting,i){
 }
 
 
+
+prob_Eval = function(par, priorList, hyperId){
+  logProb = numeric(5)
+  for(i in 1:3){
+    logProb[i] = dlnorm(par[i+1], priorList[[i]][1], priorList[[i]][2],log = T)
+  }
+
+  logProb[5] = dlnorm(par[hyperId], priorList[[4]][1], priorList[[4]][2],log = T)
+  return(logProb)
+}
+
+####
+
+update_Par_ESlice_combine = function(MCMC_obj, MCMC_setting, priorList, ESS_vec,i){
+  p = MCMC_setting$p
+  ESlice_Result = ESlice_par_General(MCMC_obj$par, MCMC_setting$times, MCMC_obj$OriginTraj, priorList, MCMC_setting$x_r, MCMC_setting$x_i, MCMC_setting$Init,
+                     MCMC_setting$gridsize, ESS_vec, MCMC_obj$coalLog,MCMC_setting$t_correct)
+  MCMC_obj$par = ESlice_Result$par
+  MCMC_obj$LatentTraj = ESlice_Result$LatentTraj
+  MCMC_obj$betaN = ESlice_Result$betaN
+  MCMC_obj$FT = ESlice_Result$FT
+
+  if(ESlice_Result$CoalLog - MCMC_obj$coalLog < -25){
+    print(paste("ChangePoint slice sampling problem",i))
+  }
+  MCMC_obj$coalLog = ESlice_Result$CoalLog
+  MCMC_obj$Ode_Traj_coarse = ESlice_Result$OdeTraj
+  MCMC_obj$par_probs = prob_Eval(MCMC_obj$par, priorList, sum(MCMC_setting$x_i[1:2]) + p + 1)
+  return(MCMC_obj)
+}
+
+
+
+####
 update_Par_ESlice = function(MCMC_obj, MCMC_setting, priorList,i){
 
   p = MCMC_setting$p
@@ -393,6 +527,9 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
     options$warmup2 = 100000
   }
   fixPCOV = !is.null(MCMC_setting$PCOV)
+  if(fixPCOV){
+    MCMC_setting$PCOV = MCMC_setting$PCOV * options$tune
+  }
   if (MCMC_setting$likelihood == "volz") { # volz likelihood model
 
     params = matrix(nrow = niter, ncol = nparam + MCMC_obj$p)
@@ -410,6 +547,7 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
   l2 = matrix(ncol = 5, nrow = niter)
   tjs = array(dim = c(dim(MCMC_obj$LatentTraj),niter))
   l3 = l
+
 
 
   #' updateVec
@@ -454,7 +592,7 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
     if(!fixPCOV){
       if((i == options$warmup2) || ((i > options$warmup2) && (i %% options$up == 0))){
 
-        idx = floor(options$burn1 + 1):(i-1)
+        idx = floor(i/3):(i-1)
         SigmaN = NULL
 
       ## get matrix of parameters to compute covariance
@@ -470,14 +608,13 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
         # compute covariance matrix for random walk proposal
         SigmaN = (2.38^2) * cov(SigmaN) / length(parId)
 
-        MCMC_setting$PCOV = options$beta * SigmaN + (1 - options$beta) * diag(rep(1,length(parId))) * 0.001 / length(parId)
-
+        MCMC_setting$PCOV = options$beta * SigmaN + (1 - options$beta) * diag(rep(1,length(parId))) * 0.0001 / length(parId)
+        MCMC_setting$PCOV = MCMC_setting$PCOV * options$tune
         print(MCMC_setting$PCOV)
 
       }
     }
-    MCMC_setting$PCOV = MCMC_setting$PCOV * options$tune
-    #' update parameters using three stage
+      #' update parameters using three stage
     #' 1. no noise in trajectory and fix hyperparamter
     #' 2. update parameters independently, trying to learn the correlations between parameters
     #' 3. update parameters using multi-dim random walk
@@ -560,8 +697,8 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
 General_MCMC_with_ESlice = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000, burn = 0, thin = 5,changetime, DEMS=c("S","I"),
                                     prior=list(pop_pr=c(1,1,1,10), R0_pr=c(1,7), mu_pr = c(3,0.2), gamma_pr = c(3,0.2), hyper_pr = c(0.001,0.001)),
                                     proposal = list(pop_prop = 0.5, R0_prop = c(0.01), mu_prop=0.1, gamma_prop = 0.2, hyper_prop=0.05),
-                                    control = list(), updateVec = c(1,1,1,1,1,1,1), likelihood = "volz",model = "SIR",
-                                    Index = c(0,2), nparam=2, method = "seq",options = list(joint = F, PCOV = NULL,beta = 0.05, burn1 = 5000, parIdlist = NULL, priorIdlist = NULL,up = 2000, tune = 0.01), verbose = T){
+                                    control = list(), ESS_vec = c(1,1,1,1,1,1,1), likelihood = "volz",model = "SIR",
+                                    Index = c(0,2), nparam=2, method = "seq",options = list(joint = F, PCOV = NULL,beta = 0.05, burn1 = 5000, parIdlist = NULL, priorIdlist = NULL,up = 2000, tune = 0.01, hyper = F), verbose = T){
 
   MCMC_setting = MCMC_setup_general(coal_obs, times,t_correct,N,gridsize,niter,burn,
                                     thin,changetime, DEMS,prior,proposal,
@@ -576,7 +713,7 @@ General_MCMC_with_ESlice = function(coal_obs,times,t_correct,N,gridsize=1000, ni
   if(is.null(options$tune)){
     options$tune = 0.01
   }
-
+  prlist = list(a = prior[[1]][1:2], b = prior[[2]][1:2],c = prior[[3]][1:2],d = prior[[5]][1:2])
   if (MCMC_setting$likelihood == "volz") { # volz likelihood model
 
     params = matrix(nrow = niter, ncol = nparam + MCMC_obj$p)
@@ -606,7 +743,8 @@ General_MCMC_with_ESlice = function(coal_obs,times,t_correct,N,gridsize=1000, ni
   #' 6 changepoints
   #' 7 LNA noise in trajectory
 
-
+  ESS_temp = ESS_vec
+  ESS_temp[5] = 0
   for (i in 1:MCMC_setting$niter) {
     if(i %% 10000 == 0){
       print(i)
@@ -622,9 +760,17 @@ General_MCMC_with_ESlice = function(coal_obs,times,t_correct,N,gridsize=1000, ni
     }
 
     if(i < options$burn1){
+        # update gamma,
+      MCMC_obj = tryCatch({Update_Param_each_Norm(MCMC_obj, MCMC_setting, options$parIdlist,
+                                             options$isLoglist, options$priorIdlist,options$priorIdlist,hyper = F)$MCMC_obj
+      }, error = function(cond){
+        message(cond)
+        # Choose a return value in case of error
+        return(MCMC_obj)
+      })
 
-
-        MCMC_obj = tryCatch({update_Par_ESlice(MCMC_obj,MCMC_setting,prior,i)},
+        # update R0 chpts
+        MCMC_obj = tryCatch({update_Par_ESlice_combine(MCMC_obj,MCMC_setting, priorList = prlist, ESS_vec = ESS_temp, i)},
                             error = function(cond){
                               message(cond)
                               # Choose a return value in case of error
@@ -632,37 +778,35 @@ General_MCMC_with_ESlice = function(coal_obs,times,t_correct,N,gridsize=1000, ni
                             })
 
     }else{
+      # update gamma, hyper
+      MCMC_obj = tryCatch({Update_Param_each_Norm(MCMC_obj, MCMC_setting, options$parIdlist,
+                                                  options$isLoglist, options$priorIdlist,options$priorIdlist,hyper = options$hyper)$MCMC_obj
+      }, error = function(cond){
+        message(cond)
+        # Choose a return value in case of error
+        return(MCMC_obj)
+      })
 
-      if(updateVec[6] == 1){
-
-        MCMC_obj = tryCatch({update_Par_ESlice(MCMC_obj,MCMC_setting,prior,i)},
+        MCMC_obj = tryCatch({update_Par_ESlice_combine(MCMC_obj,MCMC_setting,prlist,ESS_vec,i)},
                             error = function(cond){
                               message(cond)
                               # Choose a return value in case of error
                               return(MCMC_obj)
                             })
-      }
 
-      if(updateVec[7] == 1){
         MCMC_obj = tryCatch({updateTraj_general_NC(MCMC_obj,MCMC_setting,i)$MCMC_obj},
                         error = function(cond){
                           message(cond)
                           # Choose a return value in case of error
                           return(MCMC_obj)
                         })
-      }
-
-      if(updateVec[5] == 0.5){
-        MCMC_obj = update_hyper(MCMC_obj, MCMC_setting, i)$MCMC_obj
-      }
-
     }
 
     tjs[,,i] = MCMC_obj$LatentTraj
     params[i,] = MCMC_obj$par
     l[i] = MCMC_obj$logOrigin
     l1[i] = MCMC_obj$coalLog
-    l3[i] = MCMC_obj$chpr
+    l2[i,] = MCMC_obj$par_probs
   }
   return(list(par = params,Trajectory = tjs,l=l,l1=l1,l2 = l2, l3 = l3, MX = MCMC_setting$PCOV, MCMC_setting = MCMC_setting, MCMC_obj = MCMC_obj))
 }
@@ -689,6 +833,7 @@ General_MCMC_cont = function(MCMC_setting, MCMC_obj, niter, updateVec = c(1,1,1,
 
   logIndexAll = c(1,0,1,0)
   parIndexALL = c(p:(p + MCMC_setting$x_i[2]), nparam+p)
+
 
   parId = parIndexALL[updateVec[c(1:3,5)] > 0]
   logId = logIndexAll[updateVec[c(1:3,5)] > 0]

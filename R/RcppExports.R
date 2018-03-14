@@ -156,12 +156,20 @@ Param_Slice_update_all <- function(par_old, x_r, x_i, theta, newChs, rho = 1) {
     .Call('_LNAPhyloDyn_Param_Slice_update_all', PACKAGE = 'LNAPhyloDyn', par_old, x_r, x_i, theta, newChs, rho)
 }
 
+Param_Slice_update_all2 <- function(par_old, x_r, x_i, theta, newChs, ESS_vec, priorList) {
+    .Call('_LNAPhyloDyn_Param_Slice_update_all2', PACKAGE = 'LNAPhyloDyn', par_old, x_r, x_i, theta, newChs, ESS_vec, priorList)
+}
+
 ESlice_change_points <- function(param, initial, t, OriginTraj, x_r, x_i, init, gridsize, coal_log = 0, t_correct = 0, transP = "changepoint", model = "SIR", transX = "standard", volz = TRUE) {
     .Call('_LNAPhyloDyn_ESlice_change_points', PACKAGE = 'LNAPhyloDyn', param, initial, t, OriginTraj, x_r, x_i, init, gridsize, coal_log, t_correct, transP, model, transX, volz)
 }
 
 ESlice_par <- function(param, initial, t, OriginTraj, priorList, x_r, x_i, init, gridsize, coal_log = 0, t_correct = 0, transP = "changepoint", model = "SIR", transX = "standard", volz = TRUE) {
     .Call('_LNAPhyloDyn_ESlice_par', PACKAGE = 'LNAPhyloDyn', param, initial, t, OriginTraj, priorList, x_r, x_i, init, gridsize, coal_log, t_correct, transP, model, transX, volz)
+}
+
+ESlice_par_General <- function(par_old, t, OriginTraj, priorList, x_r, x_i, init, gridsize, ESS_vec, coal_log = 0, t_correct = 0, transP = "changepoint", model = "SIR", transX = "standard", volz = TRUE) {
+    .Call('_LNAPhyloDyn_ESlice_par_General', PACKAGE = 'LNAPhyloDyn', par_old, t, OriginTraj, priorList, x_r, x_i, init, gridsize, ESS_vec, coal_log, t_correct, transP, model, transX, volz)
 }
 
 ESlice_general_NC <- function(f_cur, OdeTraj, FTs, state, init, betaN, t_correct, lambda = 10, coal_log = -99999999, gridsize = 100L, volz = FALSE, model = "SIR", transX = "standard") {

@@ -634,8 +634,8 @@ List KF_param_chol(arma::mat OdeTraj, arma::vec param,int gridsize,arma::vec x_r
     try{
       Lcube.slice(i) = arma::chol(as<arma::mat>(tempres[1]) + 0.00000001 * arma::diagmat(ones(p))).t();
     }catch(...){
-      Rcout << as<arma::mat>(tempres[1]) << endl;
-      Rcout << i << endl;
+      //Rcout << as<arma::mat>(tempres[1]) << endl;
+      //Rcout << i << endl;
       throw std::invalid_argument("Invalid input for cholesky decomposition.");
     }
   }
@@ -1214,13 +1214,61 @@ arma::vec Param_Slice_update(arma::vec param, arma::vec x_r, arma::ivec x_i, dou
 arma::vec Param_Slice_update_all(arma::vec par_old, arma::vec x_r, arma::ivec x_i, double theta, arma::vec newChs, double rho = 1){
 
   arma::vec par_new = par_old;
-  arma::vec OdeChs = arma::log(par_old.subvec(1,x_i(1) + x_i(0) + 1));
+  arma::vec OdeChs = arma::log(par_old.subvec(1,x_i(1) + x_i(0) + 2));
   arma::vec Chs_prime = OdeChs * cos(theta) + newChs * sin(theta);
   par_new.subvec(1, x_i(0) + x_i(1) + 1) = arma::exp(Chs_prime);
   return par_new;
 }
 
 
+//[[Rcpp::export()]]
+arma::vec Param_Slice_update_all2(arma::vec par_old, arma::vec x_r, arma::ivec x_i, double theta, arma::vec newChs, arma::ivec ESS_vec, List priorList){
+  /*
+   * new_chs: vector of normal ((log(I0_new) - pr11)/pr12, (log(R0_new) - pr21_/ pr22, (log(gamma_new) - pr31)/ pr32,
+   * log(changepoint_new) / hyper_new, log(hyper_new))
+   *
+   * return: vector par_new that can be attached to MCMC_obj
+   */
+
+  arma::vec par_new = par_old;
+
+
+  // extract parameters for prior distribution
+  arma::vec pr(8);
+  pr.subvec(0,1) = as<arma::vec>(priorList[0]);
+  pr.subvec(2,3) = as<arma::vec>(priorList[1]);
+  pr.subvec(4,5) = as<arma::vec>(priorList[2]);
+  pr.subvec(6,7) = as<arma::vec>(priorList[3]);
+
+
+  // extract Normal(0,1) variable from par_old
+  arma::vec OdeChs = arma::log(par_old.subvec(1,x_i(1) + x_i(0) + 2));
+  // I_0 R_0 gamma
+  for(int i = 0; i < 3; i ++){
+      OdeChs(i) = (OdeChs(i) - pr(2 * i)) / pr(2 * i + 1);
+  }
+   // hyper
+  OdeChs(x_i(0) + x_i(1) + 1) =  (OdeChs(x_i(0) + x_i(1) + 1) - pr(6)) / pr(7);
+  // changepoints
+  OdeChs.subvec(3,2 + x_i(0)) = OdeChs.subvec(3,2 + x_i(0)) * par_new(x_i(0) + x_i(1) + 2);
+
+  // rotation in Elliptical slice sampler
+  arma::vec Chs_prime = OdeChs * cos(theta) + newChs * sin(theta);
+
+  for(int i = 0; i < 3; i ++){
+    if(ESS_vec(i) != 0){
+      par_new(1 + i) = exp(Chs_prime(i) * pr(2 * i + 1) + pr(2 * i));
+    }
+  }
+  if(ESS_vec(4) != 0){
+    par_new(x_i(0) + x_i(1) + 2) = exp(Chs_prime(x_i(0) + x_i(1) + 1) * pr(7) + pr(6));
+  }
+  if(ESS_vec(5) != 0){
+    par_new.subvec(4, x_i(0) + x_i(1) + 1) = arma::exp(Chs_prime.subvec(3,x_i(0) + x_i(1)) / par_new(x_i(0) + x_i(1) + 2));
+  }
+
+  return par_new;
+}
 
 //[[Rcpp::export()]]
 List ESlice_change_points(arma::vec param, arma::vec initial, arma::vec t, arma::mat OriginTraj,
@@ -1436,6 +1484,165 @@ List ESlice_par(arma::vec param, arma::vec initial, arma::vec t, arma::mat Origi
 }
 
 
+
+//[[Rcpp::export()]]
+List ESlice_par_General(arma::vec par_old, arma::vec t, arma::mat OriginTraj,List priorList,
+                arma::vec x_r, arma::ivec x_i, List init, int gridsize, arma::ivec ESS_vec,
+                double coal_log = 0, double t_correct = 0, std::string transP = "changepoint",
+                std::string model = "SIR", std::string transX = "standard", bool volz = true){
+
+  /*
+   *
+   *
+   *  priorList: a list of priors for parameters for 1. I_0, 2. R_0, 3. gamma, 4, mu (no exist in SIR model) 5 hyper
+   * all of them follows lognormal distribution
+   *
+   * ESS vec: vector that stores the index for each
+   *
+   *  test R code:
+   *
+   *  par_old = resres5MJP$par[125000,]
+      A = ESlice_par_General(par_old, seq(0,100,length.out = 2001), resres5MJP$MCMC_obj$OriginTraj, priorList = list(a=c(1,1),b=c(0.7,0.2), c=c(2,1), d=c(3,0.2)),
+                          resres5MJP$MCMC_setting$x_r, resres5MJP$MCMC_setting$x_i, resres5MJP$MCMC_setting$Init,50,ESS_vec = c(0,1,0,0,1,1,0),
+        resres5MJP$MCMC_obj$coalLog, 90)
+
+      A$par[c(1,2,4)] - par_old[c(1,2,4)]
+   *
+   */
+
+  arma::ivec Index(2);
+
+  int u_param = par_old.n_elem - 1; // length(par) - 1
+
+  // extract prior distribution for each parameter
+
+//  arma::vec R0_pr = as<arma::vec>(priorList[1]);
+//  arma::vec gamma_pr = as<arma::vec>(priorList[2]);
+//  arma::vec hyper_pr = as<arma::vec>(priorList[3]);
+
+
+  if(model == "SIR"){
+    Index(0) = 0; Index(1) = 1;
+  }else if(model == "SEIR"){
+    Index(0) = 0; Index(1) = 2;
+  }
+
+  arma::vec new_par_raw = arma::randn(u_param, 1); // 47 * 1
+
+  int N = t.n_elem / gridsize + 1;
+  if(ESS_vec(6) == 1){
+    arma::mat OriginTraj_new_raw = arma::randn(OriginTraj.n_rows, OriginTraj.n_cols);
+  }
+
+  arma::mat OriginTraj_new = OriginTraj;
+
+
+  double u = R::runif(0,1);
+
+  if(log(u) < -25){
+    Rcout << "really small u" << endl;
+    Rcout << u << endl;
+  }
+
+  double logy = coal_log + log(u);
+  double theta = 2 * pi;
+  double theta_min = 0;
+  double theta_max = 2 * pi;
+
+  arma::vec par_new = par_old;
+  List param_list;
+  List FT_new;
+  arma::vec betaN(N);
+  arma::mat OdeTraj_new(N,3);
+  arma::mat NewTraj(N,3);
+  double loglike;
+  int i = 0;
+
+  do{
+
+    i += 1;
+
+    // use the original values if no upates in 20 iterations
+    if(i>20){
+      Rcout<<"theta = "<< theta <<endl;
+      theta = 0;
+      par_new = par_old;
+      param_list = New_Param_List(par_new.subvec(2, x_i(0) + x_i(1) + 2), par_new.subvec(0,1), gridsize, t, x_r, x_i,
+                                   transP, model, transX);
+      FT_new = as<Rcpp::List>(param_list[0]);
+      betaN = as<arma::vec>(param_list[2]);
+      OdeTraj_new  = as<arma::mat>(param_list[1]);
+      OriginTraj_new = OriginTraj;
+      NewTraj = TransformTraj(OdeTraj_new, OriginTraj_new, FT_new);
+      loglike = volz_loglik_nh2(init, NewTraj,betaN,t_correct,Index ,transX);
+      break;
+    }
+
+    if(i == 1){ // first iteration
+      theta = R::runif(0,2*pi);
+      theta_min = theta - 2*pi;
+      theta_max = theta;
+    }else{
+
+      if(theta < 0){
+        theta_min = theta;
+      }else{
+        theta_max = theta;
+      }
+      theta = R::runif(theta_min,theta_max);
+    }
+
+    par_new = Param_Slice_update_all2(par_old, x_r, x_i, theta, new_par_raw, ESS_vec, priorList); // 49
+    int error = 0;
+
+    try{
+    param_list = New_Param_List(par_new.subvec(2, x_i(0) + x_i(1) + 2), par_new.subvec(0,1), gridsize, t, x_r, x_i,
+                                   transP, model, transX);
+    }catch(...){
+      error = 1;
+    }
+
+    if(error == 1) { // if error happens in parameters, go back
+      loglike = -10000000;
+      continue;
+    }
+
+    FT_new = as<Rcpp::List>(param_list[0]);
+
+     betaN = as<arma::vec>(param_list[2]);
+
+     OdeTraj_new  = as<arma::mat>(param_list[1]);
+
+  // Update OriginTraj if ESS_vec(6) == 1
+    if(ESS_vec(6) == 1){
+      OriginTraj_new = OriginTraj * cos(theta) + OriginTraj_new * sin(theta);
+    }
+
+    NewTraj = TransformTraj(OdeTraj_new, OriginTraj_new, FT_new);
+
+    loglike = volz_loglik_nh2(init, NewTraj, betaN, t_correct, Index ,transX);
+
+  }
+  while(loglike <= logy);
+
+
+  List result;
+  double logOrigin = 0;
+  for(int j = 0; j < OriginTraj_new.n_rows; j ++){
+    for(int k = 0; k < OriginTraj_new.n_cols; k ++){
+      logOrigin -= 0.5 * OriginTraj_new(j,k) * OriginTraj_new(j,k);
+    }
+  }
+  result["betaN"] = betaN;
+  result["FT"] = FT_new;
+  result["OdeTraj"] = OdeTraj_new;
+  result["par"] = par_new;
+  result["LatentTraj"] = NewTraj;
+  result["CoalLog"] = loglike;
+  result["OriginTraj"] = OriginTraj_new;
+  result["logOrigin"] = logOrigin;
+  return result;
+}
 //[[Rcpp::export()]]
 List ESlice_general_NC(arma::mat f_cur, arma::mat OdeTraj, List FTs, arma::vec state,
                          List init, arma::vec betaN, double t_correct, double lambda=10,

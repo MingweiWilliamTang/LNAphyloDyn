@@ -8,6 +8,27 @@ loadModule("mod_Foo", TRUE)
 #  })
 #}
 #SIR_FRM = StepFRM(SIR_exact)
+covtocor = function(MX){
+  return(MX / (sqrt(diag(MX)) %*% t(sqrt(diag(MX)))) )
+}
+
+partocov = function(MCMC_obj, ids, indices, logvec, COV = 1){
+  MX = NULL
+  for(i in 1:length(indices)){
+    if( logvec[i] == 1){
+      v = log( MCMC_obj$par[ids,indices[i]])
+    }else{
+      v =  MCMC_obj$par[ids,indices[i]]
+    }
+    MX = cbind(MX,v)
+  }
+  if(COV == 1){
+    return(cov(MX))
+  }else{
+    return(cor(MX))
+  }
+}
+
 
 simuSIRS = function(theta1,theta2,theta3,S,I,R,times){
   SIRS_exact = list()
