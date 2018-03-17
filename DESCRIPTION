@@ -13,7 +13,7 @@ License: What license is it under?
 LazyData: TRUE
 LinkingTo: Rcpp,RcppArmadillo,BH
 Depends:
-    R (>= 3.1.0), Rcpp, RcppArmadillo, abind, smfsb
+    R (>= 3.1.0), Rcpp, RcppArmadillo, abind, smfsb, MASS
 RcppModules: mod_Foo
 Imports:
     Rcpp,

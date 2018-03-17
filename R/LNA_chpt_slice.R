@@ -545,7 +545,7 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
   l = numeric(niter)
   l1 = l
   l2 = matrix(ncol = 5, nrow = niter)
-  tjs = array(dim = c(dim(MCMC_obj$LatentTraj),niter))
+  tjs = array(dim = c(dim(MCMC_obj$LatentTraj),niter / thin))
   l3 = l
 
 
@@ -694,11 +694,38 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
 
 #######
 
+#' @title MCMC for SIR model with LNA and changepoint on R0
+#'
+#' @param coal_obj Observed coalescent data. A list contains the sufficient statistics for coalescent: coalescant time,
+#' sampling time and number of active lineages sampled at each sampling time. For a phylogentic tree object, this is summarize_phylo(tree)
+#'
+#' @param times A fine time grid used for Ode integration
+#' @param t_correct The time period from start point to the last sampling time, a short t_correct can be used for infering
+#' infectious deseased at early stage based on truncated tree
+#' @param gridsize size of grid to integrate LNA. If dt is the interval of ODE integration, then then t_i - t_i-1
+#' @param niter total number of iterations for MCMC
+#' @param burn Number of iterations to burn
+#' @param thin Number of iterations for thinning
+#' @param changetime a vector of times that allows changing R0.
+#' @param DEMS The name of each dimension for infectious disease trajectory
+#' @param prior list of vectors for the values of the parameter prior
+#' @param proposal The step size for M-H proposal
+#' @param control The list of parameters that allows changing
+#' @param ESS_vec A 0-1 vector indicate which parameters to update using ESS
+#' @param likelihood Using volz likelihood by default
+#' @param model SIR or SEIR model
+#' @param Index Index for the S and I
+#' @param nparam number of parameters for infectious disease model. 2 for SIR model, 3 for SEIR model
+#' @param method sequentially update parameters of jointly update parameters
+#' @param opitons updating details for MCMC
+#' @param verbose boolean, if print parameters values during MCMC iterations
+#'
 General_MCMC_with_ESlice = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000, burn = 0, thin = 5,changetime, DEMS=c("S","I"),
-                                    prior=list(pop_pr=c(1,1,1,10), R0_pr=c(1,7), mu_pr = c(3,0.2), gamma_pr = c(3,0.2), hyper_pr = c(0.001,0.001)),
+                                    prior=list(pop_pr=c(1,1,1,10), R0_pr=c(0.7,0.2), mu_pr = c(3,0.2), gamma_pr = c(3,0.2), hyper_pr = c(0.001,0.001)),
                                     proposal = list(pop_prop = 0.5, R0_prop = c(0.01), mu_prop=0.1, gamma_prop = 0.2, hyper_prop=0.05),
                                     control = list(), ESS_vec = c(1,1,1,1,1,1,1), likelihood = "volz",model = "SIR",
-                                    Index = c(0,2), nparam=2, method = "seq",options = list(joint = F, PCOV = NULL,beta = 0.05, burn1 = 5000, parIdlist = NULL, priorIdlist = NULL,up = 2000, tune = 0.01, hyper = F), verbose = T){
+                                    Index = c(0,2), nparam=2, method = "seq",options = list(joint = F, PCOV = NULL,beta = 0.05, burn1 = 5000,
+                                                                                            parIdlist = NULL, priorIdlist = NULL,up = 2000, tune = 0.01, hyper = F), verbose = T){
 
   MCMC_setting = MCMC_setup_general(coal_obs, times,t_correct,N,gridsize,niter,burn,
                                     thin,changetime, DEMS,prior,proposal,
@@ -730,7 +757,7 @@ General_MCMC_with_ESlice = function(coal_obs,times,t_correct,N,gridsize=1000, ni
   l1 = l
   l3 = l
   l2 = matrix(ncol = 5, nrow = niter)
-  tjs = array(dim = c(dim(MCMC_obj$LatentTraj),niter))
+  tjs = array(dim = c(dim(MCMC_obj$LatentTraj),niter/thin))
 
 
 
@@ -829,7 +856,7 @@ General_MCMC_cont = function(MCMC_setting, MCMC_obj, niter, updateVec = c(1,1,1,
   l1 = l
   l3 = l
   l2 = matrix(ncol = 5, nrow = niter)
-  tjs = array(dim = c(dim(MCMC_obj$LatentTraj),niter))
+  tjs = array(dim = c(dim(MCMC_obj$LatentTraj),niter / thin))
 
   logIndexAll = c(1,0,1,0)
   parIndexALL = c(p:(p + MCMC_setting$x_i[2]), nparam+p)

@@ -10,6 +10,7 @@ typedef arma::vec (*h_fun)(arma::vec, arma::vec, std::string);
 */
 #include "LNA_functional.h"
 #include<stdexcept>
+#include<assert.h>
 /*
  *
  * Generate a vector of beta corresponds to each time grid
@@ -535,6 +536,17 @@ double ODE_rk45_stop(arma::vec initial, arma::vec t, arma::vec param,
 List SigmaF(arma::mat Traj_par,arma::vec param,
                   arma::vec x_r, arma::ivec x_i,
                   std::string transP = "changepoint", std::string model = "SIR",std::string transX = "standard"){
+  /*
+   * Input:
+   * Traj_par: SIR ode trjactory
+   * param: parameters for SIR model
+   *
+   * Return:
+   * A list contains two matrices: Jocobian matrix F and Covariance matrix Sigma
+   *
+   */
+
+
   int p = Traj_par.n_cols - 1;
 
   arma::mat Q = arma::eye(p,p);
@@ -586,11 +598,20 @@ List SigmaF(arma::mat Traj_par,arma::vec param,
   return Res;
 }
 
+
 //[[Rcpp::export()]]
 List KF_param(arma::mat OdeTraj, arma::vec param,int gridsize,arma::vec x_r, arma::ivec x_i,
               std::string transP = "changepoint",
               std::string model = "SIR",std::string transX = "standard"){
-
+  /*
+   * Parametrize the latent process as a Kalman filter
+   * X_{i=1} = A * X_i + epsilon where E(Epsilon) = 0  Var(epsilon) = Sigma
+   *
+   * Return a list with two cubes
+   * 1. cubes of As: A_i = A.slice(i)
+   * 2. cubes of Sigmas: Sigma_i = Sigma.slices(i)
+   *
+   */
   int n = OdeTraj.n_rows;
   //double dt = (OdeTraj(1,0) - OdeTraj(0,0));
   int k = (n-1) / gridsize;
@@ -617,7 +638,12 @@ List KF_param(arma::mat OdeTraj, arma::vec param,int gridsize,arma::vec x_r, arm
 List KF_param_chol(arma::mat OdeTraj, arma::vec param,int gridsize,arma::vec x_r, arma::ivec x_i,
               std::string transP = "changepoint",
               std::string model = "SIR",std::string transX = "standard"){
-
+  /*
+   * Using non-centralized reparametrization:
+   * LatentTraj = OdeTraj + COV_matrix * iid gaussian
+   * return the components of matrix used in non-centralized reparametrization
+   *
+   */
   int n = OdeTraj.n_rows;
   //double dt = (OdeTraj(1,0) - OdeTraj(0,0));
   int k = (n-1) / gridsize;
@@ -634,9 +660,7 @@ List KF_param_chol(arma::mat OdeTraj, arma::vec param,int gridsize,arma::vec x_r
     try{
       Lcube.slice(i) = arma::chol(as<arma::mat>(tempres[1]) + 0.00000001 * arma::diagmat(ones(p))).t();
     }catch(...){
-      //Rcout << as<arma::mat>(tempres[1]) << endl;
-      //Rcout << i << endl;
-      throw std::invalid_argument("Invalid input for cholesky decomposition.");
+      throw std::invalid_argument("Invalid input for cholesky decomposition., parametrization fails");
     }
   }
   List Res;
@@ -650,6 +674,14 @@ List KF_param_chol(arma::mat OdeTraj, arma::vec param,int gridsize,arma::vec x_r
 //[[Rcpp::export()]]
 double log_like_traj_general2(arma::mat SdeTraj,arma::mat OdeTraj, List Filter,
                              int gridsize,double t_correct){
+  /*
+   * SdeTraj: input any random trajectory with proper dimension
+   *
+   *
+   *
+   *
+   */
+  assert(SdeTraj.n_cols == OdeTraj.n_cols);
   arma::cube Acube = as<arma::cube>(Filter[0]);
   arma::cube Scube = as<arma::cube>(Filter[1]);
 
@@ -790,6 +822,17 @@ List Traj_sim_general3(arma::mat OdeTraj, List Filter,double t_correct){
 
 //[[Rcpp::export()]]
 List Traj_sim_general_noncentral(arma::mat OdeTraj, List Filter_NC,double t_correct){
+  /*
+   * Simulate Epi trajecotry using non-centralized parametrization
+   *
+   * Return: A list
+   * 1.Simulated trajectory
+   * 2. The underlying normal variable
+   * loglikelihood of the trajectory
+   *
+   *
+   *
+   */
   arma::cube Acube = as<arma::cube>(Filter_NC[0]);
   arma::cube Lcube = as<arma::cube>(Filter_NC[1]);
 

@@ -208,7 +208,7 @@ vlineCI = function(data,cred = T){
   abline(v = m ,col="blue",lwd=2)
 }
 
-randomR0_traj = function(times,MCMC_obj,R0_id,col_id,idx,ylim=c(0,2),fill = rgb(1,0,0,0.3),main = "",xlab = "time",cex.lab=1.3,cex.axis = 1.2,xaxt = "s"){
+randomR0_traj = function(times,MCMC_obj,R0_id,col_id,idx,ylim=c(0,2),fill = rgb(1,0,0,0.3), main = "",xlab = "time",cex.lab=1.3,cex.axis = 1.2,xaxt = "s"){
   R0 = MCMC_obj$par[idx,R0_id]
   R0_traj = matrix(ncol= length(col_id)+2, nrow = length(idx))
   R0_traj[,1] = R0
@@ -290,6 +290,7 @@ histwithCI = function(data,cred = T){
   vlineCI(data,cred)
 }
 
+
 effpopPlot = function(NP_res,LNA_res,t_correct,idx,row=id,lid=5,ylab="",xlab="",ylim=c(0,10)){
   plot(t_correct - NP_res$x,NP_res$effpopmean,type="l",ylim = ylim,xlab = xlab,ylab=ylab)
   polygon(c(t_correct - NP_res$x, rev(t_correct - NP_res$x)), c(NP_res$effpop975,rev(NP_res$effpop025)),
@@ -299,18 +300,26 @@ effpopPlot = function(NP_res,LNA_res,t_correct,idx,row=id,lid=5,ylab="",xlab="",
 }
 
 
-
-
-CI_Curve_eff2 = function(MCMC_obj,ids, col = "black", fill_col = "grey", Irow = 3,method = "qtile",alpha=0.05,fill = T,likelihood ="volz",
+#' @title plot effective population size using output from MCMC
+#'
+#' @param MCMC_obj A list returned from MCMC functions
+#' @param ids Indices from the MCMC iteration output
+#' @thin Thinning applies on the SIR trajectory
+#'
+#'
+CI_Curve_eff2 = function(MCMC_obj,ids, thin = 1,col = "black", fill_col = "grey", Irow = 3,method = "qtile",alpha=0.05,fill = T,likelihood ="volz",
                          x_r,x_i,p=3){
+  if(sum(ids %% thin) == 1){
+    stop("Some indices not stored")
+  }
   if(likelihood == "volz"){
-    Mx = 1/(2 * MCMC_obj$Trajectory[,2,ids]/MCMC_obj$Trajectory[,Irow,ids])
+    Mx = 1/(2 * MCMC_obj$Trajectory[,2,ids / thin]/MCMC_obj$Trajectory[,Irow,ids / thin])
     scale = sapply(ids,function(x){
       return(betaTs(MCMC_obj$par[x,(p+1):(p + x_i[1] + x_i[2])],
                    MCMC_obj$Trajectory[,1,1],x_r, x_i))})
     Mx = Mx/scale
     }else{
-    Mx = MCMC_obj$Trajectory[,Irow,ids]
+    Mx = MCMC_obj$Trajectory[,Irow,ids / thin]
     scale = 1
   }
   midcur = apply(Mx,1,mean)
