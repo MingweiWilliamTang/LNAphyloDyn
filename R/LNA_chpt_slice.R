@@ -828,8 +828,9 @@ General_MCMC_with_ESlice = function(coal_obs,times,t_correct,N,gridsize=1000, ni
                           return(MCMC_obj)
                         })
     }
-
-    tjs[,,i] = MCMC_obj$LatentTraj
+    if(i %% thin == 0){
+      tjs[,,as.integer(i/thin)] = MCMC_obj$LatentTraj
+    }
     params[i,] = MCMC_obj$par
     l[i] = MCMC_obj$logOrigin
     l1[i] = MCMC_obj$coalLog
