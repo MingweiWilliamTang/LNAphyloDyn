@@ -2,8 +2,7 @@
 title: "Fitting Stochastic Model on Genetic Data (simulation examples I)"
 author: "Mingwei Tang"
 date: "`r Sys.Date()`"
-output: 
-  rmarkdown::github_document
+output: rmarkdown::github_document
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
@@ -83,7 +82,7 @@ cht = t2[2:(length(t2)-1)]
 
 ## Start MCMC for 1000 iterations
 
-```{r MCMC,cache=TRUE}
+```{r MCMC,results='hide', message=FALSE, warning=FALSE, cache=TRUE}
 set.seed(250)
 resres6 = General_MCMC2(coal_simu6, times = seq(0,100,length.out = 2001), t_correct = 90,
                         N = 100000,gridsize = 50,niter = 1000,burn = 0,thin = 5,
