@@ -1,0 +1,158 @@
+---
+title: "Fitting Stochastic Model on Genetic Data (simulation examples)"
+author: "Mingwei Tang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+`LNAPhyloDyn` is a R-package that aims at fitting stochastic SIR model using genealogy data. The method and the model are described in the paper ... . Here's an example based on simulated dataset. First, you need to load the package and some other dependent packages. 
+
+```{r,echo=TRUE,message=FALSE}
+library(LNAPhyloDyn)
+library(MASS)
+```
+
+
+# Simulate data
+Here's the parameters for simulation. 
+
+- Initial reproduction number trajectory: R_0 = 0
+- Recovery rate: gamma = 0.2
+- Initial number of infected: I_0 = 1
+- Changepoints: At time: 20, with with ratio 1. (ratio =1 means there's at time 20, there's no change in R_0)
+
+Other configurations:
+
+- Time period: [0,100]
+- Sampled times: samp_times = c(0,10,20,40,80,85)
+- Number of lineages sampled at each time: c(200,200,300,300,20,2)
+
+## Simulate SIR trajectory 
+
+Simulate the infectious SIR trajectory based on SIR model using Markov jump process (MJP): 
+
+
+```{r,fig.show='hold',fig.height=4,fig.width=7}
+x_i4 = c(1,2,0,1) # 1 changepoint, two parameters. 0 is the index for R_0, 1 is the index for gamma. (default for SIR model)
+set.seed(44)
+
+traj6 = ODE_rk45(c(100000,1),t = seq(0,100,length.out = 4001), param = c(2.2,0.2,1),x_r = c(100000,20), x_i = x_i4, model = "SIR") # Simulation based on ode
+
+LNA_Traj6 = Traj_sim_ezG2(c(100000,1),times = seq(0,100,length.out = 4001), 
+                          param = c(2.2,0.2,1), 40,x_r = c(100000,20), x_i = x_i4,
+                          90, model = "SIR")$Simu # simulation based on non-restarting LNA
+
+
+MJP_Traj6 = simuSIRt(c(100000,1),time = seq(0,100,length.out = 4001), param1 = c(2.2,0.2,1), x_r1 = c(100000,20), x_i1 = x_i4) # simulation based on MJP
+
+# view the simulated data
+head(MJP_Traj6)
+tail(MJP_Traj6)
+# plot S, I trajectory
+par(mar = c(4,4,1,1), mgp = c(2,1,0))
+plot(MJP_Traj6[,1], MJP_Traj6[,2], type = "l",ylab = "counts", xlab = "time", lwd = 2, col = "red",ylim = c(0,100000))
+lines(MJP_Traj6[,1], MJP_Traj6[,3], lwd = 2, col = "blue")
+legend("topright", legend = c("Susceptible", "Infected"), lty = 1, lwd =2 , col = c("blue", "red"))
+```
+
+## Simulate Genealogies
+Given the simulated trajectory `MJP_Traj6`, we simulated the geonealy based on Volz .el 2009. The simulated data contains the sufficient statistics for inference: coalescent time, the sampling time, and the number of lineages sampled. If you want to sample a tree structure, view package `phydynR` by Volz for more details. 
+
+```{r genealogy}
+set.seed(55)
+coal_simu6 = volz_thin_sir(MJP_Traj6, 90, samp_times = c(0,10,20,40,80,85),
+                           c(200,200,300,300,20,2), 
+                           betaN = betaTs(c(2.2,0.2,1),t = MJP_Traj6[,1], 
+                                          x_r = c(100000,20),x_i = x_i4))
+```
+
+### Inference
+Now we do the inference by running our MCMC algorithm. First we specify the LNA grid for Ode solver, the LNA grid and the grid for changepoints 
+
+```{r, timeconfig}
+times = seq(0,1000,length.out = 2001)
+t2 = times[seq(1,length(times),by=50)]
+cht = t2[2:(length(t2)-1)]
+```
+
+
+## Start MCMC for 1000 iterations
+
+```{r MCMC,cache=TRUE}
+set.seed(250)
+resres6 = General_MCMC2(coal_simu6, times = seq(0,100,length.out = 2001), t_correct = 90,
+                        N = 100000,gridsize = 50,niter = 1000,burn = 0,thin = 5,
+                        changetime = cht,DEMS = c("S","I"),
+                        prior=list(pop_pr=c(1,1,1,1), R0_pr=c(1,7), gamma_pr = c(-1.5,0.1), mu_pr = c(-1.2,0.1), hyper_pr=c(30,0.7)),
+                        proposal = list(pop_prop = 0.2, R0_prop = c(0.01), gamma_prop=0.05, mu_prop = 0.02, hyper_prop=0.25),
+                        control = list(alpha=c(1/100000), R0 = 1.8, gamma=0.2, ch=rep(1,length(cht)), traj = matrix(rep(0,2*40),ncol=2),hyper = 10),updateVec = c(1,1,1,0,0.5,1,1),
+                        likelihood = "volz", model = "SIR",
+                        Index = c(0,1), nparam=2,method = "admcmc", options=list(joint = T, PCOV = NULL,beta=0.95,burn1 = 10, parIdlist = list(a = 2,b=3,c=4,d=5 + length(cht)), isLoglist = list(a = 1,b=0,c=1,d=0),
+                                                                                 priorIdlist = list(a=1,b=2,c = 3,d = 5),up = 1000000), verbose = F)
+
+```
+
+### Simulation results
+```{r show sim_res, fig.show='hold',fig.height=3, fig.width=5, cache=TRUE,dependson = 'MCMC'}
+# R0(t) trajectory 
+par(mar = c(4,4,1,1), mgp = c(2,1,0))
+randomR0_traj(seq(0,100,length.out = 41),resres6,3,c(5:43),
+              seq(100,1000,by=5),ylim = c(1,3))
+abline(h = 2.2,col = "red", lwd = 2)
+# Histogram for recovery rate gamma
+hist(resres6$par[100:1000,4],main = "", xlab = "gamma")
+vlineCI(resres6$par[100:1000,4])
+abline(v = 0.2, col = "red", lwd = 2)
+```
+
+If you want to have better results, try more iterations. 
+
+Have fun! 
+
+<!--Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+
+## Styles
+
+The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+
+    output: 
+      rmarkdown::html_vignette:
+        css: mystyles.css
+
+## Figures
+
+The figure sizes have been customised so that you can easily put two images side-by-side. 
+
+```{r, fig.show='hold'}
+plot(1:10)
+plot(10:1)
+```
+
+You can enable figure captions by `fig_caption: yes` in YAML:
+
+    output:
+      rmarkdown::html_vignette:
+        fig_caption: yes
+
+Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+
+## More Examples
+
+You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(mtcars, 10))
+```
+
+Also a quote using `>`:
+
+> "He who gives up [code] safety for [code] speed deserves neither."
+([via](https://twitter.com/hadleywickham/status/504368538874703872))
+-->
+## Reference
+
+1. Volz E M, Pond S L K, Ward M J, et al. Phylodynamics of infectious disease epidemics[J]. Genetics, 2009, 183(4): 1421-1430.

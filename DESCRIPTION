@@ -28,4 +28,6 @@ Imports:
     MASS
 RoxygenNote: 5.0.1
 VignetteBuilder: knitr
-Suggests: testthat
+Suggests: testthat,
+    knitr,
+    rmarkdown
