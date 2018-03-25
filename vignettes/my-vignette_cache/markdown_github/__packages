@@ -1,0 +1,7 @@
+base
+Rcpp
+RcppArmadillo
+abind
+smfsb
+LNAPhyloDyn
+MASS

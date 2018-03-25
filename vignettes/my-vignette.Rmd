@@ -1,8 +1,9 @@
 ---
-title: "Fitting Stochastic Model on Genetic Data (simulation examples)"
+title: "Fitting Stochastic Model on Genetic Data (simulation examples I)"
 author: "Mingwei Tang"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::github_document
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
@@ -20,7 +21,7 @@ library(MASS)
 # Simulate data
 Here's the parameters for simulation. 
 
-- Initial reproduction number trajectory: R_0 = 0
+- Initial reproduction number trajectory: R_0 = 2.2
 - Recovery rate: gamma = 0.2
 - Initial number of infected: I_0 = 1
 - Changepoints: At time: 20, with with ratio 1. (ratio =1 means there's at time 20, there's no change in R_0)
