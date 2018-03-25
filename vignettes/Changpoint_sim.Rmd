@@ -1,6 +1,6 @@
 ---
-title: "Vignette Title"
-author: "Vignette Author"
+title: "Fitting Stochastic Model on Genetic Data (simulation examples II)"
+author: "Mingwei Tang"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -9,12 +9,129 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+`LNAPhyloDyn` is a R-package that aims at fitting stochastic SIR model using genealogy data. The method and the model are described in the paper ... . Here's an example based on simulated dataset. In this example, you will see the method applied on a simulated case with time varying reproduction number R_0. First, you need to load the package and some other dependent packages. 
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
 
+```{r,echo=TRUE,message=FALSE}
+library(LNAPhyloDyn)
+library(MASS)
+```
+
+# Simulate data
+Here's the parameters for simulation. 
+
+- Initial reproduction number trajectory: R_0 = 2
+- Recovery rate: gamma = 0.2
+- Initial number of infected: I_0 = 1
+- Changepoints: At time: (30, 60), with ratio (0.5, 0.6). 
+
+Hence R_0 = 
+- 2 for t in [0,30]
+- 1 for t in [30, 60] 
+- 0.6 for t in [60, 100]
+```{r timesetup, fig.show='hold', fig.height=2, fig.width=3}
+t3 = c(30,60)
+thetas3 = c(0.5, 0.6)
+x_i3 = c(2,2,0,1)
+par(mar = c(4,4,1,1), mgp = c(2,1,0))
+plot(c(0,30) , c(2,2), lwd = 2,type = "l", xlab = "time", ylab = "R0")
+lines(c(30,60),c(1,1), lwd = 2)
+lines(c(60,90), c(0.6, 0.6), lwd = 2)
+```
+
+Other configurations:
+
+- Time period: [0,100]
+- Sampled times: samp_times = c(0,10,20,40,80,85)
+- Number of lineages sampled at each time:  c(20,20,80,200,20,2)
+- Population size: 1000000
+## Simulate SIR trajectory 
+
+Simulate the infectious SIR trajectory based on SIR model using Markov jump process (MJP): 
+
+```{r}
+set.seed(45884)
+MJP_Traj5 = simuSIRt(c(1000000,1),time = seq(0,100,length.out = 4001), c(2,0.2,thetas3), c(1000000,t3), x_i3)
+
+# check the path
+head(MJP_Traj5) 
+tail(MJP_Traj5)
+# plot the number of infected vs time 
+par(mar = c(4,4,1,1), mgp = c(2,1,0))
+plot(MJP_Traj5[,1], MJP_Traj5[,3], type = "l",ylab = "infected", xlab = "time", lwd = 2, col = "red")
+```
+
+## Simulate Genealogies
+Given the simulated trajectory `MJP_Traj5`, we simulated the geonealy based on Volz .el 2009. The simulated data contains the sufficient statistics for inference: coalescent time, the sampling time, and the number of lineages sampled. If you want to sample a tree structure, you need to first simulate the trajectory and then plug in some raw functions inackage `phydynR` by Volz.  
+
+```{r genealogy, echo=TRUE, message=FALSE}
+set.seed(100)
+coal_simu5 = volz_thin_sir(MJP_Traj5, 90, samp_times = c(0,10,20,40,80,85), 
+                           c(20,20,80,200,20,2),betaN = betaTs(c(2,0.2,thetas3),
+                            times = MJP_Traj5[,1], x_r = c(1000000,t3),
+                            x_i = x_i3))
+```
+
+### Inference
+Now we do the inference by running our MCMC algorithm. First we specify the LNA grid for Ode solver, the LNA grid and the grid for changepoints 
+
+```{r, timeconfig}
+times = seq(0,100,length.out = 2001)
+t2 = times[seq(1,length(times),50)]
+chpts = t2[2:(length(t2)-1)]
+```
+
+## Start MCMC for 2000 iterations
+The mixing for initial $R_0$ and recovery rate are not well for non-constant $R_0$ cases when using random walk Metropolis-Hasting algorithm, here we use elliptical slice sampling (Murray.et al, 2010) to update initial $R_0$ and change points joinly. The algorithm is implemented is the function `General_MCMC_with_ESlice`. 
+
+```{r MCMC, echo=TRUE, fig.show='hide', results= 'hide', message=FALSE, warning=FALSE, cache=TRUE}
+set.seed(1111)
+resres5 = General_MCMC_with_ESlice(coal_simu5, times = seq(0,100,length.out = 2001), t_correct = 90,
+                        N = 1000000,gridsize = 50,niter = 2000,burn = 0,thin = 1,
+                        changetime = chpts, DEMS = c("S","I"),
+                        prior=list(pop_pr=c(1,1,1,1), R0_pr=c(0.7,0.5), gamma_pr = c(-1.7,0.1), mu_pr = c(-1.7,0.1), hyper_pr=c(3,0.2)),
+                        proposal = list(pop_prop = 0.2, R0_prop = c(0.01), gamma_prop=0.1, mu_prop = 0.1, hyper_prop=0.25),
+                        control = list(alpha=c(1/1000000), R0 = 2, gamma=0.2, ch=rep(0.975,length(chpts)), traj = matrix(rep(0,2*40),ncol=2),hyper = 20),ESS_vec = c(0,1,0,0,1,1,0),
+                        likelihood = "volz", model = "SIR",
+                        Index = c(0,1), nparam=2,method = "admcmc", options=list(joint = T, PCOV = NULL,beta=0.95,burn1 = 1000, parIdlist = list(c=4,d = length(chpts)+5), isLoglist = list(c=1,d=0),
+                                                                              priorIdlist = list(c=3,d=5), up = 1000000,warmup =10000000, tune = 0.01,hyper = F), verbose = F)
+
+```
+
+### Simulation results
+The simulation result is saved in a list, with parameter, trajectories, loglikelihood, MCMC set up and the MCMC object from the last iteration 
+
+```{r}
+names(resres5)
+```
+Now look at the MCMC result
+```{r show_res, fig.show='hold',fig.height=3, fig.width=5, cache=TRUE,dependson = 'MCMC'}
+# R0(t) trajectory 
+par(mar = c(4,4,1,1), mgp = c(2,1,0))
+randomR0_traj(seq(0,100,length.out = 41),resres5,3,c(5:43),
+              seq(1000,2000,by=5),ylim = c(0.3,2.5))
+lines(c(0,30) , c(2,2), lwd = 2)
+lines(c(30,60),c(1,1), lwd = 2)
+lines(c(60,90), c(0.6, 0.6), lwd = 2)
+
+legend("topright", legend = c("post median", "true"), col = c("red", "black"), lwd = 2, lty = 1)
+
+# Histogram for recovery rate gamma
+hist(resres5$par[1000:2000,4],main = "", xlab = "gamma")
+vlineCI(resres5$par[1000:2000,4])
+abline(v = 0.2, col = "black", lwd = 2)
+legend("topright", legend = c("post median", "true", "95%CI"), col = c("red", "black", "blue"), lwd = 2, lty = 1)
+```
+
+If you want to have better results, try more iterations. 
+
+### check parameters and trajectory
+```{r}
+dim(resres5$par) # parameters
+dim(resres5$Trajectory) # trajectories
+```
+
+<!--
 ## Vignette Info
 
 Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
@@ -56,3 +173,10 @@ Also a quote using `>`:
 
 > "He who gives up [code] safety for [code] speed deserves neither."
 ([via](https://twitter.com/hadleywickham/status/504368538874703872))
+-->
+
+## Reference
+
+1. Volz E M, Pond S L K, Ward M J, et al. Phylodynamics of infectious disease epidemics[J]. Genetics, 2009, 183(4): 1421-1430.
+
+2. Murray I, Prescott Adams R, MacKay D J C. Elliptical slice sampling[J]. 2010. 
