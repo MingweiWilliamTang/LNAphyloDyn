@@ -34,9 +34,9 @@ t3 = c(30,60)
 thetas3 = c(0.5, 0.6)
 x_i3 = c(2,2,0,1)
 par(mar = c(4,4,1,1), mgp = c(2,1,0))
-plot(c(0,30) , c(2,2), lwd = 2,type = "l", xlab = "time", ylab = "R0")
+plot(c(0,30) , c(2,2), lwd = 2,type = "l",xlim = c(0,100), xlab = "time", ylab = "R0")
 lines(c(30,60),c(1,1), lwd = 2)
-lines(c(60,90), c(0.6, 0.6), lwd = 2)
+lines(c(60,100), c(0.6, 0.6), lwd = 2)
 ```
 
 Other configurations:

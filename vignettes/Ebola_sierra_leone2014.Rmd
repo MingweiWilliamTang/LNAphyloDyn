@@ -1,0 +1,96 @@
+---
+title: "Fitting Stochastic Model on Ebola genealogy from 2014 outbreak"
+author: "Mingwei Tang"
+date: "`r Sys.Date()`"
+output: rmarkdown::github_document
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+This Vignette shows a case study of Ebola data from Sierra Leone during the 2014 outbreak, using the algorithm in `LNAPhylodyn` package. 
+
+### library package and dependencies
+First, we need to library the package and some dependent packages. 
+```{r, echo=TRUE,message=FALSE}
+library(LNAPhyloDyn)
+library(phylodyn)
+library(ape)
+library(MASS)
+```
+
+## Ebola genealogy
+Then we load the dataset from LNAPhylodyn package. The dataset is a genealogy estimated from 1010 sequences in 15 cities in Sierra Leone during the 2014 ebola outbreak. The dataset is a `phylo` object with a tree structure. To parse the data into sampling time, number of sampled lineages and coalescent times, we need to call function `summarize_phylo` from `phylodyn` package by Karcher. et al (2016). 
+
+### load Ebola genealogy from 2014 outbreak
+```{r show_res, fig.show='hold',fig.height=5, fig.width=7}
+
+data(Ebola_Sierra_Leone2014) # load dataset
+par(mar = c(4,4,1,1), mgp = c(2,1,0)) # plot the genealogy
+a = plot(Ebola_Sierra_Leone2014, show.tip.label=FALSE,x.lim=c(0,1.4),use.edge.length = T)
+axisPhylo(1,root.time = 0,backward = F,xaxt = "n",las = 1)
+axis(side = 1,at = seq(0,1.5,0.25),
+     labels = c('2014-5','2014-8','2014-11','2015-2','2015-5','2015-8','2015-11'))
+# parse the phylo oject into sampling time, number of sampled lineages and coalescent times
+names(summarize_phylo(Ebola_Sierra_Leone2014))
+```
+
+## Inference
+### Setup total population size 
+The total population size is $N=7000000$, which is approximately the total population size in Sierra Leone in 2014. 
+### Setup time grid
+To run the model, firstly we need to specify the time grid for the ode solver, the LNA grid and the grid for change points. The total length out the time period is 1.36 (year). 
+
+- time grid for Ode solver `seq(0, 1.36, length.out = 2001)`. 
+- time grid for LNA integration `seq(0,1.36,length.out = 41)`, which mean `gridsize = 50` for ode steps
+- time grid for changepoint `seq(0,1.36,length.out = 41)`, the same setup as Ode integration
+
+```{r}
+times = seq(0,1.36,length.out = 2001)
+times2 = times[seq(1,length(times), by = 50)]
+chtimes = times2[2 : (length(times2) - 1)]
+```
+
+### Setup prior distribution for each parameters
+
+- $I_0$: log-normal(1,1)
+- Initial $R_0$: log-normal(0.7,0.5)
+- Recovery rate $\gamma$: log-normal(3.4,0.2), recover period will be $356/\gamma$ (days)
+- hyper-parameter for changepoint precision $1/\sigma$: log-normal(3,0.2)
+
+### Specify other configurations: 
+
+- number of Iterations: `niter = 2000` 
+- number of iterations in warmup stage I: `options$burn1 = 1000`
+- thinning: `thin = 5` Store the latent SI trajectory every 5 iterations 
+- update in the first Eliptical slice sampler `ESS=c(0,1,0,0,1,1,0)`, `0` means not update, `1` means update. The positon means: 
+1. $I_0$ 2. initial $R_0$ 3. $\gamma$ 4. $\mu$ (not use in SIR model, only use in SEIR model for latent period) 5. $\sigma$ 6. changepoints 7. Noise in LNA trajectory
+- proposal for the random walk Metroplis-Hastings: `list(pop_prop = 0.2, R0_prop = c(0.05), gamma_prop=0.06, mu_prop = 0.1, hyper_prop=0.2)`
+- verbose: boolean, `verbose = T` means print the parameters and plot the I trajectory every 100 iterations 
+
+There are other parameters, which you can keep as default. 
+
+### Running MCMC
+
+```{r, echo=TRUE, fig.show='hide', results= 'hide', message=FALSE, warning=FALSE, cache=TRUE}
+res.SIR_ADPk2 = General_MCMC_with_ESlice(summarize_phylo(Ebola_Sierra_Leone2014), times = times, t_correct = 1.36,
+                                   N = 7000000,gridsize = 50,niter = 500,burn = 0,thin = 5,
+                                   changetime = chtimes, DEMS = c("S","I"),
+                                   prior=list(pop_pr=c(1,0.5,1,1), R0_pr=c(0.7,0.5), gamma_pr = c(3,0.1), mu_pr = c(3,0.15), hyper_pr=c(3,0.2)),
+                                   proposal = list(pop_prop = 0.2, R0_prop = c(0.05), gamma_prop=0.09, mu_prop = 0.1, hyper_prop=0.2),
+                                   control = list(alpha=c(1/7000000), R0 = 2, gamma=30, ch=rep(0.975,length(chtimes)), traj = matrix(rep(0,2*40),ncol=2),hyper = 20),ESS_vec = c(0,1,0,0,1,1,0),
+                                   likelihood = "volz", model = "SIR",
+                                   Index = c(0,1), nparam=2,method = "admcmc", options=list(joint = T, 
+                                   PCOV = NULL,beta=0.95,burn1 = 300, parIdlist = list(a=1,c=3,d = length(chtimes) + 5), 
+                                   isLoglist = list(a=1,c=1,d=0),
+                                   priorIdlist = list(a=1,c=3,d=5), up = 1000000,warmup =10000000, tune = 0.01,hyper = F),
+                                   verbose = F)
+
+
+```
+
+
+
+## reference
+1. Dudas, G., Carvalho, L. M., Bedford, T., Tatem, A. J., Baele, G., Faria, N. R., ... & Bielejec, F. (2017). Virus genomes reveal factors that spread and sustained the Ebola epidemic. Nature, 544(7650), 309.
+

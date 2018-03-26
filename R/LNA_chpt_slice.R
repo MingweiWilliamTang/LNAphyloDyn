@@ -723,9 +723,9 @@ General_MCMC2 = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000,
 General_MCMC_with_ESlice = function(coal_obs,times,t_correct,N,gridsize=1000, niter = 1000, burn = 0, thin = 5,changetime, DEMS=c("S","I"),
                                     prior=list(pop_pr=c(1,1,1,10), R0_pr=c(0.7,0.2), mu_pr = c(3,0.2), gamma_pr = c(3,0.2), hyper_pr = c(0.001,0.001)),
                                     proposal = list(pop_prop = 0.5, R0_prop = c(0.01), mu_prop=0.1, gamma_prop = 0.2, hyper_prop=0.05),
-                                    control = list(), ESS_vec = c(1,1,1,1,1,1,1), likelihood = "volz",model = "SIR",
+                                    control = list(), ESS_vec = c(1,1,1,1,1,1,1),likelihood = "volz",model = "SIR",
                                     Index = c(0,2), nparam=2, method = "seq",options = list(joint = F, PCOV = NULL,beta = 0.05, burn1 = 5000,
-                                                                                            parIdlist = NULL, priorIdlist = NULL,up = 2000, tune = 0.01, hyper = F), verbose = T){
+                                                                                            parIdlist = NULL, priorIdlist = NULL,up = 2000, tune = 0.01, hyper = F), ESS_vec2 = NULL, verbose = T){
 
   MCMC_setting = MCMC_setup_general(coal_obs, times,t_correct,N,gridsize,niter,burn,
                                     thin,changetime, DEMS,prior,proposal,
@@ -821,12 +821,21 @@ General_MCMC_with_ESlice = function(coal_obs,times,t_correct,N,gridsize=1000, ni
                               return(MCMC_obj)
                             })
 
-        MCMC_obj = tryCatch({updateTraj_general_NC(MCMC_obj,MCMC_setting,i)$MCMC_obj},
+        if(is.null(ESS_vec2)){
+          MCMC_obj = tryCatch({updateTraj_general_NC(MCMC_obj,MCMC_setting,i)$MCMC_obj},
                         error = function(cond){
                           message(cond)
                           # Choose a return value in case of error
                           return(MCMC_obj)
                         })
+        }else{
+          MCMC_obj = tryCatch({update_Par_ESlice_combine(MCMC_obj,MCMC_setting,prlist,ESS_vec2,i)},
+                              error = function(cond){
+                                message(cond)
+                                # Choose a return value in case of error
+                                return(MCMC_obj)
+                              })
+        }
     }
     if(i %% thin == 0){
       tjs[,,as.integer(i/thin)] = MCMC_obj$LatentTraj
