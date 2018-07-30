@@ -19,3 +19,9 @@ After installing the prerequisites packages, LNAphyloDyn package can be installe
 Sys.setenv("PKG_LIBS" = "-llapack")
 devtools::install_github("MingweiWilliamTang/LNAPhyloDyn")
 ```
+## Vignettes
+1. [ConstantR0](https://github.com/MingweiWilliamTang/LNAphyloDyn/blob/master/vignettes/constant_sim.Rmd) A short example showing how to simulate SIR trajectory and genealogy based on constant reproduction number R0, illustrating methodology ...
+
+2. [ChangeR0](https://github.com/MingweiWilliamTang/LNAphyloDyn/blob/master/vignettes/Changpoint_sim.Rmd) A short example showing how to simulate SIR trajectory and genealogy based time-varying reproduction number R0, illustrating methodology ...
+
+3. [Ebola](https://github.com/MingweiWilliamTang/LNAphyloDyn/blob/master/vignettes/Ebola_sierra_leone2014.Rmd) Case studies analyzing Ebola genealogies from Sierra Leone and Liberia in the 2014 ebola outbreaks. 
