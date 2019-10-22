@@ -1,0 +1,335 @@
+<!--
+   <beast version='2.0' namespace='phydyn.model:beast.util:beast.evolution.alignment:beast.evolution.tree'>
+-->
+
+<beast beautitemplate='Standard' beautistatus='' namespace="phydyn.model:phydyn.distribution:phydyn.loggers:phydyn.operators:beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood" version="2.0">
+
+  <map name="Uniform">beast.math.distributions.Uniform</map>
+  <map name="Exponential">beast.math.distributions.Exponential</map>
+  <map name="LogNormal">beast.math.distributions.LogNormalDistributionModel</map>
+  <map name="Normal">beast.math.distributions.Normal</map>
+  <map name="Beta">beast.math.distributions.Beta</map>
+  <map name="Gamma">beast.math.distributions.Gamma</map>
+  <map name="LaplaceDistribution">beast.math.distributions.LaplaceDistribution</map>
+  <map name="prior">beast.math.distributions.Prior</map>
+  <map name="InverseGamma">beast.math.distributions.InverseGamma </map>
+  
+  <data id="sequences" name="alignment">
+    <sequence id="t1"  taxon="t1"  totalcount="4" value="??"/>
+    <sequence id="t2"  taxon="t2"  totalcount="4" value="??"/>
+    <sequence id="t3"  taxon="t3"  totalcount="4" value="??"/>
+    <sequence id="t4"  taxon="t4"  totalcount="4" value="??"/>
+    <sequence id="t5"  taxon="t5"  totalcount="4" value="??"/>
+    <sequence id="t6"  taxon="t6"  totalcount="4" value="??"/>
+    <sequence id="t7"  taxon="t7"  totalcount="4" value="??"/>
+    <sequence id="t8"  taxon="t8"  totalcount="4" value="??"/>
+    <sequence id="t9"  taxon="t9"  totalcount="4" value="??"/>
+    <sequence id="t10"  taxon="t10"  totalcount="4" value="??"/>
+    <sequence id="t11"  taxon="t11"  totalcount="4" value="??"/>
+    <sequence id="t12"  taxon="t12"  totalcount="4" value="??"/>
+    <sequence id="t13"  taxon="t13"  totalcount="4" value="??"/>
+    <sequence id="t14"  taxon="t14"  totalcount="4" value="??"/>
+    <sequence id="t15"  taxon="t15"  totalcount="4" value="??"/>
+    <sequence id="t16"  taxon="t16"  totalcount="4" value="??"/>
+    <sequence id="t17"  taxon="t17"  totalcount="4" value="??"/>
+    <sequence id="t18"  taxon="t18"  totalcount="4" value="??"/>
+    <sequence id="t19"  taxon="t19"  totalcount="4" value="??"/>
+    <sequence id="t20"  taxon="t20"  totalcount="4" value="??"/>
+    <sequence id="t21"  taxon="t21"  totalcount="4" value="??"/>
+    <sequence id="t22"  taxon="t22"  totalcount="4" value="??"/>
+    <sequence id="t23"  taxon="t23"  totalcount="4" value="??"/>
+    <sequence id="t24"  taxon="t24"  totalcount="4" value="??"/>
+    <sequence id="t25"  taxon="t25"  totalcount="4" value="??"/>
+    <sequence id="t26"  taxon="t26"  totalcount="4" value="??"/>
+    <sequence id="t27"  taxon="t27"  totalcount="4" value="??"/>
+    <sequence id="t28"  taxon="t28"  totalcount="4" value="??"/>
+    <sequence id="t29"  taxon="t29"  totalcount="4" value="??"/>
+    <sequence id="t30"  taxon="t30"  totalcount="4" value="??"/>
+    <sequence id="t31"  taxon="t31"  totalcount="4" value="??"/>
+    <sequence id="t32"  taxon="t32"  totalcount="4" value="??"/>
+    <sequence id="t33"  taxon="t33"  totalcount="4" value="??"/>
+    <sequence id="t34"  taxon="t34"  totalcount="4" value="??"/>
+    <sequence id="t35"  taxon="t35"  totalcount="4" value="??"/>
+    <sequence id="t36"  taxon="t36"  totalcount="4" value="??"/>
+    <sequence id="t37"  taxon="t37"  totalcount="4" value="??"/>
+    <sequence id="t38"  taxon="t38"  totalcount="4" value="??"/>
+    <sequence id="t39"  taxon="t39"  totalcount="4" value="??"/>
+    <sequence id="t40"  taxon="t40"  totalcount="4" value="??"/>
+    <sequence id="t41"  taxon="t41"  totalcount="4" value="??"/>
+    <sequence id="t42"  taxon="t42"  totalcount="4" value="??"/>
+    <sequence id="t43"  taxon="t43"  totalcount="4" value="??"/>
+    <sequence id="t44"  taxon="t44"  totalcount="4" value="??"/>
+    <sequence id="t45"  taxon="t45"  totalcount="4" value="??"/>
+    <sequence id="t46"  taxon="t46"  totalcount="4" value="??"/>
+    <sequence id="t47"  taxon="t47"  totalcount="4" value="??"/>
+    <sequence id="t48"  taxon="t48"  totalcount="4" value="??"/>
+    <sequence id="t49"  taxon="t49"  totalcount="4" value="??"/>
+    <sequence id="t50"  taxon="t50"  totalcount="4" value="??"/>
+    <sequence id="t51"  taxon="t51"  totalcount="4" value="??"/>
+    <sequence id="t52"  taxon="t52"  totalcount="4" value="??"/>
+    <sequence id="t53"  taxon="t53"  totalcount="4" value="??"/>
+    <sequence id="t54"  taxon="t54"  totalcount="4" value="??"/>
+    <sequence id="t55"  taxon="t55"  totalcount="4" value="??"/>
+    <sequence id="t56"  taxon="t56"  totalcount="4" value="??"/>
+    <sequence id="t57"  taxon="t57"  totalcount="4" value="??"/>
+    <sequence id="t58"  taxon="t58"  totalcount="4" value="??"/>
+    <sequence id="t59"  taxon="t59"  totalcount="4" value="??"/>
+    <sequence id="t60"  taxon="t60"  totalcount="4" value="??"/>
+    <sequence id="t61"  taxon="t61"  totalcount="4" value="??"/>
+    <sequence id="t62"  taxon="t62"  totalcount="4" value="??"/>
+    <sequence id="t63"  taxon="t63"  totalcount="4" value="??"/>
+    <sequence id="t64"  taxon="t64"  totalcount="4" value="??"/>
+    <sequence id="t65"  taxon="t65"  totalcount="4" value="??"/>
+    <sequence id="t66"  taxon="t66"  totalcount="4" value="??"/>
+    <sequence id="t67"  taxon="t67"  totalcount="4" value="??"/>
+    <sequence id="t68"  taxon="t68"  totalcount="4" value="??"/>
+    <sequence id="t69"  taxon="t69"  totalcount="4" value="??"/>
+    <sequence id="t70"  taxon="t70"  totalcount="4" value="??"/>
+    <sequence id="t71"  taxon="t71"  totalcount="4" value="??"/>
+    <sequence id="t72"  taxon="t72"  totalcount="4" value="??"/>
+    <sequence id="t73"  taxon="t73"  totalcount="4" value="??"/>
+    <sequence id="t74"  taxon="t74"  totalcount="4" value="??"/>
+    <sequence id="t75"  taxon="t75"  totalcount="4" value="??"/>
+    <sequence id="t76"  taxon="t76"  totalcount="4" value="??"/>
+    <sequence id="t77"  taxon="t77"  totalcount="4" value="??"/>
+    <sequence id="t78"  taxon="t78"  totalcount="4" value="??"/>
+    <sequence id="t79"  taxon="t79"  totalcount="4" value="??"/>
+    <sequence id="t80"  taxon="t80"  totalcount="4" value="??"/>
+    <sequence id="t81"  taxon="t81"  totalcount="4" value="??"/>
+    <sequence id="t82"  taxon="t82"  totalcount="4" value="??"/>
+    <sequence id="t83"  taxon="t83"  totalcount="4" value="??"/>
+    <sequence id="t84"  taxon="t84"  totalcount="4" value="??"/>
+    <sequence id="t85"  taxon="t85"  totalcount="4" value="??"/>
+    <sequence id="t86"  taxon="t86"  totalcount="4" value="??"/>
+    <sequence id="t87"  taxon="t87"  totalcount="4" value="??"/>
+    <sequence id="t88"  taxon="t88"  totalcount="4" value="??"/>
+    <sequence id="t89"  taxon="t89"  totalcount="4" value="??"/>
+    <sequence id="t90"  taxon="t90"  totalcount="4" value="??"/>
+    <sequence id="t91"  taxon="t91"  totalcount="4" value="??"/>
+    <sequence id="t92"  taxon="t92"  totalcount="4" value="??"/>
+    <sequence id="t93"  taxon="t93"  totalcount="4" value="??"/>
+    <sequence id="t94"  taxon="t94"  totalcount="4" value="??"/>
+    <sequence id="t95"  taxon="t95"  totalcount="4" value="??"/>
+    <sequence id="t96"  taxon="t96"  totalcount="4" value="??"/>
+    <sequence id="t97"  taxon="t97"  totalcount="4" value="??"/>
+    <sequence id="t98"  taxon="t98"  totalcount="4" value="??"/>
+    <sequence id="t99"  taxon="t99"  totalcount="4" value="??"/>
+    <sequence id="t100"  taxon="t100"  totalcount="4" value="??"/>
+    <sequence id="t101"  taxon="t101"  totalcount="4" value="??"/>
+    <sequence id="t102"  taxon="t102"  totalcount="4" value="??"/>
+    <sequence id="t103"  taxon="t103"  totalcount="4" value="??"/>
+    <sequence id="t104"  taxon="t104"  totalcount="4" value="??"/>
+    <sequence id="t105"  taxon="t105"  totalcount="4" value="??"/>
+    <sequence id="t106"  taxon="t106"  totalcount="4" value="??"/>
+    <sequence id="t107"  taxon="t107"  totalcount="4" value="??"/>
+    <sequence id="t108"  taxon="t108"  totalcount="4" value="??"/>
+    <sequence id="t109"  taxon="t109"  totalcount="4" value="??"/>
+    <sequence id="t110"  taxon="t110"  totalcount="4" value="??"/>
+    <sequence id="t111"  taxon="t111"  totalcount="4" value="??"/>
+    <sequence id="t112"  taxon="t112"  totalcount="4" value="??"/>
+    <sequence id="t113"  taxon="t113"  totalcount="4" value="??"/>
+    <sequence id="t114"  taxon="t114"  totalcount="4" value="??"/>
+    <sequence id="t115"  taxon="t115"  totalcount="4" value="??"/>
+    <sequence id="t116"  taxon="t116"  totalcount="4" value="??"/>
+    <sequence id="t117"  taxon="t117"  totalcount="4" value="??"/>
+    <sequence id="t118"  taxon="t118"  totalcount="4" value="??"/>
+    <sequence id="t119"  taxon="t119"  totalcount="4" value="??"/>
+    <sequence id="t120"  taxon="t120"  totalcount="4" value="??"/>
+    <sequence id="t121"  taxon="t121"  totalcount="4" value="??"/>
+    <sequence id="t122"  taxon="t122"  totalcount="4" value="??"/>
+    <sequence id="t123"  taxon="t123"  totalcount="4" value="??"/>
+    <sequence id="t124"  taxon="t124"  totalcount="4" value="??"/>
+    <sequence id="t125"  taxon="t125"  totalcount="4" value="??"/>
+    <sequence id="t126"  taxon="t126"  totalcount="4" value="??"/>
+    <sequence id="t127"  taxon="t127"  totalcount="4" value="??"/>
+    <sequence id="t128"  taxon="t128"  totalcount="4" value="??"/>
+    <sequence id="t129"  taxon="t129"  totalcount="4" value="??"/>
+    <sequence id="t130"  taxon="t130"  totalcount="4" value="??"/>
+    <sequence id="t131"  taxon="t131"  totalcount="4" value="??"/>
+    <sequence id="t132"  taxon="t132"  totalcount="4" value="??"/>
+    <sequence id="t133"  taxon="t133"  totalcount="4" value="??"/>
+    <sequence id="t134"  taxon="t134"  totalcount="4" value="??"/>
+    <sequence id="t135"  taxon="t135"  totalcount="4" value="??"/>
+    <sequence id="t136"  taxon="t136"  totalcount="4" value="??"/>
+    <sequence id="t137"  taxon="t137"  totalcount="4" value="??"/>
+    <sequence id="t138"  taxon="t138"  totalcount="4" value="??"/>
+    <sequence id="t139"  taxon="t139"  totalcount="4" value="??"/>
+    <sequence id="t140"  taxon="t140"  totalcount="4" value="??"/>
+    <sequence id="t141"  taxon="t141"  totalcount="4" value="??"/>
+    <sequence id="t142"  taxon="t142"  totalcount="4" value="??"/>
+    <sequence id="t143"  taxon="t143"  totalcount="4" value="??"/>
+    <sequence id="t144"  taxon="t144"  totalcount="4" value="??"/>
+    <sequence id="t145"  taxon="t145"  totalcount="4" value="??"/>
+    <sequence id="t146"  taxon="t146"  totalcount="4" value="??"/>
+    <sequence id="t147"  taxon="t147"  totalcount="4" value="??"/>
+    <sequence id="t148"  taxon="t148"  totalcount="4" value="??"/>
+    <sequence id="t149"  taxon="t149"  totalcount="4" value="??"/>
+    <sequence id="t150"  taxon="t150"  totalcount="4" value="??"/>
+    <sequence id="t151"  taxon="t151"  totalcount="4" value="??"/>
+    <sequence id="t152"  taxon="t152"  totalcount="4" value="??"/>
+    <sequence id="t153"  taxon="t153"  totalcount="4" value="??"/>
+    <sequence id="t154"  taxon="t154"  totalcount="4" value="??"/>
+    <sequence id="t155"  taxon="t155"  totalcount="4" value="??"/>
+    <sequence id="t156"  taxon="t156"  totalcount="4" value="??"/>
+    <sequence id="t157"  taxon="t157"  totalcount="4" value="??"/>
+    <sequence id="t158"  taxon="t158"  totalcount="4" value="??"/>
+    <sequence id="t159"  taxon="t159"  totalcount="4" value="??"/>
+    <sequence id="t160"  taxon="t160"  totalcount="4" value="??"/>
+    <sequence id="t161"  taxon="t161"  totalcount="4" value="??"/>
+    <sequence id="t162"  taxon="t162"  totalcount="4" value="??"/>
+    <sequence id="t163"  taxon="t163"  totalcount="4" value="??"/>
+    <sequence id="t164"  taxon="t164"  totalcount="4" value="??"/>
+    <sequence id="t165"  taxon="t165"  totalcount="4" value="??"/>
+    <sequence id="t166"  taxon="t166"  totalcount="4" value="??"/>
+    <sequence id="t167"  taxon="t167"  totalcount="4" value="??"/>
+    <sequence id="t168"  taxon="t168"  totalcount="4" value="??"/>
+    <sequence id="t169"  taxon="t169"  totalcount="4" value="??"/>
+    <sequence id="t170"  taxon="t170"  totalcount="4" value="??"/>
+    <sequence id="t171"  taxon="t171"  totalcount="4" value="??"/>
+    <sequence id="t172"  taxon="t172"  totalcount="4" value="??"/>
+    <sequence id="t173"  taxon="t173"  totalcount="4" value="??"/>
+    <sequence id="t174"  taxon="t174"  totalcount="4" value="??"/>
+    <sequence id="t175"  taxon="t175"  totalcount="4" value="??"/>
+    <sequence id="t176"  taxon="t176"  totalcount="4" value="??"/>
+    <sequence id="t177"  taxon="t177"  totalcount="4" value="??"/>
+    <sequence id="t178"  taxon="t178"  totalcount="4" value="??"/>
+    <sequence id="t179"  taxon="t179"  totalcount="4" value="??"/>
+    <sequence id="t180"  taxon="t180"  totalcount="4" value="??"/>
+    <sequence id="t181"  taxon="t181"  totalcount="4" value="??"/>
+    <sequence id="t182"  taxon="t182"  totalcount="4" value="??"/>
+    <sequence id="t183"  taxon="t183"  totalcount="4" value="??"/>
+    <sequence id="t184"  taxon="t184"  totalcount="4" value="??"/>
+    <sequence id="t185"  taxon="t185"  totalcount="4" value="??"/>
+    <sequence id="t186"  taxon="t186"  totalcount="4" value="??"/>
+    <sequence id="t187"  taxon="t187"  totalcount="4" value="??"/>
+    <sequence id="t188"  taxon="t188"  totalcount="4" value="??"/>
+    <sequence id="t189"  taxon="t189"  totalcount="4" value="??"/>
+    <sequence id="t190"  taxon="t190"  totalcount="4" value="??"/>
+    <sequence id="t191"  taxon="t191"  totalcount="4" value="??"/>
+    <sequence id="t192"  taxon="t192"  totalcount="4" value="??"/>
+    <sequence id="t193"  taxon="t193"  totalcount="4" value="??"/>
+    <sequence id="t194"  taxon="t194"  totalcount="4" value="??"/>
+    <sequence id="t195"  taxon="t195"  totalcount="4" value="??"/>
+    <sequence id="t196"  taxon="t196"  totalcount="4" value="??"/>
+    <sequence id="t197"  taxon="t197"  totalcount="4" value="??"/>
+    <sequence id="t198"  taxon="t198"  totalcount="4" value="??"/>
+    <sequence id="t199"  taxon="t199"  totalcount="4" value="??"/>
+    <sequence id="t200"  taxon="t200"  totalcount="4" value="??"/>
+    <sequence id="t201"  taxon="t201"  totalcount="4" value="??"/>
+    <sequence id="t202"  taxon="t202"  totalcount="4" value="??"/>
+    <sequence id="t203"  taxon="t203"  totalcount="4" value="??"/>
+    <sequence id="t204"  taxon="t204"  totalcount="4" value="??"/>
+    <sequence id="t205"  taxon="t205"  totalcount="4" value="??"/>
+    <sequence id="t206"  taxon="t206"  totalcount="4" value="??"/>
+    <sequence id="t207"  taxon="t207"  totalcount="4" value="??"/>
+    <sequence id="t208"  taxon="t208"  totalcount="4" value="??"/>
+    <sequence id="t209"  taxon="t209"  totalcount="4" value="??"/>
+    <sequence id="t210"  taxon="t210"  totalcount="4" value="??"/>
+  </data>
+  
+  <model spec='PopModelODE' id='sirmodel' evaluator="compiled"
+	 popParams='@initValues' modelParams='@rates'>
+    <definition spec='Definition'>
+      beta = R0*gamma/1000
+    </definition>
+    <matrixeq spec='MatrixEquation' type="birth" origin="I" destination="I"> beta*S*I  </matrixeq>
+    <matrixeq spec='MatrixEquation' type="death" origin="I"> gamma*I </matrixeq>
+    <matrixeq spec='MatrixEquation' type="nondeme" origin="S"> -(beta*S*I)</matrixeq>
+  </model>
+
+  <rates spec="ModelParameters" id='rates'>
+    <!--
+	unknow basic reproduction number and recovery rate
+    -->
+    <param spec='ParamValue' names='R0' values='@R0'></param>
+    <param spec='ParamValue' names='gamma' values='@gamma'></param>
+  </rates>
+
+
+  <trajparams id='initValues' spec='TrajectoryParameters' method="adams-bashforth"
+	      integrationSteps="201" rTol="0.05" aTol="1.0e-3" order="3" t0="-0.1" t1="90">
+    <!--
+	fix the initial number of infected, I0 = 3
+    -->
+   <initialValue spec="ParamValue" names='I' values='@InitI0' />
+    <initialValue spec="ParamValue" names='S' values='1000' />
+  </trajparams>
+
+  <!-- Define tree outside state -->
+  <init spec="beast.util.TreeParser" id="tree"
+	taxa="@sequences"
+	adjustTipHeights="false"
+	IsLabelledNewick="true"
+	newick="((((((((((((((((((((((((t1:0.7665120003,(t2:0.3395300125,t7:0.3395300125):0.4269819878):0.1788590072,t8:0.9453710075):0.6299134982,t5:1.575284506):11.10523585,t17:2.680520359):7.793911618,(((((t11:0.1440150637,(t12:0.06050402929,t15:0.06050402929):0.0835110344):0.6162145534,t28:0.760229617):2.352791275,(t14:0.4148831114,t18:0.4148831114):2.69813778):1.46096928,((t19:0.08723733751,t23:0.08723733751):0.9145536202,t26:1.001790958):3.572199214):5.754895944,t40:0.3288861157):0.1455458618):3.526845727,t47:4.001277704):24.36755769,t138:8.368835399):11.89121937,(((t107:16.91356623,t150:6.91356623):0.8670420801,t126:7.78060831):7.880050742,t141:15.66065905):4.599395712):2.156588936,((t90:17.14856078,((t113:3.410233397,t119:3.410233397):3.152988263,t132:6.56322166):0.5853391163):6.133768268,(t106:17.38530903,t112:7.385309031):5.897020013):9.134314657):4.090747581,t160:6.507391282):2.823021731,((((((((t36:12.70034432,t57:12.70034432):7.463191902,t137:0.1635362245):0.1593851004,t149:0.3229213249):0.6506175535,t136:0.9735388784):2.230224264,t116:3.203763142):3.11105981,(t67:11.09377093,(t71:0.08202544953,t73:0.08202544953):11.01174548):5.221052018):2.742768901,((t75:17.63864677,t140:7.638646774):0.725605342,t111:8.364252116):0.6933397361):13.54660379,t162:2.604195645):6.726217368):1.10466872,t181:0.4350817332):1.650200168,((((((((t70:20.21106605,(t94:0.2540148404,t101:0.2540148404):19.95705121):10.41067386,t152:0.6217399094):1.0588259,t164:1.680565809):2.154917101,(((t133:19.52781952,t144:19.52781952):0.6814050029,t178:0.2092245224):1.143295142,t145:21.35251966):2.482963245):0.3845175192,t165:4.220000429):0.8096401713,t161:5.0296406):0.2759457664,(t78:28.45107342,t115:18.45107342):6.854512942):5.385106288,t172:10.69069265):1.394589247):0.07362590922,t183:2.15890781):0.7982065778,t199:2.957114388):0.4443403827,t191:3.401454771):2.238620753,((t159:1.727495711,t163:1.727495711):9.510394315,t195:1.237890026):4.402185497):4.736482073,t202:0.3765575964):0.7572978288,t208:1.133855425):4.169970968,t207:5.303826394):1.10681642,((((((((((t21:1.147922434,t30:1.147922434):20.33565016,t100:1.48357259):3.580065508,t96:5.063638098):1.899067936,t102:6.962706035):10.89680862,(((t43:11.22823993,t108:1.22823993):0.3422602748,(t66:0.9386237797,t68:0.9386237797):0.6318764256):12.55203398,t148:4.122534187):3.736980465):19.45166016,(((t83:11.45656653,t99:11.45656653):2.398827108,t104:13.85539364):6.024127516,(t86:3.887908714,t92:3.887908714):15.99161244):17.43165366):3.675439731,t168:10.98661454):4.120227267,t197:5.106841807):5.302517976,t210:0.4093597835):1.119495151,t201:1.528854934):4.881787879):0.2085631813,(((((((((((t24:10.55225307,t35:0.5522530734):0.1984896566,t46:0.75074273):3.137858518,t52:3.888601248):6.344026689,t109:0.2326279372):1.076305187,t85:1.308933124):5.097884559,t79:6.406817683):5.573470139,t97:11.98028782):6.331456606,t117:8.311744428):5.022606906,((t77:10.79449176,t88:10.79449176):5.518346373,t124:6.312838133):7.0215132):4.871392846,t61:28.20574418):8.764342399,(((((t63:3.437540322,t103:3.437540322):1.377271749,(t84:1.15936656,t93:1.15936656):3.655445511):7.507777195,(t123:0.02643288705,t129:0.02643288705):2.296156378):0.6668008307,(t72:11.04392887,t146:1.043928869):1.945461227):22.40243684,(t139:21.11255377,t167:1.112553771):4.279273163):1.578259644):19.64911942):3.380794005,(((((((((t58:24.14682753,t130:4.146827528):5.375287164,(t135:4.082486893,t147:4.082486893):5.439627799):8.918818638,t142:18.44093333):1.849901467,t155:0.290834797):10.61056349,t180:10.90139829):2.283843578,t120:33.18524187):6.406412628,(((((((((t62:3.42527579,t89:3.42527579):25.30337231,t122:18.7286481):1.822938499,((t95:16.50899771,(t125:0.3994858167,t143:0.3994858167):6.109511889):2.691131747,t131:9.200129453):11.35145715):1.746891013,t127:22.29847761):0.2639816237,(t128:21.92558468,t174:1.92558468):0.6368745558):3.22821712,(t171:3.740283798,t175:3.740283798):2.050392558):6.713275054,t188:2.50395141):4.274989103,t189:6.778940513):1.293064961,(t186:1.358820185,t200:1.358820185):6.713185289):1.519649021):4.555347821,((((t156:10.12982899,t194:0.1298289902):4.569333494,(t190:1.668686018,t193:1.668686018):3.030476466):0.1572149778,(t196:0.7742754353,t198:0.7742754353):4.082102027):7.031649797,t209:1.888027259):2.258975056):1.512785466,(t205:1.839263826,t206:1.839263826):3.820523955):4.340212219):0,(((((((((((((((t3:0.3545904343,(t4:0.190657835,t10:0.190657835):0.1639325993):1.48937879,(t6:0.3405675445,t9:0.3405675445):1.503401679):8.274192615,t22:0.1181618387):11.05685531,(t31:0.8647826167,t56:0.8647826167):0.3102345317):23.77746499,t114:4.952482137):15.70786611,(((((t20:1.026227859,t25:1.026227859):14.07056896,(t33:1.314719166,t39:1.314719166):3.782077649):7.659300746,(t37:4.448020169,(t54:2.098785828,t60:2.098785828):2.349234342):8.308077392):20.07856747,t121:12.83466503):4.624942847,t64:27.45960787):3.200740378):1.65479412,(t176:1.359968247,t177:1.359968247):0.9551741245):3.590217302,t169:5.905359674):1.492570707,t173:7.397930381):4.543602805,t153:11.94153319):0.6405593494,(((((t13:12.31018689,((t27:10.34324549,t51:0.3432454935):0.1122781114,t48:0.4555236049):1.854663283):20.72984826,(((((t32:4.377202954,t38:4.377202954):6.630977021,t80:1.008179975):0.873935003,(t34:4.529469476,t50:4.529469476):7.352645501):2.174815431,(t87:1.70216826,t98:1.70216826):2.354762149):4.756101407,(t69:0.2282632087,t76:0.2282632087):8.584768608):4.22700333):16.25047926,(((t81:0.5270562792,t91:0.5270562792):0.0617050859,t82:0.5887613651):0.5158074886,t105:1.104568854):28.18594555):4.881319669,t179:4.171834076):3.797186354,((((((((t16:13.35265347,t29:13.35265347):2.130638938,t42:5.483292412):5.130752577,((t44:2.17395827,((t45:0.08524288092,t49:0.08524288092):0.1715331469,t59:0.2567760279):1.917182242):0.2012926456,t55:2.375250915):8.238794073):15.06797379,(t74:10.57739563,t118:0.5773956313):5.104623146):14.50022634,t170:0.1822451216):3.024594395,t41:43.20683952):1.071892693,(t53:42.73685172,t157:2.736851717):1.541880493):1.084149077,((t134:21.45877362,t166:1.458773616):0.4161806689,t154:1.874954285):3.487927003):2.606139142):4.613072106):0.06234662223,t187:2.644439158):4.826652544,t184:7.471091701):4.990047299,((t192:10.90581119,t204:0.9058111865):0.1323897662,t203:1.038200953):1.422938047):4.023925507,((((t65:4.644244631,t110:4.644244631):28.1903806,t151:2.834625233):4.077209405,t158:6.911834638):4.53969366,(t182:0.8686315052,t185:0.8686315052):0.582896792):15.03353621):3.514935494);
+">
+  </init>
+
+
+
+  
+  <run id="mcmc" spec="MCMC" chainLength="100000">
+    <state id="state" storeEvery="100">
+    <parameter id="InitI0" lower="1" upper="15" name="stateNode">3</parameter>
+      <parameter id="R0" lower="1.2" upper="2.5" name="stateNode">2</parameter>
+      <parameter id="gamma" lower="0.0" upper="0.5" name="stateNode">0.15</parameter>
+    </state>
+
+    <distribution id="posterior" spec="util.CompoundDistribution">
+        
+      <distribution id="prior" spec="util.CompoundDistribution">
+    <prior id="I0prior" name="distribution" x="@InitI0">
+        <LogNormal id="LogNormal:I0" M="1" S="1" name="distr" />
+    </prior>
+	<prior id="R0prior" name="distribution" x="@R0">
+	  <LogNormal id="LogNormal:R0" M="0.7" S="0.3" name="distr" />
+	</prior>
+	<prior id="gammaPrior" name="distribution" x="@gamma">
+	  <LogNormal id="LogNormal:gamma" M="-1.9" S="0.1" name="distr" />
+	</prior>
+      </distribution>
+
+      <distribution id="likelihood" spec="util.CompoundDistribution">
+	<distribution spec='STreeLikelihoodODE' id = 'stlikelihood'
+		      useStateName='true'
+		      approxLambda='false' finiteSizeCorrections='false'
+		      solvePL='false'
+		      forgiveY='true'
+		      forgiveAgtY='1.0'
+		      stepSize='.01'
+		      popmodel='@sirmodel'>
+	  <treeIntervals spec="STreeIntervals" tree='@tree'> </treeIntervals>
+	</distribution>
+      </distribution>
+    </distribution>
+    
+    <operator id="rwoperator:InitI0" spec="RealRandomWalkOperator" windowSize="0.2" parameter="@InitI0" useGaussian='true' weight="1" />
+
+    <operator id="rwoperator:R0" spec="RealRandomWalkOperator" windowSize="0.1" parameter="@R0" useGaussian='true' weight="1" />
+    <operator id="rwoperator:gamma" spec="RealRandomWalkOperator" windowSize="0.01" parameter="@gamma" useGaussian='true' weight="1" />
+<!--    <operator id="rwoperator:a" spec="RealRandomWalkOperator" windowSize="0.150" parameter="@a" useGaussian='true' weight="1" />
+    <operator id="rwoperator:initI0" spec="RealRandomWalkOperator" windowSize="1.50" parameter="@initI0" useGaussian='true' weight="1" />
+-->
+    <logger id="tracelog" fileName="/homes/mingwt/sourcecode/LNA_revision/Simulation/Rep/phydyn/res_xml/constnc2.log" logEvery="1" model="@posterior" sanitiseHeaders="true" sort="smart">
+    <log idref="InitI0"/>
+      <log idref="R0"/>
+      <log idref="gamma"/>
+      <log idref="prior"/>
+      <log idref="posterior"/>
+    </logger>
+   <!--
+     <logger id="screenlog" logEvery="10">
+      <log idref="InitI0"/>
+      <log idref="R0"/>
+      <log idref="gamma"/>
+      <log idref="prior"/>
+      <log idref="posterior"/>
+    </logger>
+-->
+    <!--
+     <logger id = "popModelLogger" fileName="$(filebase).traj" logEvery="20">
+      <log id="trajectoryLogger" spec="TrajectoryLogger" popModel="@sirmodel" pointFrequency="1"></log>
+    </logger>
+     -->
+  </run>
+
+</beast>
